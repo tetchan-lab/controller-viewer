@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2a2a3a"/>
+      <stop offset="100%" stop-color="#14141e"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="800" height="450" fill="url(#bg)" rx="12"/>
+
+  <!-- コントローラー本体シルエット -->
+  <path d="M170 140 Q130 140 110 200 L90 310 Q85 350 120 355 L200 350 L240 290 L280 270 L520 270 L560 290 L600 350 L680 355 Q715 350 710 310 L690 200 Q670 140 630 140 L550 140 Q520 120 500 110 L400 105 L300 110 Q280 120 250 140 Z"
+        fill="#1e1e2e" stroke="#3a3a5a" stroke-width="2"/>
+
+  <!-- グリップ左 -->
+  <ellipse cx="160" cy="320" rx="55" ry="70" fill="#18182a" stroke="#2a2a4a" stroke-width="1.5"/>
+  <!-- グリップ右 -->
+  <ellipse cx="640" cy="320" rx="55" ry="70" fill="#18182a" stroke="#2a2a4a" stroke-width="1.5"/>
+
+  <!-- タッチパッド -->
+  <rect x="310" y="175" width="180" height="100" rx="10" fill="#252535" stroke="#3a3a5a" stroke-width="1.5"/>
+  <text x="400" y="228" text-anchor="middle" fill="#555" font-size="12" font-family="sans-serif">Touchpad</text>
+
+  <!-- 左スティック -->
+  <circle cx="235" cy="300" r="38" fill="#222232" stroke="#3a3a5a" stroke-width="2"/>
+  <circle cx="235" cy="300" r="20" fill="#2a2a3e" stroke="#4a4a6a" stroke-width="1.5"/>
+
+  <!-- 右スティック -->
+  <circle cx="505" cy="300" r="38" fill="#222232" stroke="#3a3a5a" stroke-width="2"/>
+  <circle cx="505" cy="300" r="20" fill="#2a2a3e" stroke="#4a4a6a" stroke-width="1.5"/>
+
+  <!-- 十字キー -->
+  <rect x="183" y="200" width="34" height="62" rx="4" fill="#252535" stroke="#3a3a5a" stroke-width="1.5"/>
+  <rect x="152" y="214" width="62" height="34" rx="4" fill="#252535" stroke="#3a3a5a" stroke-width="1.5"/>
+
+  <!-- フェイスボタン (×○□△) -->
+  <circle cx="610" cy="265" r="19" fill="#222232" stroke="#3a3a5a" stroke-width="1.5"/>
+  <text x="610" y="270" text-anchor="middle" fill="#6688bb" font-size="16" font-family="sans-serif">×</text>
+  <circle cx="650" cy="225" r="19" fill="#222232" stroke="#3a3a5a" stroke-width="1.5"/>
+  <text x="650" y="230" text-anchor="middle" fill="#bb4444" font-size="16" font-family="sans-serif">○</text>
+  <circle cx="570" cy="225" r="19" fill="#222232" stroke="#3a3a5a" stroke-width="1.5"/>
+  <text x="570" y="230" text-anchor="middle" fill="#aa66aa" font-size="16" font-family="sans-serif">□</text>
+  <circle cx="610" cy="185" r="19" fill="#222232" stroke="#3a3a5a" stroke-width="1.5"/>
+  <text x="610" y="191" text-anchor="middle" fill="#44aa66" font-size="16" font-family="sans-serif">△</text>
+
+  <!-- L1/R1 -->
+  <rect x="148" y="100" width="54" height="28" rx="6" fill="#252535" stroke="#3a3a5a" stroke-width="1.5"/>
+  <text x="175" y="119" text-anchor="middle" fill="#888" font-size="13" font-family="sans-serif">L1</text>
+  <rect x="598" y="100" width="54" height="28" rx="6" fill="#252535" stroke="#3a3a5a" stroke-width="1.5"/>
+  <text x="625" y="119" text-anchor="middle" fill="#888" font-size="13" font-family="sans-serif">R1</text>
+
+  <!-- L2/R2 -->
+  <rect x="148" y="63" width="54" height="28" rx="6" fill="#252535" stroke="#3a3a5a" stroke-width="1.5"/>
+  <text x="175" y="82" text-anchor="middle" fill="#888" font-size="13" font-family="sans-serif">L2</text>
+  <rect x="598" y="63" width="54" height="28" rx="6" fill="#252535" stroke="#3a3a5a" stroke-width="1.5"/>
+  <text x="625" y="82" text-anchor="middle" fill="#888" font-size="13" font-family="sans-serif">R2</text>
+
+  <!-- Create / Options -->
+  <circle cx="315" cy="225" r="17" fill="#222232" stroke="#3a3a5a" stroke-width="1.5"/>
+  <text x="315" y="230" text-anchor="middle" fill="#777" font-size="9" font-family="sans-serif">Create</text>
+  <circle cx="485" cy="225" r="17" fill="#222232" stroke="#3a3a5a" stroke-width="1.5"/>
+  <text x="485" y="230" text-anchor="middle" fill="#777" font-size="9" font-family="sans-serif">Options</text>
+
+  <!-- PS ボタン -->
+  <circle cx="400" cy="270" r="20" fill="#1a3a5a" stroke="#2a5a8a" stroke-width="2"/>
+  <text x="400" y="276" text-anchor="middle" fill="#4488bb" font-size="14" font-family="sans-serif">PS</text>
+
+  <!-- ラベル -->
+  <text x="400" y="420" text-anchor="middle" fill="#444" font-size="14" font-family="sans-serif">
+    DualSense (PlayStation 5) — プレースホルダー
+  </text>
+  <text x="400" y="438" text-anchor="middle" fill="#333" font-size="11" font-family="sans-serif">
+    images/dualsense.svg を実際の写真 (dualsense.png) に置き換えてください
+  </text>
+</svg>

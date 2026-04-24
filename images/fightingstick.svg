@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
+  <defs>
+    <radialGradient id="bg2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2a1e1e"/>
+      <stop offset="100%" stop-color="#141010"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="800" height="450" fill="url(#bg2)" rx="12"/>
+
+  <!-- 筐体本体 -->
+  <rect x="60" y="90" width="680" height="310" rx="20" fill="#1a1212" stroke="#3a2020" stroke-width="2"/>
+
+  <!-- レバーベース -->
+  <circle cx="180" cy="244" r="65" fill="#222" stroke="#3a2a2a" stroke-width="2"/>
+  <circle cx="180" cy="244" r="45" fill="#1a1a1a" stroke="#444" stroke-width="1.5"/>
+  <!-- レバーシャフト -->
+  <rect x="173" y="180" width="14" height="65" rx="6" fill="#555" stroke="#666" stroke-width="1"/>
+  <!-- レバーボール -->
+  <circle cx="180" cy="185" r="20" fill="#cc2200" stroke="#ff4422" stroke-width="2"/>
+
+  <!-- ボタンパネル背景 -->
+  <rect x="370" y="145" width="330" height="150" rx="10" fill="#1e1414" stroke="#2a1818" stroke-width="1"/>
+
+  <!-- 上段ボタン (△ □ R1 L1) -->
+  <circle cx="425" cy="185" r="24" fill="#222" stroke="#3a2a2a" stroke-width="2"/>
+  <text x="425" y="191" text-anchor="middle" fill="#44aa66" font-size="18" font-family="sans-serif">△</text>
+
+  <circle cx="490" cy="160" r="24" fill="#222" stroke="#3a2a2a" stroke-width="2"/>
+  <text x="490" y="166" text-anchor="middle" fill="#aa66aa" font-size="18" font-family="sans-serif">□</text>
+
+  <circle cx="560" cy="158" r="24" fill="#222" stroke="#3a2a2a" stroke-width="2"/>
+  <text x="560" y="164" text-anchor="middle" fill="#888" font-size="13" font-family="sans-serif">R1</text>
+
+  <circle cx="630" cy="163" r="24" fill="#222" stroke="#3a2a2a" stroke-width="2"/>
+  <text x="630" y="169" text-anchor="middle" fill="#888" font-size="13" font-family="sans-serif">L1</text>
+
+  <!-- 下段ボタン (× ○ R2 L2) -->
+  <circle cx="430" cy="250" r="24" fill="#222" stroke="#3a2a2a" stroke-width="2"/>
+  <text x="430" y="256" text-anchor="middle" fill="#6688bb" font-size="18" font-family="sans-serif">×</text>
+
+  <circle cx="498" cy="225" r="24" fill="#222" stroke="#3a2a2a" stroke-width="2"/>
+  <text x="498" y="231" text-anchor="middle" fill="#bb4444" font-size="18" font-family="sans-serif">○</text>
+
+  <circle cx="568" cy="222" r="24" fill="#222" stroke="#3a2a2a" stroke-width="2"/>
+  <text x="568" y="228" text-anchor="middle" fill="#888" font-size="13" font-family="sans-serif">R2</text>
+
+  <circle cx="638" cy="228" r="24" fill="#222" stroke="#3a2a2a" stroke-width="2"/>
+  <text x="638" y="234" text-anchor="middle" fill="#888" font-size="13" font-family="sans-serif">L2</text>
+
+  <!-- ボトムボタン (Share Options PS) -->
+  <rect x="250" y="328" width="38" height="32" rx="6" fill="#222" stroke="#3a2a2a" stroke-width="1.5"/>
+  <text x="269" y="349" text-anchor="middle" fill="#777" font-size="10" font-family="sans-serif">Share</text>
+
+  <rect x="325" y="328" width="38" height="32" rx="6" fill="#222" stroke="#3a2a2a" stroke-width="1.5"/>
+  <text x="344" y="349" text-anchor="middle" fill="#777" font-size="9" font-family="sans-serif">Options</text>
+
+  <circle cx="400" cy="390" r="20" fill="#1a2a3a" stroke="#2a4a6a" stroke-width="2"/>
+  <text x="400" y="396" text-anchor="middle" fill="#4488bb" font-size="13" font-family="sans-serif">PS</text>
+
+  <rect x="453" y="328" width="34" height="32" rx="6" fill="#222" stroke="#3a2a2a" stroke-width="1.5"/>
+  <text x="470" y="349" text-anchor="middle" fill="#777" font-size="10" font-family="sans-serif">L3</text>
+
+  <rect x="513" y="328" width="34" height="32" rx="6" fill="#222" stroke="#3a2a2a" stroke-width="1.5"/>
+  <text x="530" y="349" text-anchor="middle" fill="#777" font-size="10" font-family="sans-serif">R3</text>
+
+  <!-- HORIロゴ風テキスト -->
+  <text x="400" y="420" text-anchor="middle" fill="#444" font-size="14" font-family="sans-serif">
+    Fighting Stick Mini (HORI) — プレースホルダー
+  </text>
+  <text x="400" y="438" text-anchor="middle" fill="#333" font-size="11" font-family="sans-serif">
+    images/fightingstick.svg を実際の写真 (fightingstick.png) に置き換えてください
+  </text>
+</svg>
