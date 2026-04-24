@@ -194,6 +194,89 @@ const ALL_CONFIGS = [DUALSENSE_CONFIG, FIGHTING_STICK_MINI_CONFIG, MY_CONTROLLER
 
 ---
 
+## Gamepad API によるデバイス認識の仕組み
+
+このアプリは、ブラウザ標準の **Gamepad API** を使ってコントローラーを認識しています。  
+コントローラーを接続してブラウザ上でボタンを押すと `gamepadconnected` イベントが発火し、  
+取得できる `Gamepad` オブジェクトのプロパティから自動判定を行います。
+
+### Gamepad オブジェクトの主要プロパティ
+
+| プロパティ | 型 | 説明 |
+|---|---|---|
+| `id` | `string` | デバイスの識別文字列（メーカー名・モデル名を含む） |
+| `index` | `number` | ブラウザが接続順に割り当てる番号（0〜3） |
+| `connected` | `boolean` | 現在接続中かどうか |
+| `mapping` | `string` | ボタン配列の規格（`"standard"` または `""`） |
+| `buttons` | `GamepadButton[]` | ボタンの状態の配列 |
+| `axes` | `number[]` | アナログ軸の値（-1.0〜1.0） |
+| `timestamp` | `number` | 最終更新時刻（`performance.now()` の値） |
+
+### デバイスの区別に使えるプロパティ
+
+| 目的 | 使うプロパティ |
+|---|---|
+| 異なるモデルを区別する | `id`（部分一致で判定） |
+| 同じモデルの複数台を区別する | `index`（接続順番号） |
+| 現在接続中かを確認する | `connected` |
+
+### ⚠️ `id` プロパティについての重要な注意
+
+`id` はデバイス固有の識別子（シリアル番号など）**ではありません**。  
+`id` にはメーカー名とモデル名が含まれるため、**同じ型のコントローラーを複数接続した場合は `id` が同一になります**。  
+その場合は `index`（接続順番号）で個別に区別します。
+
+また、USB 接続と Bluetooth 接続で `id` の書式が異なる場合があります。
+
+```javascript
+// id の例（DualSense、USB 接続）
+"Sony Interactive Entertainment Wireless Controller (054c/0ce6)"
+
+// id の例（DualSense、Bluetooth 接続）
+"Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 0ce6)"
+
+// id の例（Fighting Stick Mini、USB 接続）
+"HORI CO.,LTD. Fighting Stick mini (0f0d/011c)"
+```
+
+### 接続確認のサンプルコード
+
+```javascript
+// 接続時に全プロパティをログ出力する
+window.addEventListener("gamepadconnected", (event) => {
+  const gp = event.gamepad;
+  console.log("id       :", gp.id);       // モデル判別（固有IDではない）
+  console.log("index    :", gp.index);    // 複数台の個別識別に使う
+  console.log("connected:", gp.connected);
+  console.log("mapping  :", gp.mapping);
+  console.log("buttons  :", gp.buttons.length, "個");
+  console.log("axes     :", gp.axes.length, "本");
+});
+
+// ポーリングでボタン状態を取得する（Chrome は毎フレーム getGamepads() が必要）
+function poll(activeIndex) {
+  const gp = navigator.getGamepads()[activeIndex];
+  if (!gp) return;
+
+  gp.buttons.forEach((btn, i) => {
+    if (btn.pressed) {
+      console.log(`ボタン ${i}: value=${btn.value.toFixed(3)}`);
+    }
+  });
+
+  gp.axes.forEach((val, i) => {
+    if (Math.abs(val) > 0.1) {   // デッドゾーン処理
+      console.log(`軸 ${i}: ${val.toFixed(4)}`);
+    }
+  });
+}
+```
+
+詳細なプロパティ解説・コードサンプル・各デバイスの接続実例は  
+→ **[docs/gamepad-api.md](docs/gamepad-api.md)** を参照してください。
+
+---
+
 ## 設計メモ（後から調整しやすい構成について）
 
 このプロジェクトは **写真・座標が後から変更しやすい設計** を意識しています。
