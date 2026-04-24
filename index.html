@@ -10,6 +10,7 @@
   <div id="app">
 
     <!-- ステータスバー -->
+    <!-- クエリパラメーター ?controller= 指定時は JS で hidden クラスを付与 -->
     <div id="status-bar">
       <span id="device-name">コントローラー未接続 — USBまたはBluetoothで接続してください</span>
       <div id="controller-select">
@@ -33,7 +34,6 @@
     <!-- コントローラー表示エリア -->
     <div id="controller-container">
       <div id="controller-wrapper">
-        <!-- コントローラー写真 (images/ フォルダに実際の PNG を置いてください) -->
         <img id="controller-image" src="" alt="Controller" />
 
         <!-- ボタン / スティック オーバーレイ (config.js から動的生成) -->
@@ -44,10 +44,13 @@
       </div>
     </div>
 
-    <!-- 操作ヒント -->
+    <!-- 操作ヒント（クエリパラメーター指定時は非表示） -->
     <p id="hint">
       コントローラーを接続するとデバイス名で自動判定します。
-      上のボタンで手動切り替えも可能です。
+      上のボタンで手動切り替えも可能です。<br>
+      配信用URL例:
+      <a href="index.html?controller=dualsense"><code>index.html?controller=dualsense</code></a> /
+      <a href="index.html?controller=fightingStickMini"><code>index.html?controller=fightingStickMini</code></a>
     </p>
 
   </div>

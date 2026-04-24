@@ -14,8 +14,12 @@
 const state = {
   /** 現在表示中のコントローラー設定 */
   currentConfig: null,
-  /** 現在接続中の Gamepad オブジェクト（ポーリング用） */
+  /** 現在入力を読み取っている Gamepad オブジェクト（ポーリング用） */
   activeGamepad: null,
+  /** 接続中の全 Gamepad を index → gamepad で管理 */
+  connectedGamepads: {},
+  /** ?controller= により固定された configId（null = 自動判定モード） */
+  pinnedConfigId: null,
   /** requestAnimationFrame の ID */
   rafId: null,
 };
@@ -55,6 +59,9 @@ function applyConfig(config) {
   // ボタンオーバーレイを再生成
   buildOverlays(config);
 
+  // デバッグモードの場合は座標確認オーバーレイを描画
+  if (isDebugMode()) buildDebugOverlay(config);
+
   // アクティブボタンのハイライトを更新
   updateActiveButton(config.id);
 }
@@ -88,37 +95,376 @@ function buildOverlays(config) {
     elements.overlayLayer.appendChild(el);
   }
 
-  // スティックオーバーレイ
+  // スティック / レバー オーバーレイ
   for (const stick of config.sticks) {
-    const el = document.createElement("div");
-    el.className = "stick-overlay";
-    el.id = "stick-" + stick.id;
-    el.dataset.stickId = stick.id;
+    if (stick.type === "lever") {
+      // stickSvg が指定されていれば画像スプライトオーバーレイ、なければ SVG を生成
+      if (stick.stickSvg) {
+        const container = buildStickImgOverlay(stick);
+        elements.overlayLayer.appendChild(container);
+      } else {
+        const svg = buildLeverSVG(stick);
+        elements.overlayLayer.appendChild(svg);
+      }
+    } else {
+      const el = document.createElement("div");
+      el.className = "stick-overlay";
+      el.id = "stick-" + stick.id;
+      el.dataset.stickId = stick.id;
 
-    const size = stick.radius * 2;
-    el.style.left   = (stick.cx - stick.radius) + "px";
-    el.style.top    = (stick.cy - stick.radius) + "px";
-    el.style.width  = size + "px";
-    el.style.height = size + "px";
+      const size = stick.radius * 2;
+      el.style.left   = (stick.cx - stick.radius) + "px";
+      el.style.top    = (stick.cy - stick.radius) + "px";
+      el.style.width  = size + "px";
+      el.style.height = size + "px";
 
-    // スティックの「つまみ」
-    const dot = document.createElement("div");
-    dot.className = "stick-dot";
-    el.appendChild(dot);
+      // スティックの「つまみ」
+      const dot = document.createElement("div");
+      dot.className = "stick-dot";
+      el.appendChild(dot);
 
-    elements.overlayLayer.appendChild(el);
+      elements.overlayLayer.appendChild(el);
+    }
+  }
+}
+
+// ── レバー SVG 生成 ───────────────────────────────────────────
+
+/**
+ * アーケードレバーを疑似的に表現する SVG 要素を生成する。
+ * シャフト下端は固定（cx,cy）、上端（ボール）が axisX/Y に応じて傾く。
+ * @param {object} stick
+ * @returns {SVGElement}
+ */
+function buildLeverSVG(stick) {
+  const S  = stick.radius * 2;      // SVG の一辺 (= radius*2)
+  const CX = S / 2;                 // SVG 内中心 X
+  const CY = S / 2;                 // SVG 内中心 Y
+
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("id", "lever-svg-" + stick.id);
+  svg.setAttribute("width",  S);
+  svg.setAttribute("height", S);
+  svg.setAttribute("viewBox", `0 0 ${S} ${S}`);
+  svg.style.position = "absolute";
+  svg.style.left     = (stick.cx - stick.radius) + "px";
+  svg.style.top      = (stick.cy - stick.radius) + "px";
+  svg.style.overflow = "visible";
+  svg.style.pointerEvents = "none";
+
+  // ── ベース（土台の円）────────────────────────────────────
+  const base = document.createElementNS(ns, "circle");
+  base.setAttribute("cx", CX);
+  base.setAttribute("cy", CY);
+  base.setAttribute("r",  CX * 0.55);
+  base.setAttribute("fill", "rgba(30,30,30,0.7)");
+  base.setAttribute("stroke", "rgba(255,255,255,0.15)");
+  base.setAttribute("stroke-width", "2");
+  svg.appendChild(base);
+
+  // ── シャフト（棒）──────────────────────────────────────
+  // <line> は tick() でアニメーション → id で参照
+  const shaft = document.createElementNS(ns, "line");
+  shaft.setAttribute("id", "lever-shaft-" + stick.id);
+  shaft.setAttribute("x1", CX); shaft.setAttribute("y1", CY);    // 下端（ベース中心）固定
+  shaft.setAttribute("x2", CX); shaft.setAttribute("y2", CY - CX * 0.85); // 初期：真上
+  shaft.setAttribute("stroke", "#c0c0c0");
+  shaft.setAttribute("stroke-width", "6");
+  shaft.setAttribute("stroke-linecap", "round");
+  svg.appendChild(shaft);
+
+  // ── ボール（つまみ）────────────────────────────────────
+  const ball = document.createElementNS(ns, "circle");
+  ball.setAttribute("id", "lever-ball-" + stick.id);
+  ball.setAttribute("cx", CX);
+  ball.setAttribute("cy", CY - CX * 0.85);
+  ball.setAttribute("r",  CX * 0.28);
+  // 放射グラデーションで立体感を出す
+  const defs   = document.createElementNS(ns, "defs");
+  const grad   = document.createElementNS(ns, "radialGradient");
+  const gradId = "lever-grad-" + stick.id;
+  grad.setAttribute("id", gradId);
+  grad.setAttribute("cx", "35%"); grad.setAttribute("cy", "30%");
+  grad.setAttribute("r",  "60%");
+  const s1 = document.createElementNS(ns, "stop");
+  s1.setAttribute("offset", "0%");   s1.setAttribute("stop-color", "#606060");
+  const s2 = document.createElementNS(ns, "stop");
+  s2.setAttribute("offset", "100%"); s2.setAttribute("stop-color", "#111");
+  grad.appendChild(s1); grad.appendChild(s2);
+  defs.appendChild(grad);
+  svg.insertBefore(defs, svg.firstChild);
+
+  ball.setAttribute("fill", `url(#${gradId})`);
+  ball.setAttribute("stroke", "rgba(255,255,255,0.2)");
+  ball.setAttribute("stroke-width", "1.5");
+  svg.appendChild(ball);
+
+  // ── ニュートラル位置を示す十字ガイド（薄い）──────────
+  const guide = document.createElementNS(ns, "g");
+  guide.setAttribute("opacity", "0.12");
+  for (const [dx, dy] of [[CX*0.5,0],[0,CX*0.5]]) {
+    const line = document.createElementNS(ns, "line");
+    line.setAttribute("x1", CX - dx); line.setAttribute("y1", CY - dy);
+    line.setAttribute("x2", CX + dx); line.setAttribute("y2", CY + dy);
+    line.setAttribute("stroke", "white"); line.setAttribute("stroke-width", "1");
+    guide.appendChild(line);
+  }
+  svg.appendChild(guide);
+
+  return svg;
+}
+
+// ── stick.svg スプライトオーバーレイ ─────────────────────────
+
+// ── カスタムレバー SVG ─────────────────────────────────────────
+
+/**
+ * 16進カラー文字列の輝度を調整する。
+ * @param {string} hex "#rrggbb"
+ * @param {number} delta  調整量 (-255 ~ 255)
+ * @returns {string}
+ */
+function _adjustHexColor(hex, delta) {
+  const n = parseInt(hex.replace("#", ""), 16);
+  const clamp = (v) => Math.min(255, Math.max(0, v));
+  const r = clamp((n >> 16)        + delta);
+  const g = clamp(((n >> 8) & 0xff) + delta);
+  const b = clamp((n & 0xff)        + delta);
+  return "#" + [r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("");
+}
+
+/**
+ * 写真の遠近感に合わせたカスタムレバー SVG を生成する。
+ *
+ * stick config で使うプロパティ:
+ *   stickBallX/Y      : ニュートラル時のボール中心（画像座標）
+ *   stickBaseX/Y      : シャフトが天板から出てくる固定点（画像座標）
+ *   stickBallRadius   : ボール半径 px
+ *   stickTilt         : 最大傾き量 px（フル入力時のボール移動距離）
+ *   stickShaftWidth   : シャフトの太さ px（省略時 7）
+ *   stickColor        : ボール・シャフトの色 "#rrggbb"（省略時グレー）
+ *   stickMaskShapes   : 元写真のレバーを隠す形状配列 [{type,fill,...}]
+ *
+ * @param {object} stick
+ * @returns {SVGElement}
+ */
+function buildStickImgOverlay(stick) {
+  const baseX   = stick.stickBaseX      ?? stick.cx;
+  const baseY   = stick.stickBaseY      ?? stick.cy;
+  const ballNX  = stick.stickBallX      ?? stick.cx;
+  const ballNY  = stick.stickBallY      ?? stick.cy - 80;
+  const ballR   = stick.stickBallRadius ?? 28;
+  const tilt    = stick.stickTilt       ?? 20;
+  const shaftW  = stick.stickShaftWidth ?? 7;
+  const color   = stick.stickColor      || null;
+
+  // ── ボール・シャフトを包む基本範囲 ────────────────────────
+  const pad = ballR + tilt + 6;
+  let minX = Math.min(baseX, ballNX) - pad;
+  let minY = Math.min(baseY, ballNY) - pad;
+  let maxX = Math.max(baseX, ballNX) + pad;
+  let maxY = Math.max(baseY, ballNY) + pad;
+
+  // マスク形状が存在すれば SVG 範囲を拡張
+  if (stick.stickMaskShapes) {
+    for (const s of stick.stickMaskShapes) {
+      let b;
+      if (s.type === "circle")  b = { l: s.cx - s.r,  t: s.cy - s.r,  r: s.cx + s.r,  b: s.cy + s.r  };
+      if (s.type === "ellipse") b = { l: s.cx - s.rx, t: s.cy - s.ry, r: s.cx + s.rx, b: s.cy + s.ry };
+      if (s.type === "rect")    b = { l: s.x,         t: s.y,         r: s.x  + s.w,  b: s.y  + s.h  };
+      if (b) {
+        minX = Math.min(minX, b.l); minY = Math.min(minY, b.t);
+        maxX = Math.max(maxX, b.r); maxY = Math.max(maxY, b.b);
+      }
+    }
+  }
+
+  const svgW = maxX - minX;
+  const svgH = maxY - minY;
+
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg");
+  svg.id = "stick-img-" + stick.id;
+  svg.setAttribute("width",  svgW);
+  svg.setAttribute("height", svgH);
+  svg.setAttribute("viewBox", `${minX} ${minY} ${svgW} ${svgH}`);
+  svg.style.cssText = [
+    "position:absolute",
+    `left:${minX}px`,
+    `top:${minY}px`,
+    "pointer-events:none",
+    "z-index:5",
+    "overflow:visible",
+  ].join(";");
+
+  // ── グラデーション定義 ────────────────────────────────────
+  const defs = document.createElementNS(ns, "defs");
+
+  const gradId = "lever-ball-grad-" + stick.id;
+  const grad   = document.createElementNS(ns, "radialGradient");
+  grad.setAttribute("id", gradId);
+  grad.setAttribute("cx", "35%"); grad.setAttribute("cy", "25%"); grad.setAttribute("r", "60%");
+  grad.setAttribute("gradientUnits", "objectBoundingBox");
+
+  const gradStops = color
+    ? [["0%", _adjustHexColor(color, 70)], ["45%", color], ["100%", _adjustHexColor(color, -80)]]
+    : [["0%", "#585858"], ["45%", "#181818"], ["100%", "#000"]];
+
+  gradStops.forEach(([off, col]) => {
+    const s = document.createElementNS(ns, "stop");
+    s.setAttribute("offset", off); s.setAttribute("stop-color", col);
+    grad.appendChild(s);
+  });
+  defs.appendChild(grad);
+  svg.appendChild(defs);
+
+  // ── マスク（元写真のレバーを覆い隠す）────────────────────
+  if (stick.stickMaskShapes) {
+    for (const shape of stick.stickMaskShapes) {
+      let el;
+      if (shape.type === "circle") {
+        el = document.createElementNS(ns, "circle");
+        el.setAttribute("cx", String(shape.cx));
+        el.setAttribute("cy", String(shape.cy));
+        el.setAttribute("r",  String(shape.r));
+      } else if (shape.type === "ellipse") {
+        el = document.createElementNS(ns, "ellipse");
+        el.setAttribute("cx", String(shape.cx));
+        el.setAttribute("cy", String(shape.cy));
+        el.setAttribute("rx", String(shape.rx));
+        el.setAttribute("ry", String(shape.ry));
+      } else if (shape.type === "rect") {
+        el = document.createElementNS(ns, "rect");
+        el.setAttribute("x",      String(shape.x));
+        el.setAttribute("y",      String(shape.y));
+        el.setAttribute("width",  String(shape.w));
+        el.setAttribute("height", String(shape.h));
+        if (shape.rx) el.setAttribute("rx", String(shape.rx));
+      }
+      if (el) {
+        el.setAttribute("fill", shape.fill || "transparent");
+        svg.appendChild(el);
+      }
+    }
+  }
+
+  // ── シャフト ──────────────────────────────────────────────
+  const shaftColor = color ? _adjustHexColor(color, -40) : "#c8c8c8";
+  const shaft = document.createElementNS(ns, "line");
+  shaft.id = "lever-shaft-custom-" + stick.id;
+  shaft.setAttribute("x1", String(baseX));  shaft.setAttribute("y1", String(baseY));
+  shaft.setAttribute("x2", String(ballNX)); shaft.setAttribute("y2", String(ballNY));
+  shaft.setAttribute("stroke", shaftColor);
+  shaft.setAttribute("stroke-width", String(shaftW));
+  shaft.setAttribute("stroke-linecap", "round");
+  svg.appendChild(shaft);
+
+  // ── ボール ────────────────────────────────────────────────
+  const ball = document.createElementNS(ns, "circle");
+  ball.id = "lever-ball-custom-" + stick.id;
+  ball.setAttribute("cx", String(ballNX)); ball.setAttribute("cy", String(ballNY));
+  ball.setAttribute("r",  String(ballR));
+  ball.setAttribute("fill", `url(#${gradId})`);
+  ball.setAttribute("stroke", "rgba(255,255,255,0.07)");
+  ball.setAttribute("stroke-width", "1.5");
+  svg.appendChild(ball);
+
+  // ── スペキュラハイライト ──────────────────────────────────
+  const hl = document.createElementNS(ns, "ellipse");
+  hl.id = "lever-hl-custom-" + stick.id;
+  hl.setAttribute("cx", String(ballNX - ballR * 0.22));
+  hl.setAttribute("cy", String(ballNY - ballR * 0.30));
+  hl.setAttribute("rx", String(ballR * 0.32));
+  hl.setAttribute("ry", String(ballR * 0.20));
+  hl.setAttribute("fill", "rgba(255,255,255,0.18)");
+  svg.appendChild(hl);
+
+  return svg;
+}
+
+/**
+ * カスタムレバー SVG をアナログ入力 / d-pad 入力に合わせて更新する。
+ * シャフト根元（stickBaseX/Y）は固定のまま、ボールが傾き方向に移動する。
+ *
+ * @param {object}  stick
+ * @param {Gamepad} gp
+ * @param {object}  config
+ */
+function updateStickImg(stick, gp, config) {
+  const ballNX = stick.stickBallX      ?? stick.cx;
+  const ballNY = stick.stickBallY      ?? stick.cy - 80;
+  const ballR  = stick.stickBallRadius ?? 28;
+  const tilt   = stick.stickTilt       ?? 20;
+
+  // アナログ軸を優先し、ニュートラルなら d-pad ボタンで補完
+  let ax = gp.axes[stick.axisX] || 0;
+  let ay = gp.axes[stick.axisY] || 0;
+  if (Math.abs(ax) < 0.1 && Math.abs(ay) < 0.1) {
+    // config.buttons に ↑↓←→ がなくても動くよう固定インデックスで直読み
+    const dpadUp    = stick.dpadUp    ?? 12;
+    const dpadDown  = stick.dpadDown  ?? 13;
+    const dpadLeft  = stick.dpadLeft  ?? 14;
+    const dpadRight = stick.dpadRight ?? 15;
+    if (gp.buttons[dpadUp]?.pressed)    ay -= 1;
+    if (gp.buttons[dpadDown]?.pressed)  ay += 1;
+    if (gp.buttons[dpadLeft]?.pressed)  ax -= 1;
+    if (gp.buttons[dpadRight]?.pressed) ax += 1;
+    // 斜め入力を正規化
+    const len = Math.sqrt(ax * ax + ay * ay);
+    if (len > 1) { ax /= len; ay /= len; }
+  }
+
+  const bx = ballNX + ax * tilt;
+  const by = ballNY + ay * tilt;
+
+  const shaft = document.getElementById("lever-shaft-custom-" + stick.id);
+  const ball  = document.getElementById("lever-ball-custom-"  + stick.id);
+  const hl    = document.getElementById("lever-hl-custom-"    + stick.id);
+
+  if (shaft) {
+    shaft.setAttribute("x2", String(bx));
+    shaft.setAttribute("y2", String(by));
+  }
+  if (ball) {
+    ball.setAttribute("cx", String(bx));
+    ball.setAttribute("cy", String(by));
+  }
+  if (hl) {
+    hl.setAttribute("cx", String(bx - ballR * 0.22));
+    hl.setAttribute("cy", String(by - ballR * 0.30));
   }
 }
 
 // ── 手動切り替え ──────────────────────────────────────────────
 
 /**
+ * stick.svg を使ったレバービジュアルオーバーレイを生成する。
+// ── 手動切り替え ──────────────────────────────────────────────
+
+/**
  * コントローラーを手動で切り替える（ページ上のボタン用）。
+ * UI 設定だけでなく、対応するゲームパッドを activeGamepad に切り替える。
  * @param {string} configId - "dualsense" | "fightingStickMini"
  */
 function switchController(configId) {
   const config = ALL_CONFIGS.find((c) => c.id === configId);
-  if (config) applyConfig(config);
+  if (!config) return;
+  applyConfig(config);
+
+  // 接続中のゲームパッドから該当デバイスを探して activeGamepad を切り替える
+  const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+  for (const gp of gamepads) {
+    if (!gp) continue;
+    const detected = detectConfig(gp.id);
+    if (detected && detected.id === configId) {
+      state.activeGamepad = gp;
+      elements.deviceName.textContent = `接続中: ${gp.id}`;
+      elements.deviceName.classList.add("connected");
+      if (state.rafId === null) startPolling();
+      return;
+    }
+  }
 }
 
 /**
@@ -135,6 +481,19 @@ function updateActiveButton(configId) {
 window.addEventListener("gamepadconnected", (e) => {
   const gp = e.gamepad;
   console.log(`[GamepadConnected] ${gp.id}`);
+
+  // 接続済みリストに登録
+  state.connectedGamepads[gp.index] = gp;
+
+  // クエリ固定モード: 対応デバイス以外は無視
+  if (state.pinnedConfigId) {
+    const detected = detectConfig(gp.id);
+    if (!detected || detected.id !== state.pinnedConfigId) return;
+  }
+
+  // 既にアクティブなゲームパッドがある場合は自動切り替えしない
+  // （ユーザーが手動で切り替えられるようにする）
+  if (state.activeGamepad !== null) return;
 
   state.activeGamepad = gp;
 
@@ -155,12 +514,31 @@ window.addEventListener("gamepadconnected", (e) => {
 window.addEventListener("gamepaddisconnected", (e) => {
   console.log(`[GamepadDisconnected] ${e.gamepad.id}`);
 
+  // 接続済みリストから削除
+  delete state.connectedGamepads[e.gamepad.index];
+
   if (state.activeGamepad && state.activeGamepad.index === e.gamepad.index) {
     state.activeGamepad = null;
-    elements.deviceName.textContent = "コントローラー未接続";
-    elements.deviceName.classList.remove("connected");
     stopPolling();
     clearCanvas();
+
+    // 他に接続済みのゲームパッドがあれば自動で切り替える
+    const remaining = Object.keys(state.connectedGamepads);
+    if (remaining.length > 0) {
+      const nextGp = (navigator.getGamepads ? navigator.getGamepads() : [])[remaining[0]];
+      if (nextGp) {
+        state.activeGamepad = nextGp;
+        const detected = detectConfig(nextGp.id);
+        if (detected) applyConfig(detected);
+        elements.deviceName.textContent = `接続中: ${nextGp.id}`;
+        elements.deviceName.classList.add("connected");
+        startPolling();
+        return;
+      }
+    }
+
+    elements.deviceName.textContent = "コントローラー未接続";
+    elements.deviceName.classList.remove("connected");
   }
 });
 
@@ -228,20 +606,67 @@ function tick() {
     const axisX = gp.axes[stick.axisX] || 0;
     const axisY = gp.axes[stick.axisY] || 0;
 
-    // スティックのつまみ位置を更新
-    const stickEl = document.getElementById("stick-" + stick.id);
-    if (stickEl) {
-      const dot = stickEl.querySelector(".stick-dot");
-      if (dot) {
-        const maxOffset = stick.radius * 0.6;
-        const dx = axisX * maxOffset;
-        const dy = axisY * maxOffset;
-        dot.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+    if (stick.type === "lever") {
+      if (stick.stickSvg) {
+        // カスタムレバー SVG を更新（d-pad / アナログ対応）
+        updateStickImg(stick, gp, config);
+      } else {
+        // レバー SVG のシャフト / ボールを更新
+        updateLeverSVG(stick, axisX, axisY);
+      }
+    } else {
+      // アナログスティック（div + dot）を更新
+      const stickEl = document.getElementById("stick-" + stick.id);
+      if (stickEl) {
+        const dot = stickEl.querySelector(".stick-dot");
+        if (dot) {
+          const maxOffset = stick.radius * 0.6;
+          const dx = axisX * maxOffset;
+          const dy = axisY * maxOffset;
+          dot.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+        }
       }
     }
 
-    // canvas に軌跡の円を描画
-    drawStickIndicator(ctx, stick, axisX, axisY);
+    // canvas に軸記録を描画（カスタムSVGレバーはスキップ）
+    if (!stick.stickSvg) {
+      drawStickIndicator(ctx, stick, axisX, axisY);
+    }
+  }
+}
+
+/**
+ * レバー SVG のシャフト・ボール位置をアナログ入力に合わせて更新する。
+ * @param {object} stick
+ * @param {number} axisX  -1.0 ~ 1.0
+ * @param {number} axisY  -1.0 ~ 1.0
+ */
+function updateLeverSVG(stick, axisX, axisY) {
+  const S     = stick.radius * 2;
+  const CX    = S / 2;
+  const CY    = S / 2;
+  const reach = CX * 0.85; // シャフト長（ニュートラル時）
+  const tilt  = CX * 0.55; // 最大傾き量（px）
+
+  const ballX = CX + axisX * tilt;
+  const ballY = CY - reach + axisY * tilt;
+
+  const shaft = document.getElementById("lever-shaft-" + stick.id);
+  const ball  = document.getElementById("lever-ball-"  + stick.id);
+
+  if (shaft) {
+    shaft.setAttribute("x2", ballX);
+    shaft.setAttribute("y2", ballY);
+    // 傾き量に応じてシャフト色を変化させる
+    const intensity = Math.sqrt(axisX * axisX + axisY * axisY);
+    const r = Math.round(192 + intensity * 40);
+    const g = Math.round(192 - intensity * 80);
+    const b = Math.round(192 - intensity * 80);
+    shaft.setAttribute("stroke", `rgb(${r},${g},${b})`);
+  }
+  if (ball) {
+    ball.setAttribute("cx", ballX);
+    ball.setAttribute("cy", ballY);
   }
 }
 
@@ -263,7 +688,7 @@ function drawStickIndicator(ctx, stick, axisX, axisY) {
   // スティック位置のドット
   ctx.beginPath();
   ctx.arc(dotX, dotY, 8, 0, Math.PI * 2);
-  ctx.fillStyle = "rgba(0, 200, 255, 0.75)";
+  ctx.fillStyle = "rgba(220, 40, 50, 0.85)";
   ctx.fill();
 }
 
@@ -272,24 +697,136 @@ function clearCanvas() {
   ctx.clearRect(0, 0, elements.stickCanvas.width, elements.stickCanvas.height);
 }
 
+// ── デバッグオーバーレイ (?debug=1) ──────────────────────────
+
+function isDebugMode() {
+  return new URLSearchParams(window.location.search).has("debug");
+}
+
+/**
+ * 各ボタン・スティックの設定座標を画像上に可視化する。
+ * ?debug=1 を URL に付与すると有効になる。
+ * @param {object} config
+ */
+function buildDebugOverlay(config) {
+  const existing = document.getElementById("debug-overlay");
+  if (existing) existing.remove();
+
+  const canvas = document.createElement("canvas");
+  canvas.id     = "debug-overlay";
+  canvas.width  = config.imageWidth;
+  canvas.height = config.imageHeight;
+  canvas.style.cssText =
+    "position:absolute;inset:0;pointer-events:none;z-index:20;";
+
+  const ctx = canvas.getContext("2d");
+  ctx.lineWidth = 2;
+
+  // ── ボタン ──
+  for (const btn of config.buttons) {
+    const shape = btn.shape || "circle";
+    const isRect = shape === "rect";
+
+    // 塗りつぶし（半透明）
+    ctx.fillStyle = "rgba(255, 60, 60, 0.15)";
+    ctx.beginPath();
+    if (isRect) {
+      ctx.rect(btn.x - btn.w / 2, btn.y - btn.h / 2, btn.w, btn.h);
+    } else {
+      ctx.ellipse(btn.x, btn.y, btn.w / 2, btn.h / 2, 0, 0, Math.PI * 2);
+    }
+    ctx.fill();
+
+    // 枠線
+    ctx.strokeStyle = "rgba(255, 60, 60, 0.9)";
+    ctx.stroke();
+
+    // 中心十字
+    ctx.beginPath();
+    ctx.moveTo(btn.x - 7, btn.y); ctx.lineTo(btn.x + 7, btn.y);
+    ctx.moveTo(btn.x, btn.y - 7); ctx.lineTo(btn.x, btn.y + 7);
+    ctx.stroke();
+
+    // ラベル（インデックス:ラベル名）
+    ctx.fillStyle = "#ffff00";
+    ctx.font = "bold 11px monospace";
+    ctx.fillText(`${btn.index}:${btn.label}`, btn.x + 6, btn.y - 4);
+
+    // 座標値
+    ctx.fillStyle = "rgba(255,255,180,0.9)";
+    ctx.font = "9px monospace";
+    ctx.fillText(`(${btn.x},${btn.y})`, btn.x + 6, btn.y + 8);
+  }
+
+  // ── スティック / レバー ──
+  for (const stick of config.sticks) {
+    ctx.strokeStyle = "rgba(0, 200, 255, 0.8)";
+    ctx.beginPath();
+    ctx.arc(stick.cx, stick.cy, stick.radius, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(stick.cx - 8, stick.cy); ctx.lineTo(stick.cx + 8, stick.cy);
+    ctx.moveTo(stick.cx, stick.cy - 8); ctx.lineTo(stick.cx, stick.cy + 8);
+    ctx.stroke();
+
+    ctx.fillStyle = "#00ccff";
+    ctx.font = "bold 11px monospace";
+    ctx.fillText(`${stick.id}(${stick.cx},${stick.cy})`, stick.cx + 10, stick.cy - 2);
+  }
+
+  document.getElementById("controller-wrapper").appendChild(canvas);
+}
+
+// ── クエリパラメーター解析 ────────────────────────────────────
+
+/**
+ * ?controller=dualsense や ?controller=fightingStickMini を読み取る。
+ * 指定があればそのコンフィグを返し、なければ null。
+ * @returns {object|null}
+ */
+function getQueryConfig() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("controller");
+  if (!id) return null;
+  return ALL_CONFIGS.find((c) => c.id === id) || null;
+}
+
 // ── 起動処理 ──────────────────────────────────────────────────
 
 (function init() {
-  // デフォルトは DualSense を表示
-  applyConfig(DUALSENSE_CONFIG);
+  const queryConfig = getQueryConfig();
+
+  // クエリパラメーター指定時はステータスバーUI・ヒントを非表示にする
+  if (queryConfig) {
+    document.getElementById("controller-select").style.display = "none";
+    document.getElementById("hint").style.display = "none";
+    // body に透過背景クラスを付与（OBS等でクロマキー合成しやすいように）
+    document.body.classList.add("transparent-bg");
+    applyConfig(queryConfig);
+    state.pinnedConfigId = queryConfig.id;
+  } else {
+    applyConfig(DUALSENSE_CONFIG);
+  }
+
+  // デバッグモードのバッジ表示
+  if (isDebugMode()) document.body.classList.add("debug-mode");
 
   // すでに接続済みのゲームパッドがある場合に対応（ページリロード後など）
   const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
   for (const gp of gamepads) {
     if (!gp) continue;
-    state.activeGamepad = gp;
-    const detected = detectConfig(gp.id);
-    if (detected) {
-      applyConfig(detected);
+    state.connectedGamepads[gp.index] = gp;
+    if (state.activeGamepad === null) {
+      // クエリ固定モード: 対応デバイスのみアクティブにする
+      if (queryConfig) {
+        const detected = detectConfig(gp.id);
+        if (!detected || detected.id !== queryConfig.id) continue;
+      }
+      state.activeGamepad = gp;
+      elements.deviceName.textContent = `接続中: ${gp.id}`;
+      elements.deviceName.classList.add("connected");
+      startPolling();
     }
-    elements.deviceName.textContent = `接続中: ${gp.id}`;
-    elements.deviceName.classList.add("connected");
-    startPolling();
-    break;
   }
 })();

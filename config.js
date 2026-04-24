@@ -49,31 +49,30 @@ const DUALSENSE_CONFIG = {
    */
   buttons: [
     // ── フェイスボタン（右側ダイヤモンド配置）──────────────
-    { index:  0, label: "×",       x: 638, y: 202, w: 40, h: 40 },
-    { index:  1, label: "○",       x: 688, y: 163, w: 40, h: 40 },
-    { index:  2, label: "□",       x: 585, y: 163, w: 40, h: 40 },
-    { index:  3, label: "△",       x: 638, y: 127, w: 40, h: 40 },
+    { index:  0, label: "×",       x: 647, y: 212, w: 50, h: 50 },
+    { index:  1, label: "○",       x: 706, y: 153, w: 50, h: 50 },
+    { index:  2, label: "□",       x: 589, y: 154, w: 50, h: 50 },
+    { index:  3, label: "△",       x: 648, y: 95, w: 50, h: 50 },
 
     // ── ショルダー / トリガー ─────────────────────────────
-    // L1/R1 はバンパー（手前側）、L2/R2 はトリガー（奥側・最上段）
-    { index:  4, label: "L1",      x: 193, y:  47, w: 90, h: 25, shape: "rect" },
-    { index:  5, label: "R1",      x: 607, y:  47, w: 90, h: 25, shape: "rect" },
-    { index:  6, label: "L2",      x: 188, y:  17, w: 82, h: 22, shape: "rect" },
-    { index:  7, label: "R2",      x: 612, y:  17, w: 82, h: 22, shape: "rect" },
+    { index:  4, label: "L1",      x: 152, y:  12, w: 106, h: 20, shape: "rect" },
+    { index:  5, label: "R1",      x: 648, y:  12, w: 106, h: 20, shape: "rect" },
+    { index:  6, label: "L2",      x: 50, y:  16, w: 82, h: 24, shape: "rect" },
+    { index:  7, label: "R2",      x: 750, y:  16, w: 82, h: 24, shape: "rect" },
 
     // ── 特殊ボタン ────────────────────────────────────────
-    { index:  8, label: "Create",  x: 185, y:  68, w: 28, h: 24 },
-    { index:  9, label: "Options", x: 480, y:  68, w: 28, h: 24 },
-    { index: 10, label: "L3",      x: 225, y: 248, w: 42, h: 42 },
-    { index: 11, label: "R3",      x: 465, y: 248, w: 42, h: 42 },
-    { index: 16, label: "PS",      x: 400, y: 292, w: 34, h: 34 },
-    { index: 17, label: "Touch",   x: 400, y: 183, w: 130, h: 82, shape: "rect" },
+    { index:  8, label: "Create",  x: 214, y:  67, w: 20, h: 36 },
+    { index:  9, label: "Options", x: 585, y:  67, w: 20, h: 36 },
+    { index: 10, label: "L3",      x: 272, y: 262, w: 42, h: 42 },
+    { index: 11, label: "R3",      x: 527, y: 262, w: 42, h: 42 },
+    { index: 16, label: "PS",      x: 400, y: 304, w: 34, h: 8, shape: "rect" },
+    { index: 17, label: "Touch",   x: 400, y: 95, w: 280, h: 168, shape: "rect" },
 
     // ── 十字キー ──────────────────────────────────────────
-    { index: 12, label: "↑",       x: 141, y: 108, w: 34, h: 34 },
-    { index: 13, label: "↓",       x: 141, y: 178, w: 34, h: 34 },
-    { index: 14, label: "←",       x:  99, y: 143, w: 34, h: 34 },
-    { index: 15, label: "→",       x: 183, y: 143, w: 34, h: 34 },
+    { index: 12, label: "↑",       x: 151, y: 107, w: 34, h: 34 },
+    { index: 13, label: "↓",       x: 151, y: 200, w: 34, h: 34 },
+    { index: 14, label: "←",       x: 106, y: 152, w: 34, h: 34 },
+    { index: 15, label: "→",       x: 198, y: 152, w: 34, h: 34 },
   ],
 
   /**
@@ -83,8 +82,8 @@ const DUALSENSE_CONFIG = {
    *   radius       : スティック可動範囲の半径 (px)
    */
   sticks: [
-    { id: "LS", label: "LS", axisX: 0, axisY: 1, cx: 225, cy: 248, radius: 53 },
-    { id: "RS", label: "RS", axisX: 2, axisY: 3, cx: 465, cy: 248, radius: 53 },
+    { id: "LS", label: "LS", axisX: 0, axisY: 1, cx: 272, cy: 262, radius: 48 },
+    { id: "RS", label: "RS", axisX: 2, axisY: 3, cx: 527, cy: 262, radius: 48 },
   ],
 };
 
@@ -116,29 +115,23 @@ const FIGHTING_STICK_MINI_CONFIG = {
    */
   buttons: [
     // ── フェイスボタン（上段 左→右: □ △ R1 L1）──────────
-    { index:  2, label: "□",      x: 391, y: 175, w: 56, h: 56 },
-    { index:  3, label: "△",      x: 476, y: 158, w: 56, h: 56 },
-    { index:  5, label: "R1",     x: 563, y: 155, w: 56, h: 56 },
-    { index:  4, label: "L1",     x: 651, y: 158, w: 56, h: 56 },
+    { index:  2, label: "□",      x: 417, y: 169, w: 60, h: 32 },
+    { index:  3, label: "△",      x: 502, y: 156, w: 60, h: 32 },
+    { index:  5, label: "R1",     x: 589, y: 150, w: 60, h: 32 },
+    { index:  4, label: "L1",     x: 678, y: 150, w: 60, h: 32 },
 
-    // ── フェイスボタン（下段 左→右: × ○ R2 L2）──────────
-    { index:  0, label: "×",      x: 395, y: 222, w: 56, h: 56 },
-    { index:  1, label: "○",      x: 483, y: 212, w: 56, h: 56 },
-    { index:  7, label: "R2",     x: 568, y: 210, w: 56, h: 56 },
-    { index:  6, label: "L2",     x: 654, y: 214, w: 56, h: 56 },
+    // ── フェイスボタン（下段 左→右: × ○ R2 L2）──────
+    { index:  0, label: "×",      x: 418, y: 210, w: 60, h: 32 },
+    { index:  1, label: "○",      x: 506, y: 198, w: 60, h: 32 },
+    { index:  7, label: "R2",     x: 596, y: 192, w: 62, h: 32 },
+    { index:  6, label: "L2",     x: 688, y: 191, w: 66, h: 32 },
 
     // ── 特殊ボタン（天板中央ストリップ）─────────────────
-    { index: 16, label: "PS",      x: 387, y: 118, w: 30, h: 30 },
-    { index:  8, label: "Share",   x: 432, y: 118, w: 28, h: 22, shape: "rect" },
-    { index:  9, label: "Options", x: 476, y: 118, w: 28, h: 22, shape: "rect" },
-    { index: 10, label: "L3",      x: 514, y: 118, w: 22, h: 22 },
-    { index: 11, label: "R3",      x: 547, y: 118, w: 22, h: 22 },
-
-    // ── 十字キー（レバーが d-pad にマップされる場合）────
-    { index: 12, label: "↑",       x: 181, y: 148, w: 36, h: 36 },
-    { index: 13, label: "↓",       x: 181, y: 230, w: 36, h: 36 },
-    { index: 14, label: "←",       x: 133, y: 189, w: 36, h: 36 },
-    { index: 15, label: "→",       x: 229, y: 189, w: 36, h: 36 },
+    { index: 16, label: "PS",      x: 404, y: 120, w: 30, h: 16 },
+    { index:  8, label: "Share",   x: 458, y: 120, w: 22, h: 14 },
+    { index:  9, label: "Options", x: 506, y: 120, w: 22, h: 14 },
+    { index: 10, label: "L3",      x: 553, y: 121, w: 22, h: 14 },
+    { index: 11, label: "R3",      x: 601, y: 120, w: 22, h: 14 },
   ],
 
   /**
@@ -148,7 +141,20 @@ const FIGHTING_STICK_MINI_CONFIG = {
    *   その場合はここの axisX / axisY を実機に合わせて調整してください。
    */
   sticks: [
-    { id: "Lever", label: "Lever", axisX: 0, axisY: 1, cx: 181, cy: 189, radius: 63 },
+    { id: "Lever", label: "Lever", type: "lever", axisX: 0, axisY: 1, cx: 181, cy: 189, radius: 63,
+      stickSvg: "images/stick.svg",
+      stickBallX: 194, stickBallY: 73,   // ニュートラル時のボール中心
+      stickBaseX: 194, stickBaseY: 180,  // シャフト入口（天板上）
+      stickBallRadius: 56,               // ボール半径 px
+      stickTilt: 20,                     // 最大傾き量 px
+      stickShaftWidth: 30,               // シャフトの太さ px
+      stickColor: "#c8222a",            // ボール・シャフトの色
+      stickMaskShapes: [
+        // 元写真のレバーを视覚的に消す覚い形状
+        { type: "circle",  cx: 194, cy: 73,  r: 60,           fill: "#1c3005" }, // ボール周辺（背景グリーン）
+        { type: "rect",    x: 176,  y: 124,  w: 36, h: 70, rx: 10, fill: "#1c3005" }, // シャフト（ボディ白）
+        //{ type: "ellipse", cx: 187, cy: 194, rx: 68, ry: 32,  fill: "#161616" }, // ベースディスク（黒）
+      ] },
   ],
 };
 
