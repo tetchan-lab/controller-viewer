@@ -97,7 +97,9 @@ const FIGHTING_STICK_MINI_CONFIG = {
   name: "Fighting Stick Mini",
 
   /** 接続デバイス名に含まれる文字列（部分一致・大文字小文字無視）*/
-  deviceNamePatterns: ["Fighting Stick", "HORI", "Arcade Stick", "FS-Mini"],
+  // FIGHTING STICK MINI は Xbox 360 互換モードで動作するため、
+  // Gamepad API の id は "XBOX 360 Controller For Windows (STANDARD GAMEPAD)" と報告される。
+  deviceNamePatterns: ["Fighting Stick", "HORI", "Arcade Stick", "FS-Mini", "XBOX 360 Controller"],
 
   /**
    * コントローラー画像のパスと表示サイズ。
