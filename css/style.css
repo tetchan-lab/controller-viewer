@@ -1,0 +1,131 @@
+/* ============================================================
+   style.css  –  Gamepad Viewer スタイルシート
+   OBS ブラウザソースでの使用を想定した透明背景デザイン
+   ============================================================ */
+
+/* リセット */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── ページ全体 ── */
+html, body {
+  /* OBS ブラウザソース用: 背景を透明に */
+  background: transparent;
+  color: #e0e0e8;
+  font-family: "Segoe UI", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 14px;
+  user-select: none;
+  overflow: hidden;
+}
+
+/* ── スタンドアローン閲覧時の背景 ──
+   （OBS では body に .obs クラスを付けるか、
+     ブラウザで直接開くと見栄えが良い暗い背景になります）
+*/
+body.standalone {
+  background: #1a1b25;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 16px;
+  gap: 12px;
+}
+
+/* ── コントロールバー（上部） ── */
+#control-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+#control-bar label {
+  font-size: 13px;
+  color: #9090a8;
+}
+
+#controller-type {
+  background: #2a2c3a;
+  color: #d0d0e0;
+  border: 1px solid #44465a;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+}
+
+#controller-type:hover,
+#controller-type:focus {
+  border-color: #6060a0;
+}
+
+/* ── ゲームパッド状態テキスト ── */
+#gamepad-status {
+  font-size: 12px;
+  color: #6868a0;
+  flex: 1;
+  text-align: right;
+}
+
+/* ── コントローラー表示エリア ── */
+#controller-wrapper {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+
+/* CSS 背景（canvas が読み込めない場合のフォールバック） */
+#controller-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+/* canvas オーバーレイ */
+#overlay {
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── 未接続メッセージ ── */
+#no-controller {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: rgba(200, 200, 220, 0.50);
+  pointer-events: none;
+  z-index: 2;
+}
+
+#no-controller.hidden {
+  display: none;
+}
+
+/* ── スケール調整（OBS でサイズが合わない場合） ──
+   wrapper に style="transform: scale(0.8);" などを直接指定してください */
+
+/* ── フッター（スタンドアローン時のみ表示） ── */
+#footer {
+  font-size: 11px;
+  color: #44465a;
+  text-align: center;
+  line-height: 1.6;
+}
+
+body:not(.standalone) #control-bar,
+body:not(.standalone) #footer {
+  display: none;
+}

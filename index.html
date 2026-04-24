@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controller Viewer</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="standalone">
+
+  <!-- ── コントロールバー ─────────────────────────── -->
+  <div id="control-bar">
+    <label for="controller-type">コントローラー種別:</label>
+    <select id="controller-type"></select>
+    <span id="gamepad-status">ゲームパッドが未接続です</span>
+  </div>
+
+  <!-- ── コントローラー表示エリア ─────────────────── -->
+  <div id="controller-wrapper">
+    <!-- CSS 背景（フォールバック用）-->
+    <div id="controller-bg"></div>
+
+    <!-- メイン canvas（ボタン強調 + コントローラー画像を描画）-->
+    <canvas id="overlay" width="800" height="400"></canvas>
+
+    <!-- 未接続メッセージ -->
+    <div id="no-controller">
+      コントローラーを接続してボタンを押してください
+    </div>
+  </div>
+
+  <!-- ── フッター（スタンドアローン時のみ表示）────── -->
+  <div id="footer">
+    Controller Viewer &nbsp;|&nbsp;
+    コントローラーを接続してボタンを押すと自動認識されます &nbsp;|&nbsp;
+    OBS などのブラウザソースに URL を登録して使用できます
+  </div>
+
+  <!-- ── スクリプト ────────────────────────────────── -->
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
