@@ -44,7 +44,7 @@ function applyConfig(config) {
   elements.controllerImg.alt = config.name;
 
   // コンテナのサイズを設定
-  const wrapper = elements.controllerImg.parentElement;
+  const wrapper = document.getElementById("controller-wrapper");
   wrapper.style.width  = config.imageWidth  + "px";
   wrapper.style.height = config.imageHeight + "px";
 
