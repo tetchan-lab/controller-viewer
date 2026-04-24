@@ -105,7 +105,8 @@ function detectDevice(gamepadId) {
   if (lower.includes("dualsense") || lower.includes("playstation 5")) {
     return "DualSense";
   }
-  if (lower.includes("fighting stick") || lower.includes("hori")) {
+  if (lower.includes("fighting stick") || lower.includes("hori") ||
+      lower.includes("xbox 360 controller")) {
     return "Fighting Stick Mini";
   }
   return "Unknown";
@@ -153,9 +154,9 @@ navigator.getGamepads().forEach((gp) => {
 
 | デバイス | `id` の例（Chrome/Windows） |
 |---|---|
-| DualSense | `"Sony Interactive Entertainment Wireless Controller (054c/0ce6)"` |
-| DualSense（Bluetooth） | `"Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 0ce6)"` |
-| Fighting Stick Mini | `"HORI CO.,LTD. Fighting Stick mini (0f0d/011c)"` |
+| DualSense | `"DualSense Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 0ce6)"` |
+| DualSense（Bluetooth） | `"DualSense Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 0ce6)"` |
+| Fighting Stick Mini | `"XBOX 360 Controller For Windows (STANDARD GAMEPAD)"` |
 
 ### `id` で**できること・できないこと**
 
@@ -180,7 +181,7 @@ navigator.getGamepads().forEach((gp) => {
 ### DualSense（USB 接続）
 
 ```
-gp.id        = "Sony Interactive Entertainment Wireless Controller (054c/0ce6)"
+gp.id        = "DualSense Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 0ce6)"
 gp.index     = 0
 gp.connected = true
 gp.mapping   = "standard"
@@ -206,7 +207,7 @@ gp.axes[1] = 0.031  // -1.0（上）〜 1.0（下）
 ### DualSense（Bluetooth 接続）
 
 ```
-gp.id        = "Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 0ce6)"
+gp.id        = "DualSense Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 0ce6)"
 gp.index     = 0
 gp.connected = true
 gp.mapping   = "standard"
@@ -214,26 +215,30 @@ gp.buttons.length = 18
 gp.axes.length    = 4
 ```
 
-> **Note:** USB と Bluetooth で `id` の書式が異なります。このプロジェクトの `detectConfig()` では  
-> `"DualSense"`, `"PlayStation 5"`, `"Wireless Controller"` などの複数パターンで対応しています。
+> **Note:** DualSense は USB・Bluetooth どちらの接続でも `id` の書式は同じ  
+> `"DualSense Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 0ce6)"` です。  
+> このプロジェクトの `detectConfig()` では `"DualSense"` パターンで両方に対応しています。
 
 ### Fighting Stick Mini（USB 接続）
 
 ```
-gp.id        = "HORI CO.,LTD. Fighting Stick mini (0f0d/011c)"
+gp.id        = "XBOX 360 Controller For Windows (STANDARD GAMEPAD)"
 gp.index     = 0
 gp.connected = true
-gp.mapping   = ""           // 非標準マッピング（"standard" でない場合がある）
-gp.buttons.length = 13      // デバイスによって異なる
-gp.axes.length    = 2       // レバーがアナログ軸にマップされる場合は 2 軸
-
-// レバーを右に倒した状態（アナログマッピングの場合）:
-gp.axes[0] = 1.0   // X 軸（右）
-gp.axes[1] = 0.0   // Y 軸（ニュートラル）
+gp.mapping   = "standard"
+gp.buttons.length = 17      // Xbox 360 互換モード（標準的な値）
+gp.axes.length    = 4       // 4 軸（Xbox 360 互換モード）
 
 // レバーが d-pad（十字キー）にマップされる場合:
+gp.buttons[12] = { pressed: true, touched: false, value: 1 }  // ↑
+gp.buttons[13] = { pressed: true, touched: false, value: 1 }  // ↓
+gp.buttons[14] = { pressed: true, touched: false, value: 1 }  // ←
 gp.buttons[15] = { pressed: true, touched: false, value: 1 }  // →
 ```
+
+> **Note:** Fighting Stick Mini は Xbox 360 互換モードで動作し、`id` は  
+> `"XBOX 360 Controller For Windows (STANDARD GAMEPAD)"` と報告されます。  
+> `detectConfig()` では `"XBOX 360 Controller"` パターンで自動判定します。
 
 ---
 
@@ -308,7 +313,8 @@ function identifyDevice(gamepadId) {
 
   if (lower.includes("fighting stick") ||
       lower.includes("hori") ||
-      lower.includes("arcade stick")) {
+      lower.includes("arcade stick") ||
+      lower.includes("xbox 360 controller")) {
     return "Fighting Stick (HORI)";
   }
 
