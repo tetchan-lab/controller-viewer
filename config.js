@@ -5,8 +5,16 @@
  * ここを編集するだけで座標・ラベル・画像パスをカスタマイズできます。
  *
  * 座標系: コントローラー画像の左上を (0, 0) とした px 単位。
- *   画像を差し替えたあと imageWidth / imageHeight とボタン座標を
- *   実際の写真に合わせて調整してください。
+ *   座標は images/ フォルダ内の実際の写真から計測した値です。
+ *
+ * 再計算方法:
+ *   1. 実画像を表示サイズ (imageWidth × imageHeight) にリサイズ
+ *   2. グリッドオーバーレイ付き画像を生成して各ボタン中心座標を読み取る
+ *   3. x, y にオーバーレイ中心座標、w, h にボタン直径（px）を設定
+ *
+ * 元画像サイズと表示サイズの対応:
+ *   DualSense        : 1500×1000 px → 表示 800×533 px (スケール 0.533)
+ *   Fighting Stick   : 1417×752  px → 表示 800×425 px (スケール 0.565)
  * ============================================================
  */
 
@@ -14,7 +22,7 @@
 
 // ----------------------------------------------------------------
 // DualSense (PlayStation 5) マッピング
-// ※ 座標は仮値です。実際の写真に合わせて調整してください。
+// 座標は images/ps5_dualsense.jpg を 800×533 に縮小した状態で計測。
 // ----------------------------------------------------------------
 const DUALSENSE_CONFIG = {
   id: "dualsense",
@@ -23,10 +31,13 @@ const DUALSENSE_CONFIG = {
   /** 接続デバイス名に含まれる文字列（部分一致・大文字小文字無視）*/
   deviceNamePatterns: ["DualSense", "PS5 Controller", "PlayStation 5"],
 
-  /** コントローラー画像のパスと基準サイズ */
-  image: "images/dualsense.svg",
+  /**
+   * コントローラー画像のパスと表示サイズ。
+   * 元画像 1500×1000 を 3:2 アスペクト比のまま縮小した値。
+   */
+  image: "images/ps5_dualsense.jpg",
   imageWidth: 800,
-  imageHeight: 450,
+  imageHeight: 533,
 
   /**
    * ボタン定義
@@ -37,31 +48,32 @@ const DUALSENSE_CONFIG = {
    *   shape : "circle" | "rect" (省略時は "circle")
    */
   buttons: [
-    // ── フェイスボタン ────────────────────────────────────
-    { index:  0, label: "×",        x: 610, y: 265, w: 38, h: 38 },
-    { index:  1, label: "○",        x: 650, y: 225, w: 38, h: 38 },
-    { index:  2, label: "□",        x: 570, y: 225, w: 38, h: 38 },
-    { index:  3, label: "△",        x: 610, y: 185, w: 38, h: 38 },
+    // ── フェイスボタン（右側ダイヤモンド配置）──────────────
+    { index:  0, label: "×",       x: 638, y: 202, w: 40, h: 40 },
+    { index:  1, label: "○",       x: 688, y: 163, w: 40, h: 40 },
+    { index:  2, label: "□",       x: 585, y: 163, w: 40, h: 40 },
+    { index:  3, label: "△",       x: 638, y: 127, w: 40, h: 40 },
 
     // ── ショルダー / トリガー ─────────────────────────────
-    { index:  4, label: "L1",       x: 175, y: 115, w: 55, h: 30, shape: "rect" },
-    { index:  5, label: "R1",       x: 625, y: 115, w: 55, h: 30, shape: "rect" },
-    { index:  6, label: "L2",       x: 175, y:  78, w: 55, h: 30, shape: "rect" },
-    { index:  7, label: "R2",       x: 625, y:  78, w: 55, h: 30, shape: "rect" },
+    // L1/R1 はバンパー（手前側）、L2/R2 はトリガー（奥側・最上段）
+    { index:  4, label: "L1",      x: 193, y:  47, w: 90, h: 25, shape: "rect" },
+    { index:  5, label: "R1",      x: 607, y:  47, w: 90, h: 25, shape: "rect" },
+    { index:  6, label: "L2",      x: 188, y:  17, w: 82, h: 22, shape: "rect" },
+    { index:  7, label: "R2",      x: 612, y:  17, w: 82, h: 22, shape: "rect" },
 
     // ── 特殊ボタン ────────────────────────────────────────
-    { index:  8, label: "Create",   x: 315, y: 225, w: 34, h: 34 },
-    { index:  9, label: "Options",  x: 485, y: 225, w: 34, h: 34 },
-    { index: 10, label: "L3",       x: 235, y: 300, w: 38, h: 38 },
-    { index: 11, label: "R3",       x: 505, y: 300, w: 38, h: 38 },
-    { index: 16, label: "PS",       x: 400, y: 270, w: 40, h: 40 },
-    { index: 17, label: "Touch",    x: 400, y: 215, w: 90, h: 55, shape: "rect" },
+    { index:  8, label: "Create",  x: 185, y:  68, w: 28, h: 24 },
+    { index:  9, label: "Options", x: 480, y:  68, w: 28, h: 24 },
+    { index: 10, label: "L3",      x: 225, y: 248, w: 42, h: 42 },
+    { index: 11, label: "R3",      x: 465, y: 248, w: 42, h: 42 },
+    { index: 16, label: "PS",      x: 400, y: 292, w: 34, h: 34 },
+    { index: 17, label: "Touch",   x: 400, y: 183, w: 130, h: 82, shape: "rect" },
 
     // ── 十字キー ──────────────────────────────────────────
-    { index: 12, label: "↑",        x: 200, y: 188, w: 32, h: 32 },
-    { index: 13, label: "↓",        x: 200, y: 252, w: 32, h: 32 },
-    { index: 14, label: "←",        x: 168, y: 220, w: 32, h: 32 },
-    { index: 15, label: "→",        x: 232, y: 220, w: 32, h: 32 },
+    { index: 12, label: "↑",       x: 141, y: 108, w: 34, h: 34 },
+    { index: 13, label: "↓",       x: 141, y: 178, w: 34, h: 34 },
+    { index: 14, label: "←",       x:  99, y: 143, w: 34, h: 34 },
+    { index: 15, label: "→",       x: 183, y: 143, w: 34, h: 34 },
   ],
 
   /**
@@ -71,14 +83,14 @@ const DUALSENSE_CONFIG = {
    *   radius       : スティック可動範囲の半径 (px)
    */
   sticks: [
-    { id: "LS", label: "LS", axisX: 0, axisY: 1, cx: 235, cy: 300, radius: 45 },
-    { id: "RS", label: "RS", axisX: 2, axisY: 3, cx: 505, cy: 300, radius: 45 },
+    { id: "LS", label: "LS", axisX: 0, axisY: 1, cx: 225, cy: 248, radius: 53 },
+    { id: "RS", label: "RS", axisX: 2, axisY: 3, cx: 465, cy: 248, radius: 53 },
   ],
 };
 
 // ----------------------------------------------------------------
 // Fighting Stick Mini (HORI) マッピング
-// ※ 座標は仮値です。実際の写真に合わせて調整してください。
+// 座標は images/fighting_stick_mini.jpg を 800×425 に縮小した状態で計測。
 // ----------------------------------------------------------------
 const FIGHTING_STICK_MINI_CONFIG = {
   id: "fightingStickMini",
@@ -87,10 +99,13 @@ const FIGHTING_STICK_MINI_CONFIG = {
   /** 接続デバイス名に含まれる文字列（部分一致・大文字小文字無視）*/
   deviceNamePatterns: ["Fighting Stick", "HORI", "Arcade Stick", "FS-Mini"],
 
-  /** コントローラー画像のパスと基準サイズ */
-  image: "images/fightingstick.svg",
+  /**
+   * コントローラー画像のパスと表示サイズ。
+   * 元画像 1417×752 をアスペクト比のまま縮小した値。
+   */
+  image: "images/fighting_stick_mini.jpg",
   imageWidth: 800,
-  imageHeight: 450,
+  imageHeight: 425,
 
   /**
    * ボタン定義
@@ -98,38 +113,40 @@ const FIGHTING_STICK_MINI_CONFIG = {
    * 実機の buttons[] インデックスはファームウェア/ドライバにより異なる場合があります。
    */
   buttons: [
-    // ── フェイスボタン（上段）────────────────────────────
-    { index:  3, label: "△",    x: 425, y: 185, w: 48, h: 48 },
-    { index:  2, label: "□",    x: 490, y: 160, w: 48, h: 48 },
-    { index:  5, label: "R1",   x: 560, y: 158, w: 48, h: 48 },
-    { index:  4, label: "L1",   x: 630, y: 163, w: 48, h: 48 },
+    // ── フェイスボタン（上段 左→右: □ △ R1 L1）──────────
+    { index:  2, label: "□",      x: 391, y: 175, w: 56, h: 56 },
+    { index:  3, label: "△",      x: 476, y: 158, w: 56, h: 56 },
+    { index:  5, label: "R1",     x: 563, y: 155, w: 56, h: 56 },
+    { index:  4, label: "L1",     x: 651, y: 158, w: 56, h: 56 },
 
-    // ── フェイスボタン（下段）────────────────────────────
-    { index:  0, label: "×",    x: 430, y: 250, w: 48, h: 48 },
-    { index:  1, label: "○",    x: 498, y: 225, w: 48, h: 48 },
-    { index:  7, label: "R2",   x: 568, y: 222, w: 48, h: 48 },
-    { index:  6, label: "L2",   x: 638, y: 228, w: 48, h: 48 },
+    // ── フェイスボタン（下段 左→右: × ○ R2 L2）──────────
+    { index:  0, label: "×",      x: 395, y: 222, w: 56, h: 56 },
+    { index:  1, label: "○",      x: 483, y: 212, w: 56, h: 56 },
+    { index:  7, label: "R2",     x: 568, y: 210, w: 56, h: 56 },
+    { index:  6, label: "L2",     x: 654, y: 214, w: 56, h: 56 },
 
-    // ── 特殊ボタン ────────────────────────────────────────
-    { index:  8, label: "Share",   x: 270, y: 345, w: 40, h: 34 },
-    { index:  9, label: "Options", x: 345, y: 345, w: 40, h: 34 },
-    { index: 16, label: "PS",      x: 400, y: 390, w: 40, h: 40 },
-    { index: 10, label: "L3",      x: 470, y: 345, w: 34, h: 34 },
-    { index: 11, label: "R3",      x: 530, y: 345, w: 34, h: 34 },
+    // ── 特殊ボタン（天板中央ストリップ）─────────────────
+    { index: 16, label: "PS",      x: 387, y: 118, w: 30, h: 30 },
+    { index:  8, label: "Share",   x: 432, y: 118, w: 28, h: 22, shape: "rect" },
+    { index:  9, label: "Options", x: 476, y: 118, w: 28, h: 22, shape: "rect" },
+    { index: 10, label: "L3",      x: 514, y: 118, w: 22, h: 22 },
+    { index: 11, label: "R3",      x: 547, y: 118, w: 22, h: 22 },
 
     // ── 十字キー（レバーが d-pad にマップされる場合）────
-    { index: 12, label: "↑",       x: 180, y: 205, w: 38, h: 38 },
-    { index: 13, label: "↓",       x: 180, y: 283, w: 38, h: 38 },
-    { index: 14, label: "←",       x: 141, y: 244, w: 38, h: 38 },
-    { index: 15, label: "→",       x: 219, y: 244, w: 38, h: 38 },
+    { index: 12, label: "↑",       x: 181, y: 148, w: 36, h: 36 },
+    { index: 13, label: "↓",       x: 181, y: 230, w: 36, h: 36 },
+    { index: 14, label: "←",       x: 133, y: 189, w: 36, h: 36 },
+    { index: 15, label: "→",       x: 229, y: 189, w: 36, h: 36 },
   ],
 
   /**
-   * レバー（アナログスティックにマップされる場合）
-   * レバーが d-pad 専用の場合はこのセクションは表示に使われません。
+   * レバー定義
+   *   レバーは通常 d-pad（十字キー）にマップされますが、
+   *   ドライバ設定によってはアナログ axes にマップされることもあります。
+   *   その場合はここの axisX / axisY を実機に合わせて調整してください。
    */
   sticks: [
-    { id: "Lever", label: "Lever", axisX: 0, axisY: 1, cx: 180, cy: 244, radius: 55 },
+    { id: "Lever", label: "Lever", axisX: 0, axisY: 1, cx: 181, cy: 189, radius: 63 },
   ],
 };
 
