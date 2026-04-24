@@ -230,13 +230,13 @@ const ALL_CONFIGS = [DUALSENSE_CONFIG, FIGHTING_STICK_MINI_CONFIG, MY_CONTROLLER
 
 ```javascript
 // id の例（DualSense、USB 接続）
-"Sony Interactive Entertainment Wireless Controller (054c/0ce6)"
+"DualSense Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 0ce6)"
 
 // id の例（DualSense、Bluetooth 接続）
-"Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 0ce6)"
+"DualSense Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 0ce6)"
 
 // id の例（Fighting Stick Mini、USB 接続）
-"HORI CO.,LTD. Fighting Stick mini (0f0d/011c)"
+"XBOX 360 Controller For Windows (STANDARD GAMEPAD)"
 ```
 
 ### 接続確認のサンプルコード
