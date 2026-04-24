@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Controller Viewer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- ステータスバー -->
+    <div id="status-bar">
+      <span id="device-name">コントローラー未接続 — USBまたはBluetoothで接続してください</span>
+      <div id="controller-select">
+        <button
+          class="ctrl-btn"
+          id="btn-dualsense"
+          onclick="switchController('dualsense')"
+          title="DualSense (PS5) を手動で選択">
+          DualSense
+        </button>
+        <button
+          class="ctrl-btn"
+          id="btn-fightingStickMini"
+          onclick="switchController('fightingStickMini')"
+          title="Fighting Stick Mini を手動で選択">
+          Fighting Stick Mini
+        </button>
+      </div>
+    </div>
+
+    <!-- コントローラー表示エリア -->
+    <div id="controller-container">
+      <div id="controller-wrapper">
+        <!-- コントローラー写真 (images/ フォルダに実際の PNG を置いてください) -->
+        <img id="controller-image" src="" alt="Controller" />
+
+        <!-- ボタン / スティック オーバーレイ (config.js から動的生成) -->
+        <div id="button-overlays"></div>
+
+        <!-- スティック軌跡描画キャンバス -->
+        <canvas id="stick-canvas"></canvas>
+      </div>
+    </div>
+
+    <!-- 操作ヒント -->
+    <p id="hint">
+      コントローラーを接続するとデバイス名で自動判定します。
+      上のボタンで手動切り替えも可能です。
+    </p>
+
+  </div>
+
+  <!-- 設定ファイル（ボタン座標・デバイス名パターン） -->
+  <script src="config.js"></script>
+  <!-- メインスクリプト（Gamepad API ポーリング・描画） -->
+  <script src="script.js"></script>
+</body>
+</html>
