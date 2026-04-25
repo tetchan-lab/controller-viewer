@@ -142,7 +142,6 @@ const FIGHTING_STICK_MINI_CONFIG = {
    */
   sticks: [
     { id: "Lever", label: "Lever", type: "lever", axisX: 0, axisY: 1, cx: 181, cy: 189, radius: 63,
-      stickSvg: "images/stick.svg",
       stickBallX: 194, stickBallY: 73,   // ニュートラル時のボール中心
       stickBaseX: 194, stickBaseY: 180,  // シャフト入口（天板上）
       stickBallRadius: 56,               // ボール半径 px

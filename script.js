@@ -98,14 +98,8 @@ function buildOverlays(config) {
   // スティック / レバー オーバーレイ
   for (const stick of config.sticks) {
     if (stick.type === "lever") {
-      // stickSvg が指定されていれば画像スプライトオーバーレイ、なければ SVG を生成
-      if (stick.stickSvg) {
-        const container = buildStickImgOverlay(stick);
-        elements.overlayLayer.appendChild(container);
-      } else {
-        const svg = buildLeverSVG(stick);
-        elements.overlayLayer.appendChild(svg);
-      }
+      const container = buildStickImgOverlay(stick);
+      elements.overlayLayer.appendChild(container);
     } else {
       const el = document.createElement("div");
       el.className = "stick-overlay";
@@ -607,13 +601,8 @@ function tick() {
     const axisY = gp.axes[stick.axisY] || 0;
 
     if (stick.type === "lever") {
-      if (stick.stickSvg) {
-        // カスタムレバー SVG を更新（d-pad / アナログ対応）
-        updateStickImg(stick, gp, config);
-      } else {
-        // レバー SVG のシャフト / ボールを更新
-        updateLeverSVG(stick, axisX, axisY);
-      }
+      // カスタムレバー SVG を更新（d-pad / アナログ対応）
+      updateStickImg(stick, gp, config);
     } else {
       // アナログスティック（div + dot）を更新
       const stickEl = document.getElementById("stick-" + stick.id);
@@ -628,45 +617,10 @@ function tick() {
       }
     }
 
-    // canvas に軸記録を描画（カスタムSVGレバーはスキップ）
-    if (!stick.stickSvg) {
+    // canvas に軸記録を描画（レバーはスキップ）
+    if (stick.type !== "lever") {
       drawStickIndicator(ctx, stick, axisX, axisY);
     }
-  }
-}
-
-/**
- * レバー SVG のシャフト・ボール位置をアナログ入力に合わせて更新する。
- * @param {object} stick
- * @param {number} axisX  -1.0 ~ 1.0
- * @param {number} axisY  -1.0 ~ 1.0
- */
-function updateLeverSVG(stick, axisX, axisY) {
-  const S     = stick.radius * 2;
-  const CX    = S / 2;
-  const CY    = S / 2;
-  const reach = CX * 0.85; // シャフト長（ニュートラル時）
-  const tilt  = CX * 0.55; // 最大傾き量（px）
-
-  const ballX = CX + axisX * tilt;
-  const ballY = CY - reach + axisY * tilt;
-
-  const shaft = document.getElementById("lever-shaft-" + stick.id);
-  const ball  = document.getElementById("lever-ball-"  + stick.id);
-
-  if (shaft) {
-    shaft.setAttribute("x2", ballX);
-    shaft.setAttribute("y2", ballY);
-    // 傾き量に応じてシャフト色を変化させる
-    const intensity = Math.sqrt(axisX * axisX + axisY * axisY);
-    const r = Math.round(192 + intensity * 40);
-    const g = Math.round(192 - intensity * 80);
-    const b = Math.round(192 - intensity * 80);
-    shaft.setAttribute("stroke", `rgb(${r},${g},${b})`);
-  }
-  if (ball) {
-    ball.setAttribute("cx", ballX);
-    ball.setAttribute("cy", ballY);
   }
 }
 
