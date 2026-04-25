@@ -226,14 +226,9 @@ body.transparent-bg #app {
   padding: 0;
 }
 
-/* ── レバー SVG transition ─────────────────────────────────── */
+/* ── カスタムレバー SVG transition ─────────────────────────── */
 #button-overlays svg [id^="lever-shaft-"],
 #button-overlays svg [id^="lever-ball-"] {
   transition: cx 0.04s linear, cy 0.04s linear,
               x2 0.04s linear, y2 0.04s linear;
-}
-
-/* ── stick.svg スプライトオーバーレイ transition ──────────── */
-[id^="stick-img-el-"] {
-  transition: transform 0.06s linear;
 }
