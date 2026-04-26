@@ -664,7 +664,7 @@ function getQueryConfig() {
 
   // クエリパラメーター指定時はステータスバーUI・ヒントを非表示にする
   if (queryConfig) {
-    document.getElementById("controller-select").style.display = "none";
+    document.getElementById("status-bar").style.display = "none";
     document.getElementById("hint").style.display = "none";
     // body に透過背景クラスを付与（OBS等でクロマキー合成しやすいように）
     document.body.classList.add("transparent-bg");
