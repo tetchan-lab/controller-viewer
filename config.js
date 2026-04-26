@@ -145,9 +145,9 @@ const FIGHTING_STICK_MINI_CONFIG = {
       stickBallX: 194, stickBallY: 73,   // ニュートラル時のボール中心
       stickBaseX: 194, stickBaseY: 180,  // シャフト入口（天板上）
       stickBallRadius: 56,               // ボール半径 px
-      stickTilt: 20,                     // 最大傾き量 px
+      stickTilt: 24,                     // 最大傾き量 px（デフォルト：20）
       stickShaftWidth: 30,               // シャフトの太さ px
-      stickColor: "#c8222a",            // ボール・シャフトの色
+      stickColor: "#e82832",            // ボール・シャフトの色（デフォルト：#c8222a）
       stickMaskShapes: [
         // 元写真のレバーを视覚的に消す覚い形状
         { type: "circle",  cx: 194, cy: 73,  r: 60,           fill: "#1c3005" }, // ボール周辺（背景グリーン）

@@ -84,7 +84,7 @@ body {
 
 /* ── コントローラー表示コンテナ ─────────────────────────────── */
 #controller-container {
-  overflow: auto;
+  overflow: visible;
   width: 100%;
   display: flex;
   justify-content: center;
