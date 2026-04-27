@@ -88,7 +88,7 @@ body {
   width: 100%;
   display: flex;
   justify-content: center;
-  padding: 16px;
+  padding: 16px 0px;
 }
 
 /* controller-wrapper のサイズは script.js で動的に設定される */
