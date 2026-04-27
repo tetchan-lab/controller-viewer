@@ -41,8 +41,10 @@ const DUALSENSE_CONFIG = {
 
   /**
    * サウンド定義
-   *   dpad    : 十字キー用のサウンド
-   *   buttons : ボタン用のサウンド
+   *   dpad           : 十字キー用のサウンド
+   *   buttons        : ボタン用のサウンド
+   *   stick          : アナログスティック押し込み用のサウンド
+   *   create_options : Create/Optionsボタン用のサウンド
    */
   sounds: {
     dpad: {
@@ -52,6 +54,14 @@ const DUALSENSE_CONFIG = {
     buttons: {
       press: "sounds/dualsense/btn-press.mp3",
       release: "sounds/dualsense/btn-release.mp3"
+    },
+    stick: {
+      press: "sounds/dualsense/stick-press.mp3",
+      release: "sounds/dualsense/stick-release.mp3"
+    },
+    create_options: {
+      press: "sounds/dualsense/create_options-press.mp3",
+      release: "sounds/dualsense/create_options-press.mp3"  // 離した音は押下音と同じ
     }
   },
 
@@ -77,8 +87,8 @@ const DUALSENSE_CONFIG = {
     { index:  7, label: "R2",      x: 750, y:  16, w: 82, h: 24, shape: "rect", soundCategory: "buttons" },
 
     // ── 特殊ボタン ────────────────────────────────────────
-    { index:  8, label: "Create",  x: 214, y:  67, w: 20, h: 36, soundCategory: "buttons" },
-    { index:  9, label: "Options", x: 585, y:  67, w: 20, h: 36, soundCategory: "buttons" },
+    { index:  8, label: "Create",  x: 214, y:  67, w: 20, h: 36, soundCategory: "create_options" },
+    { index:  9, label: "Options", x: 585, y:  67, w: 20, h: 36, soundCategory: "create_options" },
     { index: 10, label: "L3",      x: 272, y: 262, w: 42, h: 42, soundCategory: "buttons" },
     { index: 11, label: "R3",      x: 527, y: 262, w: 42, h: 42, soundCategory: "buttons" },
     { index: 16, label: "PS",      x: 400, y: 304, w: 34, h: 8, shape: "rect", soundCategory: "buttons" },
@@ -128,6 +138,7 @@ const FIGHTING_STICK_MINI_CONFIG = {
    * サウンド定義
    *   lever   : レバー用のサウンド
    *   buttons : ボタン用のサウンド
+   *   upbtn   : 上部の小さなボタン用のサウンド
    */
   sounds: {
     lever: {
@@ -137,6 +148,10 @@ const FIGHTING_STICK_MINI_CONFIG = {
     buttons: {
       press: "sounds/fightingStickMini/btn-press.mp3",
       release: "sounds/fightingStickMini/btn-release.mp3"
+    },
+    upbtn: {
+      press: "sounds/fightingStickMini/upbtn-press.mp3",
+      release: "sounds/fightingStickMini/upbtn-release.mp3"
     }
   },
 
@@ -159,11 +174,17 @@ const FIGHTING_STICK_MINI_CONFIG = {
     { index:  6, label: "L2",     x: 688, y: 191, w: 66, h: 32, soundCategory: "buttons" },
 
     // ── 特殊ボタン（天板中央ストリップ）─────────────────
-    { index: 16, label: "PS",      x: 404, y: 120, w: 30, h: 16, soundCategory: "buttons" },
-    { index:  8, label: "Share",   x: 458, y: 120, w: 22, h: 14, soundCategory: "buttons" },
-    { index:  9, label: "Options", x: 506, y: 120, w: 22, h: 14, soundCategory: "buttons" },
-    { index: 10, label: "L3",      x: 553, y: 121, w: 22, h: 14, soundCategory: "buttons" },
-    { index: 11, label: "R3",      x: 601, y: 120, w: 22, h: 14, soundCategory: "buttons" },
+    { index: 16, label: "PS",      x: 404, y: 120, w: 30, h: 16, soundCategory: "upbtn" },
+    { index:  8, label: "Share",   x: 458, y: 120, w: 22, h: 14, soundCategory: "upbtn" },
+    { index:  9, label: "Options", x: 506, y: 120, w: 22, h: 14, soundCategory: "upbtn" },
+    { index: 10, label: "L3",      x: 553, y: 121, w: 22, h: 14, soundCategory: "upbtn" },
+    { index: 11, label: "R3",      x: 601, y: 120, w: 22, h: 14, soundCategory: "upbtn" },
+
+    // ── レバー（d-padボタンとして認識される場合の定義）──
+    { index: 12, label: "↑", x: 181, y: 140, w: 0, h: 0, soundCategory: "lever" },  // サイズ0で非表示
+    { index: 13, label: "↓", x: 181, y: 240, w: 0, h: 0, soundCategory: "lever" },
+    { index: 14, label: "←", x: 130, y: 189, w: 0, h: 0, soundCategory: "lever" },
+    { index: 15, label: "→", x: 230, y: 189, w: 0, h: 0, soundCategory: "lever" },
   ],
 
   /**

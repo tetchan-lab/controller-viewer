@@ -26,6 +26,8 @@ const state = {
   buttonStates: {},
   /** レバー/アナログスティックステート追跡: stickId → { axisX, axisY } */
   leverStates: {},
+  /** サウンドシステムが初期化済みか */
+  soundInitialized: false,
 };
 
 // ── DOM 参照 ──────────────────────────────────────────────────
@@ -578,7 +580,24 @@ function tick() {
           dot.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
         }
       }
-    }
+      // アナログスティックのサウンド処理（傾きの検知）
+      const threshold = 0.2; // ニュートラル判定の閾値（スティックは敏感なので小さめ）
+      const isNeutral = Math.abs(axisX) < threshold && Math.abs(axisY) < threshold;
+      const prevState = state.leverStates[stick.id] || { isNeutral: true };
+      
+      if (isNeutral !== prevState.isNeutral) {
+        if (config.sounds && config.sounds.stick) {
+          const soundId = `${config.id}_stick`;
+          if (!isNeutral) {
+            // スティックを傾けた（ニュートラルから離れた）
+            soundManager.play(`${soundId}_press`);
+          } else {
+            // スティックがニュートラルに戻った
+            soundManager.play(`${soundId}_release`);
+          }
+        }
+        state.leverStates[stick.id] = { isNeutral };
+      }    }
 
     // canvas に軸記録を描画（レバーはスキップ）
     if (stick.type !== "lever") {
@@ -747,11 +766,21 @@ function getQueryConfig() {
     }
   }
 
-  // サウンドシステムの初期化とサウンドファイルの読み込み
-  initSoundSystem();
+  // ページ全体の最初のクリックでサウンドシステムを初期化（Chrome autoplay policy対応）
+  document.addEventListener('click', initSoundSystemOnce, { once: true });
+  document.addEventListener('touchstart', initSoundSystemOnce, { once: true });
 })();
 
 // ── サウンドシステム初期化 ─────────────────────────────────────
+/**
+ * ユーザーインタラクション後に1度だけサウンドシステムを初期化（Chrome autoplay policy対応）
+ */
+function initSoundSystemOnce() {
+  if (state.soundInitialized) return;
+  state.soundInitialized = true;
+  initSoundSystem();
+}
+
 /**
  * サウンドマネージャーの初期化とサウンドファイルの事前読み込み
  */

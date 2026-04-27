@@ -7,16 +7,21 @@
 ```
 sounds/
 ├── dualsense/
-│   ├── dpad-press.mp3      # 十字キー押下時
-│   ├── dpad-release.mp3    # 十字キー離した時
-│   ├── btn-press.mp3       # ボタン押下時
-│   └── btn-release.mp3     # ボタン離した時
+│   ├── dpad-press.mp3           # 十字キー押下時
+│   ├── dpad-release.mp3         # 十字キー離した時
+│   ├── btn-press.mp3            # ボタン押下時
+│   ├── btn-release.mp3          # ボタン離した時
+│   ├── stick-press.mp3          # アナログスティック押下時（L3/R3）
+│   ├── stick-release.mp3        # アナログスティック離した時（L3/R3）
+│   └── create_options-press.mp3 # Create/Optionsボタン押下時
 │
 └── fightingStickMini/
-    ├── lever-press.mp3     # レバー倒した時
-    ├── lever-release.mp3   # レバーニュートラルに戻った時
-    ├── btn-press.mp3       # ボタン押下時
-    └── btn-release.mp3     # ボタン離した時
+    ├── lever-press.mp3          # レバー倒した時
+    ├── lever-release.mp3        # レバーニュートラルに戻った時
+    ├── btn-press.mp3            # ボタン押下時（×○□△ R1/R2 L1/L2）
+    ├── btn-release.mp3          # ボタン離した時（×○□△ R1/R2 L1/L2）
+    ├── upbtn-press.mp3          # 上部の小さなボタン押下時（PS/Share/Options/L3/R3）
+    └── upbtn-release.mp3        # 上部の小さなボタン離した時（PS/Share/Options/L3/R3）
 ```
 
 ## 音声ファイルの準備
@@ -37,9 +42,57 @@ sounds/
 
 検索ワード例: `button click`, `mechanical switch`, `keyboard click`, `arcade stick`, `lever click`
 
-#### 2. 自分で録音
-- スマートフォンやPCマイクで実際のコントローラー音を録音
-- Audacityなどの無料ソフトで編集（ノイズ除去、トリミング、正規化）
+#### 2. 自分で録音（推奨）
+実際のコントローラー音を録音することで、最もリアルなサウンドが得られます。  
+録音ソフト：[Audacity](https://www.audacityteam.org/)
+
+**録音機材例：**
+- オーディオインターフェース（volt276など）+ コンデンサーマイク/ダイナミックマイク
+- スマートフォン（iPhone等）の標準録音アプリ
+- PCの内蔵マイク
+
+**効率的な録音手順：**
+
+1. **一括録音**（推奨）
+   - 1つの録音セッションで全パターンを収録
+   - 例：「ボタン押す、離す、押す、離す...」を連続で10回
+   - 後で編集時に切り出す方が効率的
+
+2. **Audacityでの編集ワークフロー**
+   
+   ```
+   ① インポート
+      File → Open → 録音ファイルを開く
+   
+   ② ノイズ除去
+      - 無音部分を選択 → Effect → Noise Reduction → Get Noise Profile
+      - 全体を選択（Ctrl+A） → Effect → Noise Reduction → OK
+   
+   ③ トリミング
+      - 必要な音の部分を選択（ドラッグ）
+      - Ctrl+T（選択範囲をトリミング）
+      - 前後の余白を0.01秒程度残す
+   
+   ④ 正規化
+      - Effect → Normalize → Normalize peak amplitude to -1.0 dB
+   
+   ⑤ 書き出し
+      - File → Export → Export Audio...
+      - Format: MP3 Files
+      - Quality: 128 kbps (Standard)以上
+      - ファイル名を指定して保存
+   ```
+
+3. **複数ファイルの一括処理**（時短テク）
+   - 各音をラベルで区切る：Analyze → Label Sounds
+   - または手動で：Edit → Labels → Add Label at Selection (Ctrl+B)
+   - File → Export → Export Multiple... でラベルごとに分割エクスポート
+
+**録音のコツ：**
+- マイクとコントローラーの距離：10〜20cm程度
+- 周囲の雑音を最小限に（エアコン・PCファンを停止）
+- 複数回録音して良いテイクを選ぶ
+- 「押す音」と「離す音」は微妙に違うので、両方しっかり録る
 
 #### 3. サンプル音声（開発用）
 開発・テスト用に無音ファイル（silence.mp3）を配置することもできます：
