@@ -835,7 +835,20 @@ function initSoundUI() {
  */
 function openSoundSettings() {
   const modal = document.getElementById('sound-modal');
-  if (modal) {
+  const modalContent = modal?.querySelector('.modal-content');
+  const settingsBtn = document.getElementById('btn-sound-settings');
+  
+  if (modal && modalContent && settingsBtn) {
+    // 歯車ボタンの位置を取得
+    const btnRect = settingsBtn.getBoundingClientRect();
+    
+    // モーダルを歯車ボタンの下に配置
+    const topPosition = btnRect.bottom + 8; // ボタンの下に8pxの余白
+    const rightPosition = window.innerWidth - btnRect.right; // 右端からの距離を合わせる
+    
+    modalContent.style.top = `${topPosition}px`;
+    modalContent.style.right = `${rightPosition}px`;
+    
     modal.style.display = 'block';
   }
 }
