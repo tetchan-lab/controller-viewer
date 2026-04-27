@@ -12,7 +12,7 @@ class SoundManager {
     this.audioContext = null;
     this.buffers = {}; // soundId -> AudioBuffer
     this.enabled = true;
-    this.volume = 1.0;
+    this.volume = 0.5; // 初期音量50%
     this.initialized = false;
     
     // localStorageから設定を復元
