@@ -28,6 +28,14 @@
           title="Fighting Stick Mini を手動で選択">
           Fighting Stick Mini
         </button>
+        <!-- サウンド設定ボタン -->
+        <button
+          class="ctrl-btn settings-btn"
+          id="btn-sound-settings"
+          onclick="openSoundSettings()"
+          title="サウンド設定">
+          ⚙️
+        </button>
       </div>
     </div>
 
@@ -55,8 +63,40 @@
       <a href="index.html?debug"><code>index.html?debug</code></a>
     </p>
 
+    <!-- サウンド設定モーダル -->
+    <div id="sound-modal" class="modal" style="display: none;">
+      <div class="modal-overlay" onclick="closeSoundSettings()"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>サウンド設定</h2>
+          <button class="modal-close" onclick="closeSoundSettings()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="setting-row">
+            <label for="sound-enabled">
+              <input type="checkbox" id="sound-enabled" onchange="toggleSound(this.checked)" checked />
+              サウンドを有効化
+            </label>
+          </div>
+          <div class="setting-row">
+            <label for="sound-volume">音量</label>
+            <input
+              type="range"
+              id="sound-volume"
+              min="0"
+              max="100"
+              value="100"
+              oninput="updateVolume(this.value)" />
+            <span id="volume-value">100%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
+  <!-- サウンドマネージャー -->
+  <script src="sound-manager.js"></script>
   <!-- 設定ファイル（ボタン座標・デバイス名パターン） -->
   <script src="config.js"></script>
   <!-- メインスクリプト（Gamepad API ポーリング・描画） -->

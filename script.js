@@ -22,6 +22,10 @@ const state = {
   pinnedConfigId: null,
   /** requestAnimationFrame の ID */
   rafId: null,
+  /** ボタンステート追跡（サウンドトリガー用）: buttonIndex → boolean */
+  buttonStates: {},
+  /** レバー/アナログスティックステート追跡: stickId → { axisX, axisY } */
+  leverStates: {},
 };
 
 // ── DOM 参照 ──────────────────────────────────────────────────
@@ -473,6 +477,18 @@ function loop() {
 }
 
 /**
+ * ボタンのサウンドカテゴリを取得する。
+ * @param {number} buttonIndex - ボタンのインデックス
+ * @param {object} config - コントローラー設定
+ * @returns {string|null} - サウンドカテゴリ（"dpad", "buttons", "lever"）またはnull
+ */
+function getButtonSoundCategory(buttonIndex, config) {
+  if (!config || !config.buttons) return null;
+  const button = config.buttons.find(b => b.index === buttonIndex);
+  return button ? (button.soundCategory || null) : null;
+}
+
+/**
  * 1フレーム分の入力状態を取得してUIに反映する。
  */
 function tick() {
@@ -501,6 +517,23 @@ function tick() {
     if (typeof btn.value === "number") {
       el.style.setProperty("--analog-value", btn.value.toFixed(2));
     }
+
+    // ボタンステート変化の検知とサウンド再生
+    const prevPressed = state.buttonStates[idx] || false;
+    if (pressed !== prevPressed) {
+      const soundCategory = getButtonSoundCategory(idx, config);
+      if (soundCategory) {
+        const soundId = `${config.id}_${soundCategory}`;
+        if (pressed) {
+          // 押下時
+          soundManager.play(`${soundId}_press`);
+        } else {
+          // 離した時
+          soundManager.play(`${soundId}_release`);
+        }
+      }
+      state.buttonStates[idx] = pressed;
+    }
   });
 
   // ── スティック状態の反映 ──
@@ -514,6 +547,25 @@ function tick() {
     if (stick.type === "lever") {
       // カスタムレバー SVG を更新（d-pad / アナログ対応）
       updateStickImg(stick, gp, config);
+
+      // レバーのサウンド処理（アナログ値がニュートラルから離れた/戻った）
+      const threshold = 0.3; // ニュートラル判定の閾値
+      const isNeutral = Math.abs(axisX) < threshold && Math.abs(axisY) < threshold;
+      const prevState = state.leverStates[stick.id] || { isNeutral: true };
+      
+      if (isNeutral !== prevState.isNeutral) {
+        if (config.sounds && config.sounds.lever) {
+          const soundId = `${config.id}_lever`;
+          if (!isNeutral) {
+            // レバーを倒した（ニュートラルから離れた）
+            soundManager.play(`${soundId}_press`);
+          } else {
+            // レバーがニュートラルに戻った
+            soundManager.play(`${soundId}_release`);
+          }
+        }
+        state.leverStates[stick.id] = { isNeutral };
+      }
     } else {
       // アナログスティック（div + dot）を更新
       const stickEl = document.getElementById("stick-" + stick.id);
@@ -694,4 +746,99 @@ function getQueryConfig() {
       startPolling();
     }
   }
+
+  // サウンドシステムの初期化とサウンドファイルの読み込み
+  initSoundSystem();
 })();
+
+// ── サウンドシステム初期化 ─────────────────────────────────────
+/**
+ * サウンドマネージャーの初期化とサウンドファイルの事前読み込み
+ */
+async function initSoundSystem() {
+  // AudioContextの初期化
+  await soundManager.init();
+
+  // すべてのコントローラー設定からサウンドファイルを収集
+  const soundMap = {};
+  for (const config of ALL_CONFIGS) {
+    if (!config.sounds) continue;
+
+    for (const [category, paths] of Object.entries(config.sounds)) {
+      const soundIdPrefix = `${config.id}_${category}`;
+      if (paths.press) {
+        soundMap[`${soundIdPrefix}_press`] = paths.press;
+      }
+      if (paths.release) {
+        soundMap[`${soundIdPrefix}_release`] = paths.release;
+      }
+    }
+  }
+
+  // サウンドファイルを一括読み込み
+  await soundManager.loadSounds(soundMap);
+
+  // UI初期化（localStorageから設定を復元）
+  initSoundUI();
+}
+
+/**
+ * サウンド設定UIの初期化（localStorageから復元）
+ */
+function initSoundUI() {
+  const volumeSlider = document.getElementById('sound-volume');
+  const volumeValue = document.getElementById('volume-value');
+  const enabledCheckbox = document.getElementById('sound-enabled');
+
+  if (volumeSlider && volumeValue) {
+    const volume = Math.round(soundManager.getVolume() * 100);
+    volumeSlider.value = volume;
+    volumeValue.textContent = `${volume}%`;
+  }
+
+  if (enabledCheckbox) {
+    enabledCheckbox.checked = soundManager.isEnabled();
+  }
+}
+
+/**
+ * サウンド設定モーダルを開く
+ */
+function openSoundSettings() {
+  const modal = document.getElementById('sound-modal');
+  if (modal) {
+    modal.style.display = 'block';
+  }
+}
+
+/**
+ * サウンド設定モーダルを閉じる
+ */
+function closeSoundSettings() {
+  const modal = document.getElementById('sound-modal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+/**
+ * サウンドのON/OFFを切り替え
+ * @param {boolean} enabled - 有効/無効
+ */
+function toggleSound(enabled) {
+  soundManager.setEnabled(enabled);
+}
+
+/**
+ * 音量を更新
+ * @param {number} value - 音量（0〜100）
+ */
+function updateVolume(value) {
+  const volume = parseInt(value, 10) / 100;
+  soundManager.setVolume(volume);
+  
+  const volumeValue = document.getElementById('volume-value');
+  if (volumeValue) {
+    volumeValue.textContent = `${value}%`;
+  }
+}

@@ -40,6 +40,22 @@ const DUALSENSE_CONFIG = {
   imageHeight: 533,
 
   /**
+   * サウンド定義
+   *   dpad    : 十字キー用のサウンド
+   *   buttons : ボタン用のサウンド
+   */
+  sounds: {
+    dpad: {
+      press: "sounds/dualsense/dpad-press.mp3",
+      release: "sounds/dualsense/dpad-release.mp3"
+    },
+    buttons: {
+      press: "sounds/dualsense/btn-press.mp3",
+      release: "sounds/dualsense/btn-release.mp3"
+    }
+  },
+
+  /**
    * ボタン定義
    *   index : Gamepad API の buttons[] インデックス
    *   label : 表示ラベル
@@ -49,30 +65,30 @@ const DUALSENSE_CONFIG = {
    */
   buttons: [
     // ── フェイスボタン（右側ダイヤモンド配置）──────────────
-    { index:  0, label: "×",       x: 647, y: 212, w: 50, h: 50 },
-    { index:  1, label: "○",       x: 706, y: 153, w: 50, h: 50 },
-    { index:  2, label: "□",       x: 589, y: 154, w: 50, h: 50 },
-    { index:  3, label: "△",       x: 648, y: 95, w: 50, h: 50 },
+    { index:  0, label: "×",       x: 647, y: 212, w: 50, h: 50, soundCategory: "buttons" },
+    { index:  1, label: "○",       x: 706, y: 153, w: 50, h: 50, soundCategory: "buttons" },
+    { index:  2, label: "□",       x: 589, y: 154, w: 50, h: 50, soundCategory: "buttons" },
+    { index:  3, label: "△",       x: 648, y: 95, w: 50, h: 50, soundCategory: "buttons" },
 
     // ── ショルダー / トリガー ─────────────────────────────
-    { index:  4, label: "L1",      x: 152, y:  12, w: 106, h: 20, shape: "rect" },
-    { index:  5, label: "R1",      x: 648, y:  12, w: 106, h: 20, shape: "rect" },
-    { index:  6, label: "L2",      x: 50, y:  16, w: 82, h: 24, shape: "rect" },
-    { index:  7, label: "R2",      x: 750, y:  16, w: 82, h: 24, shape: "rect" },
+    { index:  4, label: "L1",      x: 152, y:  12, w: 106, h: 20, shape: "rect", soundCategory: "buttons" },
+    { index:  5, label: "R1",      x: 648, y:  12, w: 106, h: 20, shape: "rect", soundCategory: "buttons" },
+    { index:  6, label: "L2",      x: 50, y:  16, w: 82, h: 24, shape: "rect", soundCategory: "buttons" },
+    { index:  7, label: "R2",      x: 750, y:  16, w: 82, h: 24, shape: "rect", soundCategory: "buttons" },
 
     // ── 特殊ボタン ────────────────────────────────────────
-    { index:  8, label: "Create",  x: 214, y:  67, w: 20, h: 36 },
-    { index:  9, label: "Options", x: 585, y:  67, w: 20, h: 36 },
-    { index: 10, label: "L3",      x: 272, y: 262, w: 42, h: 42 },
-    { index: 11, label: "R3",      x: 527, y: 262, w: 42, h: 42 },
-    { index: 16, label: "PS",      x: 400, y: 304, w: 34, h: 8, shape: "rect" },
-    { index: 17, label: "Touch",   x: 400, y: 95, w: 280, h: 168, shape: "rect" },
+    { index:  8, label: "Create",  x: 214, y:  67, w: 20, h: 36, soundCategory: "buttons" },
+    { index:  9, label: "Options", x: 585, y:  67, w: 20, h: 36, soundCategory: "buttons" },
+    { index: 10, label: "L3",      x: 272, y: 262, w: 42, h: 42, soundCategory: "buttons" },
+    { index: 11, label: "R3",      x: 527, y: 262, w: 42, h: 42, soundCategory: "buttons" },
+    { index: 16, label: "PS",      x: 400, y: 304, w: 34, h: 8, shape: "rect", soundCategory: "buttons" },
+    { index: 17, label: "Touch",   x: 400, y: 95, w: 280, h: 168, shape: "rect", soundCategory: "buttons" },
 
     // ── 十字キー ──────────────────────────────────────────
-    { index: 12, label: "↑",       x: 151, y: 107, w: 34, h: 34 },
-    { index: 13, label: "↓",       x: 151, y: 200, w: 34, h: 34 },
-    { index: 14, label: "←",       x: 106, y: 152, w: 34, h: 34 },
-    { index: 15, label: "→",       x: 198, y: 152, w: 34, h: 34 },
+    { index: 12, label: "↑",       x: 151, y: 107, w: 34, h: 34, soundCategory: "dpad" },
+    { index: 13, label: "↓",       x: 151, y: 200, w: 34, h: 34, soundCategory: "dpad" },
+    { index: 14, label: "←",       x: 106, y: 152, w: 34, h: 34, soundCategory: "dpad" },
+    { index: 15, label: "→",       x: 198, y: 152, w: 34, h: 34, soundCategory: "dpad" },
   ],
 
   /**
@@ -109,29 +125,45 @@ const FIGHTING_STICK_MINI_CONFIG = {
   imageHeight: 425,
 
   /**
+   * サウンド定義
+   *   lever   : レバー用のサウンド
+   *   buttons : ボタン用のサウンド
+   */
+  sounds: {
+    lever: {
+      press: "sounds/fightingStickMini/lever-press.mp3",
+      release: "sounds/fightingStickMini/lever-release.mp3"
+    },
+    buttons: {
+      press: "sounds/fightingStickMini/btn-press.mp3",
+      release: "sounds/fightingStickMini/btn-release.mp3"
+    }
+  },
+
+  /**
    * ボタン定義
    * Fighting Stick Mini の標準アーケード配列（上段 4 + 下段 4）。
    * 実機の buttons[] インデックスはファームウェア/ドライバにより異なる場合があります。
    */
   buttons: [
     // ── フェイスボタン（上段 左→右: □ △ R1 L1）──────────
-    { index:  2, label: "□",      x: 417, y: 169, w: 60, h: 32 },
-    { index:  3, label: "△",      x: 502, y: 156, w: 60, h: 32 },
-    { index:  5, label: "R1",     x: 589, y: 150, w: 60, h: 32 },
-    { index:  4, label: "L1",     x: 678, y: 150, w: 60, h: 32 },
+    { index:  2, label: "□",      x: 417, y: 169, w: 60, h: 32, soundCategory: "buttons" },
+    { index:  3, label: "△",      x: 502, y: 156, w: 60, h: 32, soundCategory: "buttons" },
+    { index:  5, label: "R1",     x: 589, y: 150, w: 60, h: 32, soundCategory: "buttons" },
+    { index:  4, label: "L1",     x: 678, y: 150, w: 60, h: 32, soundCategory: "buttons" },
 
     // ── フェイスボタン（下段 左→右: × ○ R2 L2）──────
-    { index:  0, label: "×",      x: 418, y: 210, w: 60, h: 32 },
-    { index:  1, label: "○",      x: 506, y: 198, w: 60, h: 32 },
-    { index:  7, label: "R2",     x: 596, y: 192, w: 62, h: 32 },
-    { index:  6, label: "L2",     x: 688, y: 191, w: 66, h: 32 },
+    { index:  0, label: "×",      x: 418, y: 210, w: 60, h: 32, soundCategory: "buttons" },
+    { index:  1, label: "○",      x: 506, y: 198, w: 60, h: 32, soundCategory: "buttons" },
+    { index:  7, label: "R2",     x: 596, y: 192, w: 62, h: 32, soundCategory: "buttons" },
+    { index:  6, label: "L2",     x: 688, y: 191, w: 66, h: 32, soundCategory: "buttons" },
 
     // ── 特殊ボタン（天板中央ストリップ）─────────────────
-    { index: 16, label: "PS",      x: 404, y: 120, w: 30, h: 16 },
-    { index:  8, label: "Share",   x: 458, y: 120, w: 22, h: 14 },
-    { index:  9, label: "Options", x: 506, y: 120, w: 22, h: 14 },
-    { index: 10, label: "L3",      x: 553, y: 121, w: 22, h: 14 },
-    { index: 11, label: "R3",      x: 601, y: 120, w: 22, h: 14 },
+    { index: 16, label: "PS",      x: 404, y: 120, w: 30, h: 16, soundCategory: "buttons" },
+    { index:  8, label: "Share",   x: 458, y: 120, w: 22, h: 14, soundCategory: "buttons" },
+    { index:  9, label: "Options", x: 506, y: 120, w: 22, h: 14, soundCategory: "buttons" },
+    { index: 10, label: "L3",      x: 553, y: 121, w: 22, h: 14, soundCategory: "buttons" },
+    { index: 11, label: "R3",      x: 601, y: 120, w: 22, h: 14, soundCategory: "buttons" },
   ],
 
   /**
