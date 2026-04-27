@@ -22,7 +22,7 @@ body {
 /* ── アプリ全体レイアウト ───────────────────────────────────── */
 #app {
   width: 100%;
-  max-width: 900px;
+  max-width: 916px;
   padding: 28px 16px 16px;
   display: flex;
   flex-direction: column;

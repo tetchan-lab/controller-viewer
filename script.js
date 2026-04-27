@@ -396,6 +396,9 @@ window.addEventListener("gamepadconnected", (e) => {
   // 接続済みリストに登録
   state.connectedGamepads[gp.index] = gp;
 
+  // ゲームパッド接続時にサウンドシステム初期化を試みる（OBS対応）
+  initSoundSystemOnce();
+
   // クエリ固定モード: 対応デバイス以外は無視
   if (state.pinnedConfigId) {
     const detected = detectConfig(gp.id);
@@ -523,6 +526,11 @@ function tick() {
     // ボタンステート変化の検知とサウンド再生
     const prevPressed = state.buttonStates[idx] || false;
     if (pressed !== prevPressed) {
+      // 最初のボタン入力時にサウンドシステム初期化を試みる（OBS対応）
+      if (!state.soundInitialized) {
+        initSoundSystemOnce();
+      }
+      
       const soundCategory = getButtonSoundCategory(idx, config);
       if (soundCategory) {
         const soundId = `${config.id}_${soundCategory}`;
@@ -556,6 +564,11 @@ function tick() {
       const prevState = state.leverStates[stick.id] || { isNeutral: true };
       
       if (isNeutral !== prevState.isNeutral) {
+        // 最初のレバー入力時にサウンドシステム初期化を試みる（OBS対応）
+        if (!state.soundInitialized) {
+          initSoundSystemOnce();
+        }
+        
         if (config.sounds && config.sounds.lever) {
           const soundId = `${config.id}_lever`;
           if (!isNeutral) {
@@ -586,6 +599,11 @@ function tick() {
       const prevState = state.leverStates[stick.id] || { isNeutral: true };
       
       if (isNeutral !== prevState.isNeutral) {
+        // 最初のスティック入力時にサウンドシステム初期化を試みる（OBS対応）
+        if (!state.soundInitialized) {
+          initSoundSystemOnce();
+        }
+        
         if (config.sounds && config.sounds.stick) {
           const soundId = `${config.id}_stick`;
           if (!isNeutral) {
@@ -775,10 +793,16 @@ function getQueryConfig() {
 /**
  * ユーザーインタラクション後に1度だけサウンドシステムを初期化（Chrome autoplay policy対応）
  */
-function initSoundSystemOnce() {
-  if (state.soundInitialized) return;
-  state.soundInitialized = true;
-  initSoundSystem();
+async function initSoundSystemOnce() {
+  // soundManagerの初期化状態で判定（失敗した場合も再試行可能）
+  if (soundManager.initialized) return;
+  
+  await initSoundSystem();
+  
+  // 初期化が成功した場合のみフラグを立てる
+  if (soundManager.initialized) {
+    state.soundInitialized = true;
+  }
 }
 
 /**
