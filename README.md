@@ -84,20 +84,22 @@ controller-viewer/
 └── sounds/
     ├── README.md                # サウンドファイル準備ガイド
     ├── dualsense/               # DualSense 用サウンドファイル（MP3）
-    │   ├── dpad_press.mp3
-    │   ├── dpad_release.mp3
-    │   ├── buttons_press.mp3
-    │   ├── buttons_release.mp3
-    │   ├── stick_press.mp3
-    │   ├── stick_release.mp3
-    │   └── create_options_press.mp3
+    │   ├── dpad-press.mp3
+    │   ├── dpad-release.mp3
+    │   ├── btn-press.mp3
+    │   ├── btn-release.mp3
+    │   ├── stick-press.mp3
+    │   ├── stick-release.mp3
+    │   ├── touch-press.mp3
+    │   ├── touch-release.mp3
+    │   └── create_options-press.mp3
     └── fightingStickMini/       # Fighting Stick Mini 用サウンドファイル（MP3）
-        ├── lever_press.mp3
-        ├── lever_release.mp3
-        ├── buttons_press.mp3
-        ├── buttons_release.mp3
-        ├── upbtn_press.mp3
-        └── upbtn_release.mp3
+        ├── lever-press.mp3
+        ├── lever-release.mp3
+        ├── btn-press.mp3
+        ├── btn-release.mp3
+        ├── upbtn-press.mp3
+        └── upbtn-release.mp3
 ```
 
 ---
@@ -203,7 +205,7 @@ https://tetchan-lab.github.io/controller-viewer/?controller=dualsense&debug
 
 - **低レイテンシー再生**：ボタン・レバー・スティック操作に即座に反応
 - **カテゴリ別サウンド**：
-  - DualSense: 十字キー、ボタン、スティック、Create/Options
+  - DualSense: 十字キー、ボタン、スティック、タッチパッド、Create/Options
   - Fighting Stick Mini: レバー、ボタン、上部小ボタン
 - **音量調整とON/OFF**：歯車アイコン（⚙️）から設定可能
 - **設定の永続化**：localStorage により設定を保存

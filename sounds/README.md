@@ -13,6 +13,8 @@ sounds/
 │   ├── btn-release.mp3          # ボタン離した時
 │   ├── stick-press.mp3          # アナログスティック押下時（L3/R3）
 │   ├── stick-release.mp3        # アナログスティック離した時（L3/R3）
+│   ├── touch-press.mp3          # タッチパッド押下時
+│   ├── touch-release.mp3        # タッチパッド離した時
 │   └── create_options-press.mp3 # Create/Optionsボタン押下時
 │
 └── fightingStickMini/

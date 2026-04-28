@@ -45,6 +45,7 @@ const DUALSENSE_CONFIG = {
    *   buttons        : ボタン用のサウンド
    *   stick          : アナログスティック押し込み用のサウンド
    *   create_options : Create/Optionsボタン用のサウンド
+   *   touch          : タッチパッド用のサウンド
    */
   sounds: {
     dpad: {
@@ -62,6 +63,10 @@ const DUALSENSE_CONFIG = {
     create_options: {
       press: "sounds/dualsense/create_options-press.mp3",
       release: "sounds/dualsense/create_options-press.mp3"  // 離した音は押下音と同じ
+    },
+    touch: {
+      press: "sounds/dualsense/touch-press.mp3",
+      release: "sounds/dualsense/touch-release.mp3"
     }
   },
 
@@ -92,7 +97,7 @@ const DUALSENSE_CONFIG = {
     { index: 10, label: "L3",      x: 272, y: 262, w: 42, h: 42, soundCategory: "buttons" },
     { index: 11, label: "R3",      x: 527, y: 262, w: 42, h: 42, soundCategory: "buttons" },
     { index: 16, label: "PS",      x: 400, y: 304, w: 34, h: 8, shape: "rect", soundCategory: "buttons" },
-    { index: 17, label: "Touch",   x: 400, y: 95, w: 280, h: 168, shape: "rect", soundCategory: "buttons" },
+    { index: 17, label: "Touch",   x: 400, y: 95, w: 280, h: 168, shape: "rect", soundCategory: "touch" },
 
     // ── 十字キー ──────────────────────────────────────────
     { index: 12, label: "↑",       x: 151, y: 107, w: 34, h: 34, soundCategory: "dpad" },
