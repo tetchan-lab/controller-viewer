@@ -194,13 +194,13 @@ body {
 
 /* ── ヒントテキスト ─────────────────────────────────────────── */
 #hint {
-  font-size: 0.75rem;
-  color: #555;
+  font-size: 0.8rem;
+  color: #888;
   text-align: center;
 }
 
 #hint code {
-  font-family: monospace;
+  font-family: "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
   background: #1a1a1a;
   padding: 1px 4px;
   border-radius: 3px;
