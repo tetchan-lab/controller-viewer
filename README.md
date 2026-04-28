@@ -174,6 +174,7 @@ https://tetchan-lab.github.io/controller-viewer/?controller=fightingStickMini
    - DualSense: **幅 800 × 高さ 565**
    - Fighting Stick Mini: **幅 800 × 高さ 457**
 4. OBS のフィルタで **「クロマキー」** を追加し、緑色を指定して背景を透過
+5. 音量調整は[OBS での音量調整](#OBS-での音量調整)をご覧ください。
 
 > **Note:** クエリパラメーターを使用すると、コントローラー切り替えボタンとステータス表示が非表示になり、
 > 指定したコントローラーのみが常に表示されます。OBS での使用に最適化された表示になります。
