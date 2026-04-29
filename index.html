@@ -28,6 +28,14 @@
           title="Fighting Stick Mini を手動で選択">
           Fighting Stick Mini
         </button>
+        <!-- デバイス選択 -->
+        <select
+          class="ctrl-btn device-select"
+          id="device-select"
+          onchange="switchDevice(this.value)"
+          title="使用するゲームパッドを選択">
+          <option value="auto">すべてのデバイス</option>
+        </select>
         <!-- サウンド設定ボタン -->
         <button
           class="ctrl-btn settings-btn"
@@ -59,6 +67,9 @@
       配信用URL例:
       <a href="index.html?controller=dualsense"><code>index.html?controller=dualsense</code></a> /
       <a href="index.html?controller=fightingStickMini"><code>index.html?controller=fightingStickMini</code></a><br>
+      デバイス指定例:
+      <a href="index.html?controller=dualsense&device=0"><code>index.html?controller=dualsense&device=0</code></a> (index 0のみ) /
+      <a href="index.html?controller=fightingStickMini&device=1"><code>index.html?controller=fightingStickMini&device=1</code></a> (index 1のみ)<br>
       デバッグモード（座標確認用）:
       <a href="index.html?debug"><code>index.html?debug</code></a><br>
       使い方（外部リンク）：

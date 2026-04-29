@@ -226,13 +226,15 @@ const ALL_CONFIGS = [DUALSENSE_CONFIG, FIGHTING_STICK_MINI_CONFIG];
 
 /**
  * Gamepad の id 文字列から最適な設定を返す。
- * どのパターンにも一致しなければ null を返す。
+ * デバイス名パターンマッチングを試みて、一致しなければデフォルト設定を返す。
+ * これにより、すべての STANDARD GAMEPAD デバイスが動作可能。
  *
  * @param {string} gamepadId  - gamepad.id
- * @returns {object|null}     - マッチした設定オブジェクト or null
+ * @returns {object}          - マッチした設定 or デフォルト設定
  */
 function detectConfig(gamepadId) {
   const lower = gamepadId.toLowerCase();
+  // デバイス名パターンマッチングを試す
   for (const cfg of ALL_CONFIGS) {
     for (const pattern of cfg.deviceNamePatterns) {
       if (lower.includes(pattern.toLowerCase())) {
@@ -240,5 +242,7 @@ function detectConfig(gamepadId) {
       }
     }
   }
-  return null;
+  // パターンに一致しない場合はデフォルト設定を返す
+  // すべての STANDARD GAMEPAD デバイスが動作可能
+  return DUALSENSE_CONFIG;
 }

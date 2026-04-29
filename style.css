@@ -22,7 +22,7 @@ body {
 /* ── アプリ全体レイアウト ───────────────────────────────────── */
 #app {
   width: 100%;
-  max-width: 916px;
+  max-width: 900px;
   padding: 28px 16px 16px;
   display: flex;
   flex-direction: column;
@@ -32,7 +32,8 @@ body {
 
 /* ── ステータスバー ─────────────────────────────────────────── */
 #status-bar {
-  width: 100%;
+  width: 800px;
+  max-width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -41,7 +42,7 @@ body {
   background: #1a1a1a;
   border: 1px solid #2a2a2a;
   border-radius: 8px;
-  padding: 10px 16px;
+  padding: 10px 12px;
 }
 
 #device-name {
@@ -58,6 +59,10 @@ body {
 #controller-select {
   display: flex;
   gap: 8px;
+}
+
+.device-select {
+  width: 420px;
 }
 
 .ctrl-btn {
