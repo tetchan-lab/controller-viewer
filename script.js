@@ -371,7 +371,8 @@ function updateStickImg(stick, gp, config) {
  *   stickBallRadius   : ボール半径 px（省略時 20）
  *   stickTilt         : 最大傾き量 px（省略時 radius * 0.6）
  *   stickColor        : ボールの色 "#rrggbb"（省略時 "#1a1a1a"）
- *   stickMaskShapes   : 元写真のスティックを隠す形状配列 [{type,fill,...}]
+ *   stickMaskShapes   : 元写真のスティックを隠す形状配列 [{type,fill,gradient,...}]
+ *                       gradient: true を指定すると球体グラデーションを適用
  *
  * @param {object} stick
  * @returns {SVGElement}
@@ -425,21 +426,59 @@ function buildAnalogStickOverlay(stick) {
   // ── グラデーション定義 ────────────────────────────────────
   const defs = document.createElementNS(ns, "defs");
 
+  // マスク用グラデーション（球体表現）
+  let maskGradIds = [];
+  if (stick.stickMaskShapes) {
+    stick.stickMaskShapes.forEach((shape, idx) => {
+      if (shape.gradient) {
+        const maskGradId = `stick-mask-grad-${stick.id}-${idx}`;
+        maskGradIds.push({ idx, id: maskGradId, shape });
+        
+        const maskGrad = document.createElementNS(ns, "radialGradient");
+        maskGrad.setAttribute("id", maskGradId);
+        maskGrad.setAttribute("cx", "30%");
+        maskGrad.setAttribute("cy", "20%");
+        maskGrad.setAttribute("r", "65%");
+        maskGrad.setAttribute("gradientUnits", "objectBoundingBox");
+        
+        const baseColor = shape.fill || "#1a1a1a";
+        const maskStops = [
+          ["0%",   _adjustHexColor(baseColor, 80)],
+          ["50%",  baseColor],
+          ["100%", _adjustHexColor(baseColor, -100)]
+        ];
+        
+        maskStops.forEach(([off, col]) => {
+          const s = document.createElementNS(ns, "stop");
+          s.setAttribute("offset", off);
+          s.setAttribute("stop-color", col);
+          maskGrad.appendChild(s);
+        });
+        defs.appendChild(maskGrad);
+      }
+    });
+  }
+
+  // 動くボール用グラデーション（フラット寄り）
   const gradId = "stick-ball-grad-" + stick.id;
   const grad   = document.createElementNS(ns, "radialGradient");
   grad.setAttribute("id", gradId);
-  grad.setAttribute("cx", "35%"); grad.setAttribute("cy", "25%"); grad.setAttribute("r", "60%");
+  grad.setAttribute("cx", "40%");
+  grad.setAttribute("cy", "30%");
+  grad.setAttribute("r", "70%");
   grad.setAttribute("gradientUnits", "objectBoundingBox");
 
+  // 軽いグラデーション（フラット寄り）
   const gradStops = [
-    ["0%", _adjustHexColor(color, 70)], 
-    ["45%", color], 
-    ["100%", _adjustHexColor(color, -80)]
+    ["0%",   _adjustHexColor(color, 30)], 
+    ["60%",  color], 
+    ["100%", _adjustHexColor(color, -40)]
   ];
 
   gradStops.forEach(([off, col]) => {
     const s = document.createElementNS(ns, "stop");
-    s.setAttribute("offset", off); s.setAttribute("stop-color", col);
+    s.setAttribute("offset", off);
+    s.setAttribute("stop-color", col);
     grad.appendChild(s);
   });
   defs.appendChild(grad);
@@ -447,7 +486,7 @@ function buildAnalogStickOverlay(stick) {
 
   // ── マスク（元写真のスティックを覆い隠す）────────────────
   if (stick.stickMaskShapes) {
-    for (const shape of stick.stickMaskShapes) {
+    stick.stickMaskShapes.forEach((shape, idx) => {
       let el;
       if (shape.type === "circle") {
         el = document.createElementNS(ns, "circle");
@@ -469,10 +508,31 @@ function buildAnalogStickOverlay(stick) {
         if (shape.rx) el.setAttribute("rx", String(shape.rx));
       }
       if (el) {
-        el.setAttribute("fill", shape.fill || "transparent");
+        // グラデーションが有効な場合は適用
+        const maskGradInfo = maskGradIds.find(m => m.idx === idx);
+        if (maskGradInfo) {
+          el.setAttribute("fill", `url(#${maskGradInfo.id})`);
+          el.setAttribute("stroke", "rgba(0,0,0,0.3)");
+          el.setAttribute("stroke-width", "1");
+        } else {
+          el.setAttribute("fill", shape.fill || "transparent");
+        }
         svg.appendChild(el);
+        
+        // マスク球体のハイライト（gradient=trueの円形のみ）
+        if (shape.gradient && shape.type === "circle") {
+          const maskHl = document.createElementNS(ns, "ellipse");
+          const hlOffsetX = shape.r * 0.25;
+          const hlOffsetY = shape.r * 0.35;
+          maskHl.setAttribute("cx", String(shape.cx - hlOffsetX));
+          maskHl.setAttribute("cy", String(shape.cy - hlOffsetY));
+          maskHl.setAttribute("rx", String(shape.r * 0.35));
+          maskHl.setAttribute("ry", String(shape.r * 0.22));
+          maskHl.setAttribute("fill", "rgba(255,255,255,0.25)");
+          svg.appendChild(maskHl);
+        }
       }
-    }
+    });
   }
 
   // ── 可動範囲の外枠（薄い円）──────────────────────────────
@@ -485,25 +545,25 @@ function buildAnalogStickOverlay(stick) {
   rangeCircle.setAttribute("stroke-width", "2");
   svg.appendChild(rangeCircle);
 
-  // ── ボール ────────────────────────────────────────────────
+  // ── ボール（動く部分：軽いグラデーション）────────────────
   const ball = document.createElementNS(ns, "circle");
   ball.id = "stick-ball-" + stick.id;
   ball.setAttribute("cx", String(centerX));
   ball.setAttribute("cy", String(centerY));
   ball.setAttribute("r",  String(ballR));
   ball.setAttribute("fill", `url(#${gradId})`);
-  ball.setAttribute("stroke", "rgba(255,255,255,0.1)");
-  ball.setAttribute("stroke-width", "1.5");
+  ball.setAttribute("stroke", "rgba(255,255,255,0.15)");
+  ball.setAttribute("stroke-width", "1");
   svg.appendChild(ball);
 
-  // ── スペキュラハイライト ──────────────────────────────────
+  // ── スペキュラハイライト（軽め）──────────────────────────
   const hl = document.createElementNS(ns, "ellipse");
   hl.id = "stick-hl-" + stick.id;
-  hl.setAttribute("cx", String(centerX - ballR * 0.22));
-  hl.setAttribute("cy", String(centerY - ballR * 0.30));
-  hl.setAttribute("rx", String(ballR * 0.32));
-  hl.setAttribute("ry", String(ballR * 0.20));
-  hl.setAttribute("fill", "rgba(255,255,255,0.18)");
+  hl.setAttribute("cx", String(centerX - ballR * 0.20));
+  hl.setAttribute("cy", String(centerY - ballR * 0.28));
+  hl.setAttribute("rx", String(ballR * 0.30));
+  hl.setAttribute("ry", String(ballR * 0.18));
+  hl.setAttribute("fill", "rgba(255,255,255,0.20)");
   svg.appendChild(hl);
 
   return svg;

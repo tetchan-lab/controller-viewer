@@ -114,7 +114,9 @@ const DUALSENSE_CONFIG = {
    *   stickBallRadius   : ボール半径 px（省略時 20）
    *   stickTilt         : 最大傾き量 px（省略時 radius * 0.6）
    *   stickColor        : ボール・シャフトの色 "#rrggbb"（省略時 "#1a1a1a"）
-   *   stickMaskShapes   : 元写真のスティックを隠す形状配列 [{type,fill,...}]
+   *   stickMaskShapes   : 元写真のスティックを隠す形状配列
+   *                       [{type, fill, gradient, ...}]
+   *                       gradient: true で球体グラデーション適用
    */
   sticks: [
     { 
@@ -125,11 +127,11 @@ const DUALSENSE_CONFIG = {
       cx: 272, 
       cy: 262, 
       radius: 48,
-      stickBallRadius: 20,
-      stickTilt: 28,
-      stickColor: "#1a1a1a",
+      stickBallRadius: 44,
+      stickTilt: 20,
+      stickColor: "#e82832",
       stickMaskShapes: [
-        { type: "circle", cx: 272, cy: 262, r: 21, fill: "#2a2a2a" }  // 元のスティックを隠す
+        { type: "circle", cx: 272, cy: 262, r: 46, fill: "#1a1a1a", gradient: true }  // 固定球体（グラデーション有効）
       ]
     },
     { 
@@ -140,11 +142,11 @@ const DUALSENSE_CONFIG = {
       cx: 527, 
       cy: 262, 
       radius: 48,
-      stickBallRadius: 20,
-      stickTilt: 28,
-      stickColor: "#1a1a1a",
+      stickBallRadius: 44,
+      stickTilt: 20,
+      stickColor: "#e82832",
       stickMaskShapes: [
-        { type: "circle", cx: 527, cy: 262, r: 21, fill: "#2a2a2a" }  // 元のスティックを隠す
+        { type: "circle", cx: 527, cy: 262, r: 46, fill: "#1a1a1a", gradient: true }  // 固定球体（グラデーション有効）
       ]
     },
   ],
