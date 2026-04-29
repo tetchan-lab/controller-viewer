@@ -127,7 +127,7 @@ const DUALSENSE_CONFIG = {
       cx: 272, 
       cy: 262, 
       radius: 48,
-      stickBallRadius: 44,
+      stickBallRadius: 42,
       stickTilt: 20,
       stickColor: "#e82832",
       stickMaskShapes: [
@@ -142,7 +142,7 @@ const DUALSENSE_CONFIG = {
       cx: 527, 
       cy: 262, 
       radius: 48,
-      stickBallRadius: 44,
+      stickBallRadius: 42,
       stickTilt: 20,
       stickColor: "#e82832",
       stickMaskShapes: [
