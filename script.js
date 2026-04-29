@@ -10,6 +10,12 @@
 
 "use strict";
 
+// ── 定数 ─────────────────────────────────────────────────────
+/** デバイス名の最大表示長 */
+const DEVICE_NAME_MAX_LENGTH = 50;
+/** デバイス名の切り詰め長（"..." を付けるため -3） */
+const DEVICE_NAME_TRUNCATE_LENGTH = 47;
+
 // ── 状態管理 ─────────────────────────────────────────────────
 const state = {
   /** 現在表示中のコントローラー設定 */
@@ -353,10 +359,6 @@ function updateStickImg(stick, gp, config) {
 // ── 手動切り替え ──────────────────────────────────────────────
 
 /**
- * stick.svg を使ったレバービジュアルオーバーレイを生成する。
-// ── 手動切り替え ──────────────────────────────────────────────
-
-/**
  * コントローラーを手動で切り替える（ページ上のボタン用）。
  * 変更前：UI 設定だけでなく、対応するゲームパッドを activeGamepad に切り替える。
  * 変更後：UI 設定だけでなく、接続中の任意のゲームパッドを activeGamepad に設定する。
@@ -372,16 +374,8 @@ function switchController(configId) {
   const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
   for (const gp of gamepads) {
     if (!gp) continue;
-    /*const detected = detectConfig(gp.id);
-    if (detected && detected.id === configId) {
-      state.activeGamepad = gp;
-      elements.deviceName.textContent = `接続中: ${gp.id}`;
-      elements.deviceName.classList.add("connected");
-      if (state.rafId === null) startPolling();
-      return;
-    }*/
 
-    // 変更後：すべてのゲームパッドで全ての設定が使えるようにする
+    // すべてのゲームパッドで全ての設定が使えるようにする
     state.activeGamepad = gp;
     elements.deviceName.textContent = `接続中: ${gp.id}`;
     elements.deviceName.classList.add("connected");
@@ -397,6 +391,20 @@ function switchController(configId) {
 function updateActiveButton(configId) {
   elements.btnDualSense.classList.toggle("active", configId === "dualsense");
   elements.btnFSMini.classList.toggle("active",    configId === "fightingStickMini");
+}
+
+/**
+ * デバイスステータステキストを更新する。
+ * @param {Gamepad} gamepad - 接続中のゲームパッド
+ */
+function updateDeviceStatusText(gamepad) {
+  const count = Object.keys(state.connectedGamepads).length;
+  if (count > 1) {
+    elements.deviceName.textContent = `接続中 (${count}台): ${gamepad.id} 他`;
+  } else {
+    elements.deviceName.textContent = `接続中: ${gamepad.id}`;
+  }
+  elements.deviceName.classList.add("connected");
 }
 
 /**
@@ -420,8 +428,8 @@ function updateDeviceSelect() {
     
     // デバイス名を短縮表示（長すぎる場合）
     let displayName = gp.id;
-    if (displayName.length > 50) {
-      displayName = displayName.substring(0, 47) + "...";
+    if (displayName.length > DEVICE_NAME_MAX_LENGTH) {
+      displayName = displayName.substring(0, DEVICE_NAME_TRUNCATE_LENGTH) + "...";
     }
     option.textContent = `[${gp.index}] ${displayName}`;
     
@@ -483,13 +491,7 @@ window.addEventListener("gamepadconnected", (e) => {
       startPolling();
     }
     // 接続中のゲームパッド数を表示（クエリパラメーター時は非表示だが、内部状態は更新）
-    const count = Object.keys(state.connectedGamepads).length;
-    if (count > 1) {
-      elements.deviceName.textContent = `接続中 (${count}台): ${gp.id} 他`;
-    } else {
-      elements.deviceName.textContent = `接続中: ${gp.id}`;
-    }
-    elements.deviceName.classList.add("connected");
+    updateDeviceStatusText(gp);
     return;
   }
 
@@ -497,14 +499,7 @@ window.addEventListener("gamepadconnected", (e) => {
   // ただし、接続されたことはUIに表示する
   if (state.activeGamepad !== null) {
     // 接続中のゲームパッド数を表示
-    const count = Object.keys(state.connectedGamepads).length;
-    const firstGp = state.activeGamepad;
-    if (count > 1) {
-      elements.deviceName.textContent = `接続中 (${count}台): ${firstGp.id} 他`;
-    } else {
-      elements.deviceName.textContent = `接続中: ${firstGp.id}`;
-    }
-    elements.deviceName.classList.add("connected");
+    updateDeviceStatusText(state.activeGamepad);
     return;
   }
 
@@ -516,13 +511,7 @@ window.addEventListener("gamepadconnected", (e) => {
     applyConfig(DUALSENSE_CONFIG);
   }
   
-  const count = Object.keys(state.connectedGamepads).length;
-  if (count > 1) {
-    elements.deviceName.textContent = `接続中 (${count}台): ${gp.id} 他`;
-  } else {
-    elements.deviceName.textContent = `接続中: ${gp.id}`;
-  }
-  elements.deviceName.classList.add("connected");
+  updateDeviceStatusText(gp);
 
   startPolling();
 });
@@ -548,13 +537,7 @@ window.addEventListener("gamepaddisconnected", (e) => {
       if (nextGp) {
         state.activeGamepad = nextGp;
         // 現在の設定を維持（ユーザーが手動で切り替えた設定を尊重）
-        const count = Object.keys(state.connectedGamepads).length;
-        if (count > 1) {
-          elements.deviceName.textContent = `接続中 (${count}台): ${nextGp.id} 他`;
-        } else {
-          elements.deviceName.textContent = `接続中: ${nextGp.id}`;
-        }
-        elements.deviceName.classList.add("connected");
+        updateDeviceStatusText(nextGp);
         startPolling();
         return;
       }
@@ -603,6 +586,43 @@ function getButtonSoundCategory(buttonIndex, config) {
 }
 
 /**
+ * スティック/レバーのサウンドステートを更新する。
+ * @param {Gamepad} gp - ゲームパッド
+ * @param {object} stick - スティック設定
+ * @param {number} axisX - X軸の値
+ * @param {number} axisY - Y軸の値
+ * @param {number} threshold - ニュートラル判定の閾値
+ * @param {string} soundCategory - サウンドカテゴリ（"lever" | "stick"）
+ * @param {object} config - コントローラー設定
+ */
+function updateStickSoundState(gp, stick, axisX, axisY, threshold, soundCategory, config) {
+  const isNeutral = Math.abs(axisX) < threshold && Math.abs(axisY) < threshold;
+  
+  // デバイスごとにステートを分離
+  if (!state.leverStates[gp.index]) {
+    state.leverStates[gp.index] = {};
+  }
+  const prevState = state.leverStates[gp.index][stick.id] || { isNeutral: true };
+  
+  if (isNeutral !== prevState.isNeutral) {
+    // 最初の入力時にサウンドシステム初期化を試みる（OBS対応）
+    if (!state.soundInitialized) {
+      initSoundSystemOnce();
+    }
+    
+    if (config.sounds && config.sounds[soundCategory]) {
+      const soundId = `${config.id}_${soundCategory}`;
+      if (!isNeutral) {
+        soundManager.play(`${soundId}_press`);
+      } else {
+        soundManager.play(`${soundId}_release`);
+      }
+    }
+    state.leverStates[gp.index][stick.id] = { isNeutral };
+  }
+}
+
+/**
  * 1フレーム分の入力状態を取得してUIに反映する。
  */
 function tick() {
@@ -630,12 +650,7 @@ function tick() {
         state.activeGamepad = gamepad;
         // クエリパラメーター指定時は表示を更新しない
         if (state.pinnedConfigId === null) {
-          const count = Object.keys(state.connectedGamepads).length;
-          if (count > 1) {
-            elements.deviceName.textContent = `接続中 (${count}台): ${gamepad.id} 他`;
-          } else {
-            elements.deviceName.textContent = `接続中: ${gamepad.id}`;
-          }
+          updateDeviceStatusText(gamepad);
         }
       }
       break;
@@ -708,34 +723,8 @@ function tick() {
       // カスタムレバー SVG を更新（d-pad / アナログ対応）
       updateStickImg(stick, gp, config);
 
-      // レバーのサウンド処理（アナログ値がニュートラルから離れた/戻った）
-      const threshold = 0.3; // ニュートラル判定の閾値
-      const isNeutral = Math.abs(axisX) < threshold && Math.abs(axisY) < threshold;
-      
-      // デバイスごとにレバーステートを分離
-      if (!state.leverStates[gp.index]) {
-        state.leverStates[gp.index] = {};
-      }
-      const prevState = state.leverStates[gp.index][stick.id] || { isNeutral: true };
-      
-      if (isNeutral !== prevState.isNeutral) {
-        // 最初のレバー入力時にサウンドシステム初期化を試みる（OBS対応）
-        if (!state.soundInitialized) {
-          initSoundSystemOnce();
-        }
-        
-        if (config.sounds && config.sounds.lever) {
-          const soundId = `${config.id}_lever`;
-          if (!isNeutral) {
-            // レバーを倒した（ニュートラルから離れた）
-            soundManager.play(`${soundId}_press`);
-          } else {
-            // レバーがニュートラルに戻った
-            soundManager.play(`${soundId}_release`);
-          }
-        }
-        state.leverStates[gp.index][stick.id] = { isNeutral };
-      }
+      // レバーのサウンド処理
+      updateStickSoundState(gp, stick, axisX, axisY, 0.3, "lever", config);
     } else {
       // アナログスティック（div + dot）を更新
       const stickEl = document.getElementById("stick-" + stick.id);
@@ -748,34 +737,10 @@ function tick() {
           dot.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
         }
       }
-      // アナログスティックのサウンド処理（傾きの検知）
-      const threshold = 0.2; // ニュートラル判定の閾値（スティックは敏感なので小さめ）
-      const isNeutral = Math.abs(axisX) < threshold && Math.abs(axisY) < threshold;
       
-      // デバイスごとにスティックステートを分離
-      if (!state.leverStates[gp.index]) {
-        state.leverStates[gp.index] = {};
-      }
-      const prevState = state.leverStates[gp.index][stick.id] || { isNeutral: true };
-      
-      if (isNeutral !== prevState.isNeutral) {
-        // 最初のスティック入力時にサウンドシステム初期化を試みる（OBS対応）
-        if (!state.soundInitialized) {
-          initSoundSystemOnce();
-        }
-        
-        if (config.sounds && config.sounds.stick) {
-          const soundId = `${config.id}_stick`;
-          if (!isNeutral) {
-            // スティックを傾けた（ニュートラルから離れた）
-            soundManager.play(`${soundId}_press`);
-          } else {
-            // スティックがニュートラルに戻った
-            soundManager.play(`${soundId}_release`);
-          }
-        }
-        state.leverStates[gp.index][stick.id] = { isNeutral };
-      }    }
+      // アナログスティックのサウンド処理
+      updateStickSoundState(gp, stick, axisX, axisY, 0.2, "stick", config);
+    }
 
     // canvas に軸記録を描画（レバーはスキップ）
     if (stick.type !== "lever") {
