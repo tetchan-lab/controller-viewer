@@ -108,13 +108,47 @@ const DUALSENSE_CONFIG = {
 
   /**
    * アナログスティック定義
-   *   axisX, axisY : Gamepad API の axes[] インデックス
-   *   cx, cy       : スティック中心座標 (px)
-   *   radius       : スティック可動範囲の半径 (px)
+   *   axisX, axisY      : Gamepad API の axes[] インデックス
+   *   cx, cy            : スティック中心座標 (px)
+   *   radius            : スティック可動範囲の半径 (px)
+   *   stickBallRadius   : ボール半径 px（省略時 20）
+   *   stickTilt         : 最大傾き量 px（省略時 radius * 0.6）
+   *   stickColor        : ボール・シャフトの色 "#rrggbb"（省略時 "#1a1a1a"）
+   *   stickMaskShapes   : 元写真のスティックを隠す形状配列
+   *                       [{type, fill, gradient, ...}]
+   *                       gradient: true で球体グラデーション適用
    */
   sticks: [
-    { id: "LS", label: "LS", axisX: 0, axisY: 1, cx: 272, cy: 262, radius: 48 },
-    { id: "RS", label: "RS", axisX: 2, axisY: 3, cx: 527, cy: 262, radius: 48 },
+    { 
+      id: "LS", 
+      label: "LS", 
+      axisX: 0, 
+      axisY: 1, 
+      cx: 272, 
+      cy: 262, 
+      radius: 48,
+      stickBallRadius: 42,
+      stickTilt: 20,
+      stickColor: "#e82832",
+      stickMaskShapes: [
+        { type: "circle", cx: 272, cy: 262, r: 46, fill: "#1a1a1a", gradient: true }  // 固定球体（グラデーション有効）
+      ]
+    },
+    { 
+      id: "RS", 
+      label: "RS", 
+      axisX: 2, 
+      axisY: 3, 
+      cx: 527, 
+      cy: 262, 
+      radius: 48,
+      stickBallRadius: 42,
+      stickTilt: 20,
+      stickColor: "#e82832",
+      stickMaskShapes: [
+        { type: "circle", cx: 527, cy: 262, r: 46, fill: "#1a1a1a", gradient: true }  // 固定球体（グラデーション有効）
+      ]
+    },
   ],
 };
 
