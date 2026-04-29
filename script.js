@@ -113,9 +113,15 @@ function buildOverlays(config) {
   // スティック / レバー オーバーレイ
   for (const stick of config.sticks) {
     if (stick.type === "lever") {
+      // レバータイプ（シャフト付き）
       const container = buildStickImgOverlay(stick);
       elements.overlayLayer.appendChild(container);
+    } else if (stick.stickBallRadius !== undefined || stick.stickMaskShapes !== undefined) {
+      // カスタムアナログスティック（SVG版）
+      const container = buildAnalogStickOverlay(stick);
+      elements.overlayLayer.appendChild(container);
     } else {
+      // 従来のアナログスティック（canvas版）
       const el = document.createElement("div");
       el.className = "stick-overlay";
       el.id = "stick-" + stick.id;
@@ -355,6 +361,186 @@ function updateStickImg(stick, gp, config) {
     hl.setAttribute("cy", String(by - ballR * 0.30));
   }
 }
+
+/**
+ * アナログスティック用の SVG を生成する（レバーと異なりシャフト無し）。
+ *
+ * stick config で使うプロパティ:
+ *   cx, cy            : スティック中心座標
+ *   radius            : スティック可動範囲の半径
+ *   stickBallRadius   : ボール半径 px（省略時 20）
+ *   stickTilt         : 最大傾き量 px（省略時 radius * 0.6）
+ *   stickColor        : ボールの色 "#rrggbb"（省略時 "#1a1a1a"）
+ *   stickMaskShapes   : 元写真のスティックを隠す形状配列 [{type,fill,...}]
+ *
+ * @param {object} stick
+ * @returns {SVGElement}
+ */
+function buildAnalogStickOverlay(stick) {
+  const centerX = stick.cx;
+  const centerY = stick.cy;
+  const ballR   = stick.stickBallRadius ?? 20;
+  const tilt    = stick.stickTilt       ?? (stick.radius * 0.6);
+  const color   = stick.stickColor      || "#1a1a1a";
+
+  // ── SVG 範囲を計算（ボール + 傾き範囲 + マスク）──────────
+  const pad = ballR + tilt + 6;
+  let minX = centerX - pad;
+  let minY = centerY - pad;
+  let maxX = centerX + pad;
+  let maxY = centerY + pad;
+
+  // マスク形状が存在すれば SVG 範囲を拡張
+  if (stick.stickMaskShapes) {
+    for (const s of stick.stickMaskShapes) {
+      let b;
+      if (s.type === "circle")  b = { l: s.cx - s.r,  t: s.cy - s.r,  r: s.cx + s.r,  b: s.cy + s.r  };
+      if (s.type === "ellipse") b = { l: s.cx - s.rx, t: s.cy - s.ry, r: s.cx + s.rx, b: s.cy + s.ry };
+      if (s.type === "rect")    b = { l: s.x,         t: s.y,         r: s.x  + s.w,  b: s.y  + s.h  };
+      if (b) {
+        minX = Math.min(minX, b.l); minY = Math.min(minY, b.t);
+        maxX = Math.max(maxX, b.r); maxY = Math.max(maxY, b.b);
+      }
+    }
+  }
+
+  const svgW = maxX - minX;
+  const svgH = maxY - minY;
+
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg");
+  svg.id = "stick-img-" + stick.id;
+  svg.setAttribute("width",  svgW);
+  svg.setAttribute("height", svgH);
+  svg.setAttribute("viewBox", `${minX} ${minY} ${svgW} ${svgH}`);
+  svg.style.cssText = [
+    "position:absolute",
+    `left:${minX}px`,
+    `top:${minY}px`,
+    "pointer-events:none",
+    "z-index:5",
+    "overflow:visible",
+  ].join(";");
+
+  // ── グラデーション定義 ────────────────────────────────────
+  const defs = document.createElementNS(ns, "defs");
+
+  const gradId = "stick-ball-grad-" + stick.id;
+  const grad   = document.createElementNS(ns, "radialGradient");
+  grad.setAttribute("id", gradId);
+  grad.setAttribute("cx", "35%"); grad.setAttribute("cy", "25%"); grad.setAttribute("r", "60%");
+  grad.setAttribute("gradientUnits", "objectBoundingBox");
+
+  const gradStops = [
+    ["0%", _adjustHexColor(color, 70)], 
+    ["45%", color], 
+    ["100%", _adjustHexColor(color, -80)]
+  ];
+
+  gradStops.forEach(([off, col]) => {
+    const s = document.createElementNS(ns, "stop");
+    s.setAttribute("offset", off); s.setAttribute("stop-color", col);
+    grad.appendChild(s);
+  });
+  defs.appendChild(grad);
+  svg.appendChild(defs);
+
+  // ── マスク（元写真のスティックを覆い隠す）────────────────
+  if (stick.stickMaskShapes) {
+    for (const shape of stick.stickMaskShapes) {
+      let el;
+      if (shape.type === "circle") {
+        el = document.createElementNS(ns, "circle");
+        el.setAttribute("cx", String(shape.cx));
+        el.setAttribute("cy", String(shape.cy));
+        el.setAttribute("r",  String(shape.r));
+      } else if (shape.type === "ellipse") {
+        el = document.createElementNS(ns, "ellipse");
+        el.setAttribute("cx", String(shape.cx));
+        el.setAttribute("cy", String(shape.cy));
+        el.setAttribute("rx", String(shape.rx));
+        el.setAttribute("ry", String(shape.ry));
+      } else if (shape.type === "rect") {
+        el = document.createElementNS(ns, "rect");
+        el.setAttribute("x",      String(shape.x));
+        el.setAttribute("y",      String(shape.y));
+        el.setAttribute("width",  String(shape.w));
+        el.setAttribute("height", String(shape.h));
+        if (shape.rx) el.setAttribute("rx", String(shape.rx));
+      }
+      if (el) {
+        el.setAttribute("fill", shape.fill || "transparent");
+        svg.appendChild(el);
+      }
+    }
+  }
+
+  // ── 可動範囲の外枠（薄い円）──────────────────────────────
+  const rangeCircle = document.createElementNS(ns, "circle");
+  rangeCircle.setAttribute("cx", String(centerX));
+  rangeCircle.setAttribute("cy", String(centerY));
+  rangeCircle.setAttribute("r",  String(stick.radius));
+  rangeCircle.setAttribute("fill", "none");
+  rangeCircle.setAttribute("stroke", "rgba(255,255,255,0.1)");
+  rangeCircle.setAttribute("stroke-width", "2");
+  svg.appendChild(rangeCircle);
+
+  // ── ボール ────────────────────────────────────────────────
+  const ball = document.createElementNS(ns, "circle");
+  ball.id = "stick-ball-" + stick.id;
+  ball.setAttribute("cx", String(centerX));
+  ball.setAttribute("cy", String(centerY));
+  ball.setAttribute("r",  String(ballR));
+  ball.setAttribute("fill", `url(#${gradId})`);
+  ball.setAttribute("stroke", "rgba(255,255,255,0.1)");
+  ball.setAttribute("stroke-width", "1.5");
+  svg.appendChild(ball);
+
+  // ── スペキュラハイライト ──────────────────────────────────
+  const hl = document.createElementNS(ns, "ellipse");
+  hl.id = "stick-hl-" + stick.id;
+  hl.setAttribute("cx", String(centerX - ballR * 0.22));
+  hl.setAttribute("cy", String(centerY - ballR * 0.30));
+  hl.setAttribute("rx", String(ballR * 0.32));
+  hl.setAttribute("ry", String(ballR * 0.20));
+  hl.setAttribute("fill", "rgba(255,255,255,0.18)");
+  svg.appendChild(hl);
+
+  return svg;
+}
+
+/**
+ * アナログスティック SVG をアナログ入力に合わせて更新する。
+ *
+ * @param {object}  stick
+ * @param {Gamepad} gp
+ */
+function updateAnalogStick(stick, gp) {
+  const centerX = stick.cx;
+  const centerY = stick.cy;
+  const ballR   = stick.stickBallRadius ?? 20;
+  const tilt    = stick.stickTilt       ?? (stick.radius * 0.6);
+
+  // アナログ軸の値を取得
+  const ax = gp.axes[stick.axisX] || 0;
+  const ay = gp.axes[stick.axisY] || 0;
+
+  const bx = centerX + ax * tilt;
+  const by = centerY + ay * tilt;
+
+  const ball = document.getElementById("stick-ball-" + stick.id);
+  const hl   = document.getElementById("stick-hl-"   + stick.id);
+
+  if (ball) {
+    ball.setAttribute("cx", String(bx));
+    ball.setAttribute("cy", String(by));
+  }
+  if (hl) {
+    hl.setAttribute("cx", String(bx - ballR * 0.22));
+    hl.setAttribute("cy", String(by - ballR * 0.30));
+  }
+}
+
 
 // ── 手動切り替え ──────────────────────────────────────────────
 
@@ -725,8 +911,14 @@ function tick() {
 
       // レバーのサウンド処理
       updateStickSoundState(gp, stick, axisX, axisY, 0.3, "lever", config);
+    } else if (stick.stickBallRadius !== undefined || stick.stickMaskShapes !== undefined) {
+      // カスタムアナログスティック（SVG版）を更新
+      updateAnalogStick(stick, gp);
+
+      // アナログスティックのサウンド処理
+      updateStickSoundState(gp, stick, axisX, axisY, 0.2, "stick", config);
     } else {
-      // アナログスティック（div + dot）を更新
+      // 従来のアナログスティック（div + dot）を更新
       const stickEl = document.getElementById("stick-" + stick.id);
       if (stickEl) {
         const dot = stickEl.querySelector(".stick-dot");
@@ -742,8 +934,8 @@ function tick() {
       updateStickSoundState(gp, stick, axisX, axisY, 0.2, "stick", config);
     }
 
-    // canvas に軸記録を描画（レバーはスキップ）
-    if (stick.type !== "lever") {
+    // canvas に軸記録を描画（レバーとカスタムアナログスティックはスキップ）
+    if (stick.type !== "lever" && !stick.stickBallRadius && !stick.stickMaskShapes) {
       drawStickIndicator(ctx, stick, axisX, axisY);
     }
   }
