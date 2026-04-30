@@ -114,6 +114,13 @@ function updateOverlayScale() {
   elements.stickCanvas.style.transform = `scale(${scale})`;
   elements.stickCanvas.style.transformOrigin = 'top left';
   
+  // デバッグオーバーレイもスケール調整
+  const debugOverlay = document.getElementById("debug-overlay");
+  if (debugOverlay) {
+    debugOverlay.style.transform = `scale(${scale})`;
+    debugOverlay.style.transformOrigin = 'top left';
+  }
+  
   // wrapperの高さを画像の実際の高さに合わせる（アスペクト比維持）
   wrapper.style.height = (state.currentConfig.imageHeight * scale) + 'px';
 }
