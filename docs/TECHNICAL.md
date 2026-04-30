@@ -59,7 +59,7 @@ controller-viewer/
 | `style.css` | ボタンオーバーレイのスタイル、押下エフェクト、レスポンシブ対応 |
 | `script.js` | Gamepad API ポーリング、オーバーレイ描画、デバイス自動判定 |
 | `config.js` | **設定の中心**：ボタン座標、デバイス名パターン、サウンドパス |
-| `keyboard-input.js` | キーボード/マウスイベントを仮想ゲームパッド状態に変換 |
+| `keyboard-input.js` | キーボード/マウスイベントを仮想ゲームパッド状態に変換（`?keyboard=on/off` で制御） |
 | `sound-manager.js` | Web Audio API によるサウンド管理、音量調整、ローディング |
 
 ---

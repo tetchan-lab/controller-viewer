@@ -252,6 +252,13 @@ document.getElementById("btn-myController").addEventListener("click", () => {
 http://localhost:8080/?controller=myController&debug
 ```
 
+### その他の便利なクエリパラメーター
+
+- `?keyboard=off` - キーボード/マウス入力を無効化（実ゲームパッドのみ）
+- `?device=0` - デバイス0番のみ受け付ける（複数コントローラー使用時）
+
+詳細は **[README.md - クエリパラメーター一覧](../README.md#クエリパラメーター一覧)** を参照してください。
+
 ---
 
 ## 関連ドキュメント
