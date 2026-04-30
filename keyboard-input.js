@@ -23,6 +23,21 @@
 
 "use strict";
 
+// ── クエリパラメーター解析 ────────────────────────────────────
+
+/**
+ * URLクエリパラメーター "keyboard" の値を取得。
+ * 値が "off" の場合はキーボード/マウス入力を無効化する。
+ * デフォルトは "on"（既存の動作を維持）。
+ *
+ * 使用例:
+ *   index.html?keyboard=off  → キーボード/マウス入力を無効化
+ *   index.html?keyboard=on   → キーボード/マウス入力を有効化（デフォルト）
+ */
+const _urlParams = new URLSearchParams(window.location.search);
+const _keyboardParam = _urlParams.get("keyboard") || "on";
+const _keyboardInputEnabled = (_keyboardParam.toLowerCase() !== "off");
+
 // ── 仮想ゲームパッド状態 ──────────────────────────────────────
 
 /**
@@ -181,6 +196,7 @@ function _updateVirtualGamepad() {
 // ── イベントリスナー ──────────────────────────────────────────
 
 window.addEventListener("keydown", (e) => {
+  if (!_keyboardInputEnabled) return;
   if (_shouldIgnoreKeyboard()) return;
   if (e.repeat) return;
   if (PREVENT_DEFAULT_KEYS.has(e.code)) {
@@ -191,17 +207,20 @@ window.addEventListener("keydown", (e) => {
 });
 
 window.addEventListener("keyup", (e) => {
+  if (!_keyboardInputEnabled) return;
   _pressedInputs.delete(e.code);
   _updateVirtualGamepad();
 });
 
 window.addEventListener("mousedown", (e) => {
+  if (!_keyboardInputEnabled) return;
   if (MOUSE_TO_BUTTON_INDEX[e.button] === undefined) return;
   _pressedInputs.add(`Mouse${e.button}`);
   _updateVirtualGamepad();
 });
 
 window.addEventListener("mouseup", (e) => {
+  if (!_keyboardInputEnabled) return;
   if (MOUSE_TO_BUTTON_INDEX[e.button] === undefined) return;
   _pressedInputs.delete(`Mouse${e.button}`);
   _updateVirtualGamepad();
@@ -209,6 +228,7 @@ window.addEventListener("mouseup", (e) => {
 
 // ウィンドウのフォーカスが外れた際に全入力をリセット（キー離し検知の漏れ対策）
 window.addEventListener("blur", () => {
+  if (!_keyboardInputEnabled) return;
   _pressedInputs.clear();
   _updateVirtualGamepad();
 });
