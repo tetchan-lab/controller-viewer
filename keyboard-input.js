@@ -14,7 +14,8 @@
  *   L1              : O
  *   R1              : P
  *   左スティック     : W=上  S=下  A=左  D=右（十字キーと共用）
- *   右スティック     : Numpad8=上  Numpad2=下  Numpad4=左  Numpad6=右
+ * 右アナログスティック     : ↑↓←→（アローキー）= 上下左右
+ *                           Numpad8/2/4/6 にも対応（テンキーありキーボードの場合）
  *
  * 依存: なし（script.js より前に読み込む）
  * ============================================================
@@ -71,6 +72,15 @@ const KEY_TO_BUTTON_INDEX = {
 };
 
 /**
+ * 右スティック用軸キーのセット。
+ * アローキー（Macキーボード対応）とテンキー両方を受け付ける。
+ */
+const RS_AXIS_KEYS = new Set([
+  "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
+  "Numpad8", "Numpad2", "Numpad4", "Numpad6",
+]);
+
+/**
  * マウスボタン番号 → ゲームパッドボタンインデックス
  *   0 = 左クリック → × (Cross)
  */
@@ -85,6 +95,7 @@ const MOUSE_TO_BUTTON_INDEX = {
 const PREVENT_DEFAULT_KEYS = new Set([
   "Space",
   "KeyW", "KeyS", "KeyA", "KeyD",
+  "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
   "Numpad2", "Numpad4", "Numpad6", "Numpad8",
 ]);
 
@@ -145,11 +156,12 @@ function _updateVirtualGamepad() {
   if (_pressedInputs.has("KeyW")) virtualGamepad.axes[1] -= 1;
   if (_pressedInputs.has("KeyS")) virtualGamepad.axes[1] += 1;
 
-  // ── テンキー → 右アナログスティック軸 ──
-  if (_pressedInputs.has("Numpad4")) virtualGamepad.axes[2] -= 1;
-  if (_pressedInputs.has("Numpad6")) virtualGamepad.axes[2] += 1;
-  if (_pressedInputs.has("Numpad8")) virtualGamepad.axes[3] -= 1;
-  if (_pressedInputs.has("Numpad2")) virtualGamepad.axes[3] += 1;
+  // ── アローキー / テンキー → 右アナログスティック軸 ──
+  // ArrowLeft/Right/Up/Down（Macキーボード対応）と Numpad4/6/8/2 の両方を受け付ける
+  if (_pressedInputs.has("ArrowLeft")  || _pressedInputs.has("Numpad4")) virtualGamepad.axes[2] -= 1;
+  if (_pressedInputs.has("ArrowRight") || _pressedInputs.has("Numpad6")) virtualGamepad.axes[2] += 1;
+  if (_pressedInputs.has("ArrowUp")    || _pressedInputs.has("Numpad8")) virtualGamepad.axes[3] -= 1;
+  if (_pressedInputs.has("ArrowDown")  || _pressedInputs.has("Numpad2")) virtualGamepad.axes[3] += 1;
 
   // ── 斜め入力の正規化（左スティック）──
   const lsLen = Math.hypot(virtualGamepad.axes[0], virtualGamepad.axes[1]);

@@ -1012,15 +1012,15 @@ function tick() {
     const hasVirtual =
       virtualGamepad.buttons.some((b) => b.pressed) ||
       virtualGamepad.axes.some((v) => Math.abs(v) > 0);
-    if (hasVirtual) {
-      // 最初のキーボード/マウス入力時にサウンドシステムを初期化
-      if (!state.soundInitialized) initSoundSystemOnce();
-      if (gp) {
-        gp = _mergeGamepadWithVirtual(gp);
-      } else {
-        // ゲームパッド未接続でもキーボード/マウス入力を反映
-        gp = { index: -1, buttons: virtualGamepad.buttons, axes: virtualGamepad.axes };
-      }
+    // キー押下時のみサウンド初期化を試みる
+    if (hasVirtual && !state.soundInitialized) initSoundSystemOnce();
+    if (gp) {
+      // 実ゲームパッドと仔想入力を OR マージ
+      gp = _mergeGamepadWithVirtual(gp);
+    } else if (state.currentConfig) {
+      // ゲームパッド未接続時は virtualGamepad をそのまま使う。
+      // キーを離した際に hasVirtual=false でも必ず通ってオーバーレイをクリアするため。
+      gp = { index: -1, buttons: virtualGamepad.buttons, axes: virtualGamepad.axes };
     }
   }
 
