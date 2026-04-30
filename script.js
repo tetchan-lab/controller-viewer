@@ -885,6 +885,35 @@ function loop() {
   });
 }
 
+// ── キーボード/マウス仮想入力マージ ─────────────────────────────
+
+/**
+ * 実ゲームパッドの状態にキーボード/マウス仮想入力をマージする。
+ * 同じボタン/軸については OR（最大値）をとる。
+ *
+ * @param {Gamepad} realGp - 実ゲームパッド
+ * @returns {{ index: number, buttons: Array, axes: Array }}
+ */
+function _mergeGamepadWithVirtual(realGp) {
+  const vGp = virtualGamepad;
+  const maxBtns = Math.max(realGp.buttons.length, vGp.buttons.length);
+  const mergedButtons = Array.from({ length: maxBtns }, (_, i) => {
+    const r = realGp.buttons[i] || { pressed: false, value: 0 };
+    const v = vGp.buttons[i]   || { pressed: false, value: 0 };
+    return {
+      pressed: r.pressed || v.pressed,
+      value:   Math.max(r.value || 0, v.value || 0),
+    };
+  });
+  const maxAxes = Math.max(realGp.axes.length, vGp.axes.length);
+  const mergedAxes = Array.from({ length: maxAxes }, (_, i) => {
+    const r = realGp.axes[i] || 0;
+    const v = vGp.axes[i]    || 0;
+    return Math.abs(r) >= Math.abs(v) ? r : v;
+  });
+  return { index: realGp.index, buttons: mergedButtons, axes: mergedAxes };
+}
+
 /**
  * ボタンのサウンドカテゴリを取得する。
  * @param {number} buttonIndex - ボタンのインデックス
@@ -975,6 +1004,23 @@ function tick() {
     // activeGamepadもデバイスフィルターでチェック
     if (candidateGp && matchesDeviceFilter(candidateGp, deviceFilter)) {
       gp = candidateGp;
+    }
+  }
+
+  // ── キーボード/マウス入力のマージ ──
+  if (typeof virtualGamepad !== "undefined") {
+    const hasVirtual =
+      virtualGamepad.buttons.some((b) => b.pressed) ||
+      virtualGamepad.axes.some((v) => Math.abs(v) > 0);
+    if (hasVirtual) {
+      // 最初のキーボード/マウス入力時にサウンドシステムを初期化
+      if (!state.soundInitialized) initSoundSystemOnce();
+      if (gp) {
+        gp = _mergeGamepadWithVirtual(gp);
+      } else {
+        // ゲームパッド未接続でもキーボード/マウス入力を反映
+        gp = { index: -1, buttons: virtualGamepad.buttons, axes: virtualGamepad.axes };
+      }
     }
   }
 
@@ -1298,6 +1344,9 @@ function matchesDeviceFilter(gamepad, filter) {
   // ページ全体の最初のクリックでサウンドシステムを初期化（Chrome autoplay policy対応）
   document.addEventListener('click', initSoundSystemOnce, { once: true });
   document.addEventListener('touchstart', initSoundSystemOnce, { once: true });
+
+  // ゲームパッド未接続でもキーボード/マウス入力が動くようにポーリングを開始
+  startPolling();
 })();
 
 // ── サウンドシステム初期化 ─────────────────────────────────────
