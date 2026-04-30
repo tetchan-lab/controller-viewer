@@ -168,10 +168,66 @@ body {
   user-select: none;
   line-height: 1;
   pointer-events: none;
+  /* フォントのアセンダー/ディセンダー不均等による視覚的な下ズレを補正 */
+  transform: translateY(-0.05em);
 }
 
 .btn-overlay.pressed .btn-label {
   color: #fff;
+}
+
+/* ── ダイヤモンド配置フェイスボタン（×○□△）専用ラベル ──── */
+.btn-overlay[data-label="×"] .btn-label {
+  font-size: 0px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  transform: translateY(-0.13em);
+}
+
+.btn-overlay[data-label="○"] .btn-label {
+  font-size: 0px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.75);
+  transform: translateY(-0.06em);
+}
+
+.btn-overlay[data-label="□"] .btn-label {
+  font-size: 0px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.75);
+  transform: translateY(-0.20em);
+}
+
+.btn-overlay[data-label="△"] .btn-label {
+  font-size: 0px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.75);
+  transform: translateY(-0.10em);
+}
+
+.btn-overlay.pressed[data-label="×"] .btn-label {
+  font-size: 60px;
+  font-weight: 600;
+  color: #cecece;
+  transform: translateY(-0.13em);
+}
+.btn-overlay.pressed[data-label="○"] .btn-label {
+  font-size: 46px;
+  font-weight: 800;
+  color: #cecece;
+  transform: translateY(-0.06em);
+}
+.btn-overlay.pressed[data-label="□"] .btn-label {
+  font-size: 59px;
+  font-weight: 900;
+  color: #cecece;
+  transform: translateY(-0.20em);
+}
+.btn-overlay.pressed[data-label="△"] .btn-label {
+  font-size: 36px;
+  font-weight: 900;
+  color: #cecece;
+  transform: translateY(-0.10em);
 }
 
 /* ── スティックオーバーレイ ─────────────────────────────────── */
