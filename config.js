@@ -127,11 +127,11 @@ const DUALSENSE_CONFIG = {
       cx: 272, 
       cy: 262, 
       radius: 48,
-      stickBallRadius: 42,
+      stickBallRadius: 40,
       stickTilt: 20,
       stickColor: "#e82832",
       stickMaskShapes: [
-        { type: "circle", cx: 272, cy: 262, r: 46, fill: "#1a1a1a", gradient: true }  // 固定球体（グラデーション有効）
+        { type: "circle", cx: 272, cy: 262, r: 50, fill: "#1a1a1a", gradient: true }  // 固定球体（グラデーション有効）
       ]
     },
     { 
@@ -142,11 +142,11 @@ const DUALSENSE_CONFIG = {
       cx: 527, 
       cy: 262, 
       radius: 48,
-      stickBallRadius: 42,
+      stickBallRadius: 40,
       stickTilt: 20,
       stickColor: "#e82832",
       stickMaskShapes: [
-        { type: "circle", cx: 527, cy: 262, r: 46, fill: "#1a1a1a", gradient: true }  // 固定球体（グラデーション有効）
+        { type: "circle", cx: 527, cy: 262, r: 50, fill: "#1a1a1a", gradient: true }  // 固定球体（グラデーション有効）
       ]
     },
   ],
