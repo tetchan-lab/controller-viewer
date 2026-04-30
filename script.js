@@ -79,6 +79,43 @@ function applyConfig(config) {
 
   // アクティブボタンのハイライトを更新
   updateActiveButton(config.id);
+
+  // 画像読み込み完了後にスケール調整（スマホ対応）
+  if (elements.controllerImg.complete) {
+    updateOverlayScale();
+  } else {
+    elements.controllerImg.addEventListener('load', updateOverlayScale, { once: true });
+  }
+}
+
+/**
+ * オーバーレイとcanvasをスマホ画面に合わせてスケール調整する。
+ * CSSメディアクエリで画像が縮小された場合、オーバーレイ座標も比例縮小する。
+ */
+function updateOverlayScale() {
+  if (!state.currentConfig) return;
+
+  const wrapper = document.getElementById("controller-wrapper");
+  const img = elements.controllerImg;
+  
+  // 画像の実際の表示サイズを取得
+  const actualWidth = img.offsetWidth;
+  const configWidth = state.currentConfig.imageWidth;
+  
+  // スケール比率を計算
+  const scale = actualWidth / configWidth;
+  
+  // オーバーレイとcanvasをスケール調整
+  elements.overlayLayer.style.transform = `scale(${scale})`;
+  elements.overlayLayer.style.transformOrigin = 'top left';
+  elements.overlayLayer.style.width = configWidth + 'px';
+  elements.overlayLayer.style.height = state.currentConfig.imageHeight + 'px';
+  
+  elements.stickCanvas.style.transform = `scale(${scale})`;
+  elements.stickCanvas.style.transformOrigin = 'top left';
+  
+  // wrapperの高さを画像の実際の高さに合わせる（アスペクト比維持）
+  wrapper.style.height = (state.currentConfig.imageHeight * scale) + 'px';
 }
 
 /**
@@ -1347,6 +1384,11 @@ function matchesDeviceFilter(gamepad, filter) {
 
   // ゲームパッド未接続でもキーボード/マウス入力が動くようにポーリングを開始
   startPolling();
+
+  // ウィンドウリサイズ時にオーバーレイのスケールを再調整（スマホ対応）
+  window.addEventListener('resize', () => {
+    updateOverlayScale();
+  });
 })();
 
 // ── サウンドシステム初期化 ─────────────────────────────────────

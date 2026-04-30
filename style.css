@@ -442,3 +442,178 @@ body.transparent-bg #app {
   padding: 4px 10px;
 }
 
+/* ============================================================
+   レスポンシブ対応（スマホ・タブレット）
+   ============================================================ */
+
+/* タブレット以下（画面幅 768px 以下） */
+@media (max-width: 768px) {
+  #app {
+    padding: 16px 8px 8px;
+    gap: 8px;
+  }
+
+  #status-bar {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 0.8rem;
+  }
+
+  #device-name {
+    font-size: 0.75rem;
+  }
+
+  #controller-select {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .ctrl-btn {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+  }
+
+  .device-select {
+    width: 100%;
+  }
+
+  #controller-container {
+    padding: 8px 0;
+  }
+
+  /* コントローラー画像を画面幅に合わせて縮小 */
+  #controller-wrapper {
+    width: 100% !important;
+    max-width: 500px;
+    height: auto !important;
+  }
+
+  #controller-image {
+    width: 100%;
+    height: auto;
+  }
+
+  /* オーバーレイ要素を画像の縮小率に合わせてスケール調整 */
+  #button-overlays,
+  #stick-canvas {
+    transform-origin: top left;
+  }
+
+  /* ボタンラベルのフォントサイズを縮小 */
+  .btn-label {
+    font-size: 8px;
+  }
+
+  /* フェイスボタン（×○□△）の押下時フォントサイズを縮小 */
+  .btn-overlay.pressed[data-label="×"] .btn-label {
+    font-size: 45px;
+  }
+  .btn-overlay.pressed[data-label="○"] .btn-label {
+    font-size: 35px;
+  }
+  .btn-overlay.pressed[data-label="□"] .btn-label {
+    font-size: 44px;
+  }
+  .btn-overlay.pressed[data-label="△"] .btn-label {
+    font-size: 27px;
+  }
+
+  #hint {
+    font-size: 0.7rem;
+    padding: 0 8px;
+  }
+
+  /* サウンド設定モーダルをスマホ画面に最適化 */
+  .modal-content {
+    width: calc(100% - 32px);
+    max-width: 320px;
+    left: 16px !important;
+    right: 16px !important;
+    top: 50% !important;
+    transform: translateY(-50%);
+  }
+}
+
+/* スマホ（画面幅 480px 以下） */
+@media (max-width: 480px) {
+  #app {
+    padding: 12px 4px 4px;
+  }
+
+  #status-bar {
+    padding: 6px 8px;
+    font-size: 0.7rem;
+    gap: 6px;
+  }
+
+  #device-name {
+    font-size: 0.7rem;
+    width: 100%;
+  }
+
+  #controller-select {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .ctrl-btn {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    flex: 1;
+  }
+
+  .device-select {
+    font-size: 0.7rem;
+  }
+
+  .settings-btn {
+    font-size: 0.9rem;
+    padding: 4px 8px;
+  }
+
+  /* コントローラー画像をさらに縮小 */
+  #controller-wrapper {
+    max-width: 100%;
+  }
+
+  /* ボタンラベルをさらに縮小 */
+  .btn-label {
+    font-size: 7px;
+  }
+
+  .btn-overlay.pressed[data-label="×"] .btn-label {
+    font-size: 35px;
+  }
+  .btn-overlay.pressed[data-label="○"] .btn-label {
+    font-size: 28px;
+  }
+  .btn-overlay.pressed[data-label="□"] .btn-label {
+    font-size: 34px;
+  }
+  .btn-overlay.pressed[data-label="△"] .btn-label {
+    font-size: 22px;
+  }
+
+  #hint {
+    font-size: 0.65rem;
+  }
+
+  /* サウンド設定モーダルをさらに最適化 */
+  .modal-header {
+    padding: 12px 16px;
+  }
+
+  .modal-header h2 {
+    font-size: 1rem;
+  }
+
+  .modal-body {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .setting-row label {
+    font-size: 0.85rem;
+  }
+}
+
