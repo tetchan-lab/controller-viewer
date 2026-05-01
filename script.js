@@ -1552,24 +1552,26 @@ function extractDeviceKeyword(gamepadId) {
   const idLower = gamepadId.toLowerCase();
   
   // DualSense系
-  if (idLower.includes('dualsense') || idLower.includes('ps5')) {
+  if (idLower.includes('dualsense')) {
     return 'dualsense';
   }
   
-  // Fighting Stick Mini / Xbox 360互換
-  if (idLower.includes('fighting stick') || 
-      idLower.includes('hori') ||
-      idLower.includes('arcade stick')) {
-    return 'hori';
+  // Fighting Stick Mini（XBOX 360互換モードで動作）
+  // ID例: "XBOX 360 Controller For Windows (STANDARD GAMEPAD)"
+  // "windows" を返すことで、"For Windows" を含むデバイスにマッチ
+  if (idLower.includes('for windows')) {
+    return 'windows';
   }
   
   // Xbox系
-  if (idLower.includes('xbox') || idLower.includes('xinput')) {
+  // ID例: "Xbox 360 Controller (XInput STANDARD GAMEPAD)"
+  // "xbox" のみで判定（"xinput" は他デバイスにも含まれる可能性があるため除外）
+  if (idLower.includes('xbox')) {
     return 'xbox';
   }
   
   // Switch Pro Controller
-  if (idLower.includes('pro controller') || idLower.includes('switch')) {
+  if (idLower.includes('switch')) {
     return 'switch';
   }
   
