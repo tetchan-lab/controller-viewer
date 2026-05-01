@@ -9,6 +9,7 @@
 - [ファイル構成](#ファイル構成)
 - [Gamepad API によるデバイス認識の仕組み](#gamepad-api-によるデバイス認識の仕組み)
 - [サウンドシステムの詳細](#サウンドシステムの詳細)
+- [OBS用URL生成機能](#obs用url生成機能)
 - [設計メモ（後から調整しやすい構成について）](#設計メモ後から調整しやすい構成について)
 
 ---
@@ -300,6 +301,212 @@ document.addEventListener('touchstart', initSoundSystemOnce, { once: true });
 
 各コントローラーの実機から録音した音声ファイル（MP3形式）を使用しています。  
 録音手順や音声編集の詳細は **[../sounds/README.md](../sounds/README.md)** を参照してください。
+
+---
+
+## OBS用URL生成機能
+
+設定モーダル内に、現在の設定を反映したOBS用URLを自動生成してコピーする機能を実装しています。
+
+### 機能概要
+
+- **自動URL生成**: コントローラー設定、デバイス識別、サウンド状態を含むURLを生成
+- **ワンクリックコピー**: Clipboard APIでクリップボードに即座にコピー
+- **リアルタイム更新**: 設定変更時にURLが自動的に更新される
+
+### 実装の詳細
+
+#### URL生成ロジック（`script.js`）
+
+```javascript
+function generateObsUrl() {
+  const baseUrl = 'https://tetchan-lab.github.io/controller-viewer/';
+  const params = new URLSearchParams();
+  
+  // 1. コントローラー設定
+  if (state.currentConfig) {
+    params.append('controller', state.currentConfig.id);
+  }
+  
+  // 2. デバイス識別（複数接続時の区別）
+  if (state.activeGamepad) {
+    const deviceKeyword = extractDeviceKeyword(state.activeGamepad.id);
+    if (deviceKeyword) {
+      params.append('device', deviceKeyword);
+    }
+  }
+  
+  // 3. サウンド設定
+  const soundState = soundManager.isEnabled() ? 'on' : 'off';
+  params.append('sound', soundState);
+  
+  return `${baseUrl}?${params.toString()}`;
+}
+```
+
+#### デバイスキーワード抽出（`extractDeviceKeyword()`）
+
+同一モデルの複数台接続時に区別するため、gamepad.idから識別キーワードを抽出します。
+
+```javascript
+function extractDeviceKeyword(gamepadId) {
+  const idLower = gamepadId.toLowerCase();
+  
+  // DualSense系
+  if (idLower.includes('dualsense')) {
+    return 'dualsense';
+  }
+  
+  // Fighting Stick Mini（XBOX 360互換モードで動作）
+  // ID例: "XBOX 360 Controller For Windows (STANDARD GAMEPAD)"
+  if (idLower.includes('for windows')) {
+    return 'windows';  // URLパラメーター: device=windows
+  }
+  
+  // Xbox系
+  // ID例: "Xbox 360 Controller (XInput STANDARD GAMEPAD)"
+  if (idLower.includes('xbox')) {
+    return 'xbox';
+  }
+  
+  // Switch Pro Controller
+  if (idLower.includes('switch')) {
+    return 'switch';
+  }
+  
+  // フォールバック: IDの最初の単語
+  const firstWord = gamepadId.split(' ')[0].toLowerCase();
+  return firstWord || 'gamepad';
+}
+```
+
+**設計思想:**
+- 返すキーワードは必ずデバイスIDに含まれる文字列とする
+- `matchesDeviceFilter()` が `includes()` でパターンマッチするため、部分一致で動作
+- Fighting Stick Mini は "XBOX 360 Controller For Windows" なので `'windows'` を返す
+
+#### UI更新トリガー
+
+URLは以下のタイミングで自動更新されます：
+
+- 設定モーダルを開いた時（`openSoundSettings()`）
+- コントローラー切り替え時（`switchController()`）
+- デバイス選択時（`switchDevice()`）
+- サウンド設定変更時（`toggleSound()`）
+- ゲームパッド接続/切断時（`gamepadconnected`/`gamepaddisconnected` イベント）
+
+```javascript
+function updateObsUrl() {
+  const urlOutput = document.getElementById('obs-url-output');
+  if (!urlOutput) return;
+  
+  urlOutput.value = generateObsUrl();
+}
+```
+
+#### クリップボードコピー（Clipboard API）
+
+```javascript
+async function copyObsUrl() {
+  const urlOutput = document.getElementById('obs-url-output');
+  const copyStatus = document.getElementById('copy-status');
+  
+  try {
+    await navigator.clipboard.writeText(urlOutput.value);
+    copyStatus.textContent = 'コピーしました！';
+    copyStatus.className = 'copy-status success';
+    
+    setTimeout(() => {
+      copyStatus.textContent = '';
+      copyStatus.className = 'copy-status';
+    }, 2000);
+  } catch (err) {
+    copyStatus.textContent = 'コピー失敗';
+    copyStatus.className = 'copy-status error';
+  }
+}
+```
+
+### HTML構造（`index.html`）
+
+設定モーダル内に以下のUIを追加：
+
+```html
+<div class="setting-section">
+  <h3>OBS用URL生成</h3>
+  <p class="setting-description">
+    現在の設定を反映したURLを生成します。OBSのブラウザソースにペーストしてください。
+  </p>
+  <div class="setting-row">
+    <textarea
+      id="obs-url-output"
+      class="url-output"
+      readonly
+      rows="5"
+      placeholder="コントローラーを接続すると、OBS用URLが生成されます"></textarea>
+  </div>
+  <div class="setting-row">
+    <button class="copy-btn" onclick="copyObsUrl()">📋 URLをコピー</button>
+    <span id="copy-status" class="copy-status"></span>
+  </div>
+</div>
+```
+
+### スタイリング（`style.css`）
+
+```css
+.setting-section {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.url-output {
+  width: 100%;
+  min-height: 100px;
+  padding: 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: #fff;
+  resize: vertical;
+}
+
+.copy-btn {
+  padding: 10px 20px;
+  background: #0078d4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.copy-status.success {
+  color: #4caf50;
+}
+
+.copy-status.error {
+  color: #f44336;
+}
+```
+
+### 使用例
+
+生成されるURLの例：
+
+```
+# DualSense、サウンドON
+https://tetchan-lab.github.io/controller-viewer/?controller=dualsense&device=dualsense&sound=on
+
+# Fighting Stick Mini、サウンドOFF
+https://tetchan-lab.github.io/controller-viewer/?controller=fightingStickMini&device=windows&sound=off
+
+# Xbox Controller、サウンドON
+https://tetchan-lab.github.io/controller-viewer/?controller=dualsense&device=xbox&sound=on
+```
 
 ---
 
