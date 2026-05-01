@@ -157,6 +157,23 @@ class SoundManager {
    */
   loadSettings() {
     try {
+      // URLクエリパラメーター "sound" の値を取得（優先度最高）
+      const params = new URLSearchParams(window.location.search);
+      const soundParam = params.get('sound');
+      
+      // ?sound=off または ?sound=on が指定されている場合は、それを優先
+      if (soundParam !== null) {
+        this.enabled = soundParam.toLowerCase() !== 'off';
+        console.log(`Sound enabled set from query parameter: ${this.enabled}`);
+        // クエリパラメーター指定時はlocalStorageの音量のみ復元
+        const savedVolume = localStorage.getItem('soundVolume');
+        if (savedVolume !== null) {
+          this.volume = parseFloat(savedVolume);
+        }
+        return;
+      }
+      
+      // クエリパラメーターがない場合はlocalStorageから復元
       const savedVolume = localStorage.getItem('soundVolume');
       if (savedVolume !== null) {
         this.volume = parseFloat(savedVolume);
