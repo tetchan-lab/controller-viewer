@@ -102,6 +102,26 @@
               oninput="updateVolume(this.value)" />
             <span id="volume-value">50%</span>
           </div>
+          
+          <!-- OBS用URL生成 -->
+          <div class="setting-section">
+            <h3>OBS用URL生成</h3>
+            <p class="setting-description">
+              現在の設定を反映したURLを生成します。OBSのブラウザソースにペーストしてください。
+            </p>
+            <div class="setting-row">
+              <textarea
+                id="obs-url-output"
+                class="url-output"
+                readonly
+                rows="5"
+                placeholder="コントローラーを接続すると、OBS用URLが生成されます"></textarea>
+            </div>
+            <div class="setting-row">
+              <button class="copy-btn" onclick="copyObsUrl()">📋 URLをコピー</button>
+              <span id="copy-status" class="copy-status"></span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

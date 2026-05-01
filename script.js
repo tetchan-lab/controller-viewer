@@ -736,6 +736,9 @@ function switchController(configId) {
     elements.deviceName.textContent = `接続中: ${gp.id}`;
     elements.deviceName.classList.add("connected");
     if (state.rafId === null) startPolling();
+    
+    // OBS用URLを更新
+    updateObsUrl();
     return;  // 最初の有効なゲームパッドを使う    
   }
 }
@@ -822,6 +825,9 @@ function switchDevice(value) {
       if (state.rafId === null) startPolling();
     }
   }
+  
+  // OBS用URLを更新
+  updateObsUrl();
 }
 
 // ── Gamepad API イベント ──────────────────────────────────────
@@ -870,6 +876,9 @@ window.addEventListener("gamepadconnected", (e) => {
   updateDeviceStatusText(gp);
 
   startPolling();
+  
+  // OBS用URLを更新
+  updateObsUrl();
 });
 
 window.addEventListener("gamepaddisconnected", (e) => {
@@ -902,6 +911,9 @@ window.addEventListener("gamepaddisconnected", (e) => {
     elements.deviceName.textContent = "コントローラー未接続";
     elements.deviceName.classList.remove("connected");
   }
+  
+  // OBS用URLを更新
+  updateObsUrl();
 });
 
 // ── ポーリングループ ──────────────────────────────────────────
@@ -1483,6 +1495,9 @@ function openSoundSettings() {
     modalContent.style.right = `${rightPosition}px`;
     
     modal.style.display = 'block';
+    
+    // OBS用URLを更新
+    updateObsUrl();
   }
 }
 
@@ -1502,6 +1517,9 @@ function closeSoundSettings() {
  */
 function toggleSound(enabled) {
   soundManager.setEnabled(enabled);
+  
+  // OBS用URLを更新
+  updateObsUrl();
 }
 
 /**
@@ -1515,5 +1533,141 @@ function updateVolume(value) {
   const volumeValue = document.getElementById('volume-value');
   if (volumeValue) {
     volumeValue.textContent = `${value}%`;
+  }
+  
+  // OBS用URLを更新
+  updateObsUrl();
+}
+
+// ── OBS用URL生成 ──────────────────────────────────────────────
+
+/**
+ * ゲームパッドIDから識別用キーワードを抽出する
+ * @param {string} gamepadId - Gamepad.id
+ * @returns {string} - デバイス識別キーワード（小文字）
+ */
+function extractDeviceKeyword(gamepadId) {
+  if (!gamepadId) return '';
+  
+  const idLower = gamepadId.toLowerCase();
+  
+  // DualSense系
+  if (idLower.includes('dualsense')) {
+    return 'dualsense';
+  }
+  
+  // Fighting Stick Mini（XBOX 360互換モードで動作）
+  // ID例: "XBOX 360 Controller For Windows (STANDARD GAMEPAD)"
+  // "windows" を返すことで、"For Windows" を含むデバイスにマッチ
+  if (idLower.includes('for windows')) {
+    return 'windows';
+  }
+  
+  // Xbox系
+  // ID例: "Xbox 360 Controller (XInput STANDARD GAMEPAD)"
+  // "xbox" のみで判定（"xinput" は他デバイスにも含まれる可能性があるため除外）
+  if (idLower.includes('xbox')) {
+    return 'xbox';
+  }
+  
+  // Switch Pro Controller
+  if (idLower.includes('switch')) {
+    return 'switch';
+  }
+  
+  // その他：最初の単語を抽出（スペース、括弧、ハイフンで分割）
+  const match = idLower.match(/^([a-z0-9]+)/);
+  return match ? match[1] : 'gamepad';
+}
+
+/**
+ * OBS用URLを生成する
+ * @returns {string} - 生成されたURL
+ */
+function generateObsUrl() {
+  const baseUrl = 'https://tetchan-lab.github.io/controller-viewer/';
+  const params = [];
+  
+  // controller パラメーター
+  if (state.currentConfig && state.currentConfig.id) {
+    params.push(`controller=${state.currentConfig.id}`);
+  }
+  
+  // device パラメーター（アクティブなゲームパッドがある場合）
+  if (state.activeGamepad) {
+    const deviceKeyword = extractDeviceKeyword(state.activeGamepad.id);
+    if (deviceKeyword) {
+      params.push(`device=${deviceKeyword}`);
+    }
+  }
+  
+  // sound パラメーター
+  const soundEnabled = soundManager.isEnabled();
+  params.push(`sound=${soundEnabled ? 'on' : 'off'}`);
+  
+  // URLを組み立て
+  if (params.length > 0) {
+    return `${baseUrl}?${params.join('&')}`;
+  }
+  
+  return baseUrl;
+}
+
+/**
+ * OBS用URL表示を更新する
+ */
+function updateObsUrl() {
+  const urlOutput = document.getElementById('obs-url-output');
+  if (!urlOutput) return;
+  
+  const url = generateObsUrl();
+  urlOutput.value = url;
+  
+  // プレースホルダーを更新（ゲームパッド未接続時）
+  if (!state.activeGamepad) {
+    urlOutput.placeholder = 'コントローラーを接続すると、OBS用URLが生成されます';
+  } else {
+    urlOutput.placeholder = '';
+  }
+}
+
+/**
+ * OBS用URLをクリップボードにコピーする
+ */
+async function copyObsUrl() {
+  const urlOutput = document.getElementById('obs-url-output');
+  const copyStatus = document.getElementById('copy-status');
+  
+  if (!urlOutput || !urlOutput.value) {
+    if (copyStatus) {
+      copyStatus.textContent = '⚠️ URLが生成されていません';
+      copyStatus.className = 'copy-status error';
+      setTimeout(() => {
+        copyStatus.textContent = '';
+      }, 2000);
+    }
+    return;
+  }
+  
+  try {
+    await navigator.clipboard.writeText(urlOutput.value);
+    
+    if (copyStatus) {
+      copyStatus.textContent = '✓ コピーしました';
+      copyStatus.className = 'copy-status success';
+      setTimeout(() => {
+        copyStatus.textContent = '';
+      }, 2000);
+    }
+  } catch (error) {
+    console.error('Failed to copy URL:', error);
+    
+    if (copyStatus) {
+      copyStatus.textContent = '✗ コピーに失敗しました';
+      copyStatus.className = 'copy-status error';
+      setTimeout(() => {
+        copyStatus.textContent = '';
+      }, 2000);
+    }
   }
 }

@@ -436,6 +436,87 @@ body.transparent-bg #app {
   text-align: right;
 }
 
+/* 設定セクション（OBS用URL生成など） */
+.setting-section {
+  border-top: 1px solid #333;
+  padding-top: 16px;
+  margin-top: 8px;
+}
+
+.setting-section h3 {
+  font-size: 0.95rem;
+  color: #fff;
+  margin: 0 0 8px 0;
+  font-weight: 600;
+}
+
+.setting-description {
+  font-size: 0.8rem;
+  color: #999;
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+}
+
+.url-output {
+  width: 100%;
+  padding: 10px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 4px;
+  color: #ccc;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.85rem;
+  resize: vertical;
+  min-height: 60px;
+  line-height: 1.4;
+}
+
+.url-output:focus {
+  outline: none;
+  border-color: #1a7fc0;
+}
+
+.url-output::placeholder {
+  color: #666;
+  font-style: italic;
+}
+
+.copy-btn {
+  padding: 8px 16px;
+  background: #1a7fc0;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.copy-btn:hover {
+  background: #2a8fd0;
+}
+
+.copy-btn:active {
+  background: #0f5f9f;
+}
+
+.copy-status {
+  font-size: 0.85rem;
+  margin-left: 8px;
+  transition: opacity 0.2s;
+}
+
+.copy-status.success {
+  color: #4caf50;
+}
+
+.copy-status.error {
+  color: #f44336;
+}
+
 /* 設定ボタン（歯車アイコン）のスタイル調整 */
 .settings-btn {
   font-size: 1.1rem;
