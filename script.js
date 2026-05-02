@@ -1561,9 +1561,8 @@ function extractDeviceKeyword(gamepadId) {
   
   // Fighting Stick Mini（XBOX 360互換モードで動作）
   // ID例: "XBOX 360 Controller For Windows (STANDARD GAMEPAD)"
-  // "windows" を返すことで、"For Windows" を含むデバイスにマッチ
   if (idLower.includes('for windows')) {
-    return 'windows';
+    return 'windows'; // 通常ブラウザ用（OBS用URLでは "xbox" として統一するため、ここでは "windows" を返す）
   }
   
   // Xbox系
@@ -1596,7 +1595,47 @@ function generateObsUrl() {
     params.push(`controller=${state.currentConfig.id}`);
   }
   
-  // device パラメーター（アクティブなゲームパッドがある場合）
+  // device パラメーター
+  if (state.activeGamepad) {
+    const idLower = state.activeGamepad.id.toLowerCase();
+    // Xbox系デバイス（Fighting Stick Mini含む）は xbox で統一
+    if (idLower.includes('xbox')) {
+      params.push('device=xbox');
+    } else {
+      // DualSenseなど他のデバイス
+      const deviceKeyword = extractDeviceKeyword(state.activeGamepad.id);
+      if (deviceKeyword) {
+        params.push(`device=${deviceKeyword}`);
+      }
+    }
+  }
+  
+  // sound パラメーター
+  const soundEnabled = soundManager.isEnabled();
+  params.push(`sound=${soundEnabled ? 'on' : 'off'}`);
+  
+  // URLを組み立て
+  if (params.length > 0) {
+    return `${baseUrl}?${params.join('&')}`;
+  }
+  
+  return baseUrl;
+}
+
+/**
+ * 動作確認用URLを生成する（Chromeなど通常ブラウザ用、デバイスキーワードをそのまま使用）
+ * @returns {string} - 生成されたURL
+ */
+function generateWindowUrl() {
+  const baseUrl = 'https://tetchan-lab.github.io/controller-viewer/';
+  const params = [];
+  
+  // controller パラメーター
+  if (state.currentConfig && state.currentConfig.id) {
+    params.push(`controller=${state.currentConfig.id}`);
+  }
+  
+  // device パラメーター（動作確認用は元のキーワードを使用）
   if (state.activeGamepad) {
     const deviceKeyword = extractDeviceKeyword(state.activeGamepad.id);
     if (deviceKeyword) {
@@ -1620,17 +1659,31 @@ function generateObsUrl() {
  * OBS用URL表示を更新する
  */
 function updateObsUrl() {
-  const urlOutput = document.getElementById('obs-url-output');
-  if (!urlOutput) return;
+  const obsUrlOutput = document.getElementById('obs-url-output');
+  const windowUrlOutput = document.getElementById('window-url-output');
   
-  const url = generateObsUrl();
-  urlOutput.value = url;
+  if (obsUrlOutput) {
+    const obsUrl = generateObsUrl();
+    obsUrlOutput.value = obsUrl;
+    
+    // プレースホルダーを更新（ゲームパッド未接続時）
+    if (!state.activeGamepad) {
+      obsUrlOutput.placeholder = 'コントローラーを接続すると、OBS用URLが生成されます';
+    } else {
+      obsUrlOutput.placeholder = '';
+    }
+  }
   
-  // プレースホルダーを更新（ゲームパッド未接続時）
-  if (!state.activeGamepad) {
-    urlOutput.placeholder = 'コントローラーを接続すると、OBS用URLが生成されます';
-  } else {
-    urlOutput.placeholder = '';
+  if (windowUrlOutput) {
+    const windowUrl = generateWindowUrl();
+    windowUrlOutput.value = windowUrl;
+    
+    // プレースホルダーを更新（ゲームパッド未接続時）
+    if (!state.activeGamepad) {
+      windowUrlOutput.placeholder = 'コントローラーを接続すると、URLが生成されます';
+    } else {
+      windowUrlOutput.placeholder = '';
+    }
   }
 }
 
@@ -1664,7 +1717,7 @@ function displayBrowserInfo() {
 
   // OBS/CEF検出
   const userAgentLower = navigator.userAgent.toLowerCase();
-  const isOBS = userAgentLower.includes('obs') || userAgentLower.includes('cef');
+  const isOBS = userAgentLower.includes('obs');
   const isCEF = userAgentLower.includes('cef');
 
   let html = '<table style="width: 100%; border-collapse: collapse;">';
@@ -1692,7 +1745,48 @@ function displayBrowserInfo() {
  */
 async function copyObsUrl() {
   const urlOutput = document.getElementById('obs-url-output');
-  const copyStatus = document.getElementById('copy-status');
+  const copyStatus = document.getElementById('copy-status-obs');
+  
+  if (!urlOutput || !urlOutput.value) {
+    if (copyStatus) {
+      copyStatus.textContent = '⚠️ URLが生成されていません';
+      copyStatus.className = 'copy-status error';
+      setTimeout(() => {
+        copyStatus.textContent = '';
+      }, 2000);
+    }
+    return;
+  }
+  
+  try {
+    await navigator.clipboard.writeText(urlOutput.value);
+    
+    if (copyStatus) {
+      copyStatus.textContent = '✓ コピーしました';
+      copyStatus.className = 'copy-status success';
+      setTimeout(() => {
+        copyStatus.textContent = '';
+      }, 2000);
+    }
+  } catch (error) {
+    console.error('Failed to copy URL:', error);
+    
+    if (copyStatus) {
+      copyStatus.textContent = '✗ コピーに失敗しました';
+      copyStatus.className = 'copy-status error';
+      setTimeout(() => {
+        copyStatus.textContent = '';
+      }, 2000);
+    }
+  }
+}
+
+/**
+ * 動作確認用URLをクリップボードにコピーする
+ */
+async function copyWindowUrl() {
+  const urlOutput = document.getElementById('window-url-output');
+  const copyStatus = document.getElementById('copy-status-window');
   
   if (!urlOutput || !urlOutput.value) {
     if (copyStatus) {

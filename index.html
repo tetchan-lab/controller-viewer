@@ -111,7 +111,7 @@
           
           <!-- OBS用URL生成 -->
           <div class="setting-section">
-            <h3>OBS用URL生成</h3>
+            <h3>OBS用URL（ブラウザソース）</h3>
             <p class="setting-description">
               現在の設定を反映したURLを生成します。OBSのブラウザソースにペーストしてください。
             </p>
@@ -120,12 +120,32 @@
                 id="obs-url-output"
                 class="url-output"
                 readonly
-                rows="5"
+                rows="3"
                 placeholder="コントローラーを接続すると、OBS用URLが生成されます"></textarea>
             </div>
             <div class="setting-row">
-              <button class="copy-btn" onclick="copyObsUrl()">📋 URLをコピー</button>
-              <span id="copy-status" class="copy-status"></span>
+              <button class="copy-btn" onclick="copyObsUrl()">📋 OBS用URLをコピー</button>
+              <span id="copy-status-obs" class="copy-status"></span>
+            </div>
+          </div>
+          
+          <!-- 動作確認用URL生成 -->
+          <div class="setting-section">
+            <h3>動作確認用URL</h3>
+            <p class="setting-description">
+              通常のブラウザで動作確認する際のURLです。Chromeなどで開いてテストできます。
+            </p>
+            <div class="setting-row">
+              <textarea
+                id="window-url-output"
+                class="url-output"
+                readonly
+                rows="3"
+                placeholder="コントローラーを接続すると、URLが生成されます"></textarea>
+            </div>
+            <div class="setting-row">
+              <button class="copy-btn" onclick="copyWindowUrl()">📋 動作確認用URLをコピー</button>
+              <span id="copy-status-window" class="copy-status"></span>
             </div>
           </div>
         </div>

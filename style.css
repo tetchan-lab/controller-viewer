@@ -317,7 +317,7 @@ body.transparent-bg #app {
   background: #1a1a1a;
   border: 1px solid #2a2a2a;
   border-radius: 12px;
-  width: 320px;
+  width: 466px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   z-index: 1001;
   pointer-events: auto;
