@@ -1408,6 +1408,9 @@ function matchesDeviceFilter(gamepad, filter) {
   window.addEventListener('resize', () => {
     updateOverlayScale();
   });
+
+  // ブラウザ情報を表示（OBS検証用）
+  displayBrowserInfo();
 })();
 
 // ── サウンドシステム初期化 ─────────────────────────────────────
@@ -1629,6 +1632,59 @@ function updateObsUrl() {
   } else {
     urlOutput.placeholder = '';
   }
+}
+
+/**
+ * ブラウザ情報を取得して表示する（OBS検証用）
+ */
+function displayBrowserInfo() {
+  const infoContainer = document.getElementById('browser-info-content');
+  if (!infoContainer) return;
+
+  const info = {
+    'User-Agent': navigator.userAgent,
+    'Vendor': navigator.vendor,
+    'Platform': navigator.platform,
+    'App Name': navigator.appName,
+    'App Version': navigator.appVersion,
+    'App Code Name': navigator.appCodeName,
+    'Product': navigator.product,
+    'Product Sub': navigator.productSub,
+    'Language': navigator.language,
+    'Languages': navigator.languages ? navigator.languages.join(', ') : 'N/A',
+    'Online': navigator.onLine,
+    'Cookie Enabled': navigator.cookieEnabled,
+    'Hardware Concurrency': navigator.hardwareConcurrency || 'N/A',
+    'Max Touch Points': navigator.maxTouchPoints || 'N/A',
+    'Screen Width': screen.width,
+    'Screen Height': screen.height,
+    'Window Width': window.innerWidth,
+    'Window Height': window.innerHeight,
+  };
+
+  // OBS/CEF検出
+  const userAgentLower = navigator.userAgent.toLowerCase();
+  const isOBS = userAgentLower.includes('obs') || userAgentLower.includes('cef');
+  const isCEF = userAgentLower.includes('cef');
+
+  let html = '<table style="width: 100%; border-collapse: collapse;">';
+  
+  // OBS/CEF検出結果を強調表示
+  if (isOBS || isCEF) {
+    html += '<tr style="background: rgba(255,0,0,0.3);">';
+    html += '<td colspan="2" style="padding: 8px; font-weight: bold; color: #ff6666;">⚠️ OBS/CEF ブラウザとして検出されました</td>';
+    html += '</tr>';
+  }
+
+  for (const [key, value] of Object.entries(info)) {
+    html += '<tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">';
+    html += `<td style="padding: 5px; font-weight: bold; color: #00ffff;">${key}:</td>`;
+    html += `<td style="padding: 5px; word-break: break-all;">${value}</td>`;
+    html += '</tr>';
+  }
+  html += '</table>';
+
+  infoContainer.innerHTML = html;
 }
 
 /**
