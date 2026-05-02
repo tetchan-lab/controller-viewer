@@ -436,11 +436,38 @@ body.transparent-bg #app {
   text-align: right;
 }
 
-/* 設定セクション（OBS用URL生成など） */
-.setting-section {
-  border-top: 1px solid #333;
-  padding-top: 16px;
-  margin-top: 8px;
+/* details/summary トグルスタイル */
+details.setting-section {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: background 0.2s ease;
+}
+
+details.setting-section:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+details.setting-section summary {
+  cursor: pointer;
+  font-weight: 600;
+  list-style: none;
+  transition: background 0.2s ease;
+}
+
+details.setting-section summary::-webkit-details-marker {
+  display: none;
+}
+
+details.setting-section summary::before {
+  content: '▶';
+  display: inline-block;
+  margin-right: 8px;
+  transition: transform 0.2s ease;
+  font-size: 12px;
+}
+
+details.setting-section[open] summary::before {
+  transform: rotate(90deg);
 }
 
 .setting-section h3 {
@@ -453,8 +480,7 @@ body.transparent-bg #app {
 .setting-description {
   font-size: 0.8rem;
   color: #999;
-  margin: 0 0 12px 0;
-  line-height: 1.4;
+  margin: 12px 0 12px 0;
 }
 
 .url-output {
