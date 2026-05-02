@@ -76,6 +76,12 @@
       <a href="https://github.com/tetchan-lab/controller-viewer#controller-viewer"><code>GitHub README</code></a>
     </p>
 
+    <!-- ブラウザ情報デバッグ表示エリア（OBS検証用） -->
+    <div id="browser-info" style="display: none; margin: 20px; padding: 15px; background: rgba(0,0,0,0.7); color: #00ff00; font-family: monospace; font-size: 12px; border-radius: 8px; max-width: 800px;">
+      <h3 style="margin-top: 0; color: #ffff00;">🔍 ブラウザ情報（OBS検証用）</h3>
+      <div id="browser-info-content"></div>
+    </div>
+
     <!-- サウンド設定モーダル -->
     <div id="sound-modal" class="modal" style="display: none;">
       <div class="modal-overlay" onclick="closeSoundSettings()"></div>
@@ -104,8 +110,8 @@
           </div>
           
           <!-- OBS用URL生成 -->
-          <div class="setting-section">
-            <h3>OBS用URL生成</h3>
+          <details class="setting-section" open>
+            <summary>🎥 OBS用URL（ブラウザソース）</summary>
             <p class="setting-description">
               現在の設定を反映したURLを生成します。OBSのブラウザソースにペーストしてください。
             </p>
@@ -114,14 +120,34 @@
                 id="obs-url-output"
                 class="url-output"
                 readonly
-                rows="5"
+                rows="3"
                 placeholder="コントローラーを接続すると、OBS用URLが生成されます"></textarea>
             </div>
             <div class="setting-row">
-              <button class="copy-btn" onclick="copyObsUrl()">📋 URLをコピー</button>
-              <span id="copy-status" class="copy-status"></span>
+              <button class="copy-btn" onclick="copyObsUrl()">📋 OBS用URLをコピー</button>
+              <span id="copy-status-obs" class="copy-status"></span>
             </div>
-          </div>
+          </details>
+          
+          <!-- 動作確認用URL生成 -->
+          <details class="setting-section">
+            <summary>🪟 動作確認用URL</summary>
+            <p class="setting-description">
+              通常のブラウザで動作確認する際のURLです。Chromeなどで開いてテストできます。
+            </p>
+            <div class="setting-row">
+              <textarea
+                id="window-url-output"
+                class="url-output"
+                readonly
+                rows="3"
+                placeholder="コントローラーを接続すると、URLが生成されます"></textarea>
+            </div>
+            <div class="setting-row">
+              <button class="copy-btn" onclick="copyWindowUrl()">📋 動作確認用URLをコピー</button>
+              <span id="copy-status-window" class="copy-status"></span>
+            </div>
+          </details>
         </div>
       </div>
     </div>
