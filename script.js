@@ -1006,6 +1006,62 @@ function getButtonSoundCategory(buttonIndex, config) {
 }
 
 /**
+ * サウンドセットに応じた適切なサウンドIDを取得する。
+ * @param {object} config - 現在のコントローラー設定
+ * @param {string} soundCategory - サウンドカテゴリ（"dpad", "buttons", "lever", "stick"など）
+ * @param {number|null} buttonIndex - ボタンインデックス（ボタンの場合のみ）
+ * @returns {string} - サウンドID（例: "dualsense_dpad"）
+ */
+function getEffectiveSoundId(config, soundCategory, buttonIndex = null) {
+  const soundset = soundManager.getSoundset();
+  
+  // auto または対応するサウンドセットがない場合は元のまま
+  if (soundset === 'auto') {
+    return `${config.id}_${soundCategory}`;
+  }
+
+  // Fighting Stick Mini + soundset=dual の場合
+  if (config.id === 'fightingStickMini' && soundset === 'dual') {
+    if (soundCategory === 'lever') {
+      // レバー → DualSenseの十字キー
+      return 'dualsense_dpad';
+    } else if (soundCategory === 'upbtn') {
+      // 上部ボタン → DualSenseのcreate_optionsまたはbuttons
+      // Share(index=8) → create_options、その他 → buttons
+      if (buttonIndex === 8) {
+        return 'dualsense_create_options';
+      }
+      return 'dualsense_buttons';
+    }
+  }
+  
+  // DualSense + soundset=fighting の場合
+  if (config.id === 'dualsense' && soundset === 'fighting') {
+    if (soundCategory === 'dpad') {
+      // 十字キー → Fighting Stick Miniのレバー
+      return 'fightingStickMini_lever';
+    } else if (soundCategory === 'create_options') {
+      // Create/Options → Fighting Stick Miniの上部ボタン
+      return 'fightingStickMini_upbtn';
+    } else if (soundCategory === 'buttons') {
+      // L3/R3のみ → Fighting Stick Miniの上部ボタン
+      // L3(index=10), R3(index=11)
+      if (buttonIndex === 10 || buttonIndex === 11) {
+        return 'fightingStickMini_upbtn';
+      }
+      // その他のボタンは元のまま
+      return `${config.id}_${soundCategory}`;
+    } else if (soundCategory === 'stick') {
+      // アナログスティック → DualSenseのまま
+      return `${config.id}_${soundCategory}`;
+    }
+  }
+
+  // その他の場合は元のまま
+  return `${config.id}_${soundCategory}`;
+}
+
+/**
  * スティック/レバーのサウンドステートを更新する。
  * @param {Gamepad} gp - ゲームパッド
  * @param {object} stick - スティック設定
@@ -1031,7 +1087,7 @@ function updateStickSoundState(gp, stick, axisX, axisY, threshold, soundCategory
     }
     
     if (config.sounds && config.sounds[soundCategory]) {
-      const soundId = `${config.id}_${soundCategory}`;
+      const soundId = getEffectiveSoundId(config, soundCategory);
       if (!isNeutral) {
         soundManager.play(`${soundId}_press`);
       } else {
@@ -1135,7 +1191,7 @@ function tick() {
       
       const soundCategory = getButtonSoundCategory(idx, config);
       if (soundCategory) {
-        const soundId = `${config.id}_${soundCategory}`;
+        const soundId = getEffectiveSoundId(config, soundCategory, idx);
         if (pressed) {
           // 押下時
           soundManager.play(`${soundId}_press`);
@@ -1476,20 +1532,12 @@ async function initSoundSystem() {
     }
   }
 
-  // すべてのコントローラー設定からサウンドファイルを収集
+  // すべてのコントローラー設定からサウンドファイルを収集（全サウンドをロード）
   const soundMap = {};
   for (const config of ALL_CONFIGS) {
     if (!config.sounds) continue;
 
-    // サウンドセットに応じて使用するサウンド定義を選択
-    let soundsToUse = config.sounds;
-    if (soundset === 'dual' && dualsenseSounds) {
-      soundsToUse = dualsenseSounds;
-    } else if (soundset === 'fighting' && fightingSounds) {
-      soundsToUse = fightingSounds;
-    }
-
-    for (const [category, paths] of Object.entries(soundsToUse)) {
+    for (const [category, paths] of Object.entries(config.sounds)) {
       const soundIdPrefix = `${config.id}_${category}`;
       if (paths.press) {
         soundMap[`${soundIdPrefix}_press`] = paths.press;
