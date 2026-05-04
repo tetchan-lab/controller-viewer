@@ -13,6 +13,7 @@ class SoundManager {
     this.buffers = {}; // soundId -> AudioBuffer
     this.enabled = true;
     this.volume = 0.5; // 初期音量50%
+    this.soundset = 'auto'; // サウンドセット: 'auto', 'dual', 'fighting'
     this.initialized = false;
     
     // localStorageから設定を復元
@@ -141,12 +142,32 @@ class SoundManager {
   }
 
   /**
+   * サウンドセットを設定
+   * @param {string} soundset - 'auto', 'dual', 'fighting'
+   */
+  setSoundset(soundset) {
+    if (['auto', 'dual', 'fighting'].includes(soundset)) {
+      this.soundset = soundset;
+      this.saveSettings();
+    }
+  }
+
+  /**
+   * 現在のサウンドセットを取得
+   * @returns {string} サウンドセット
+   */
+  getSoundset() {
+    return this.soundset;
+  }
+
+  /**
    * 設定をlocalStorageに保存
    */
   saveSettings() {
     try {
       localStorage.setItem('soundVolume', this.volume.toString());
       localStorage.setItem('soundEnabled', this.enabled.toString());
+      localStorage.setItem('soundSoundset', this.soundset);
     } catch (error) {
       console.warn('Failed to save sound settings:', error);
     }
@@ -157,31 +178,42 @@ class SoundManager {
    */
   loadSettings() {
     try {
-      // URLクエリパラメーター "sound" の値を取得（優先度最高）
+      // URLクエリパラメーター "sound" と "soundset" の値を取得（優先度最高）
       const params = new URLSearchParams(window.location.search);
       const soundParam = params.get('sound');
+      const soundsetParam = params.get('soundset');
       
       // ?sound=off または ?sound=on が指定されている場合は、それを優先
       if (soundParam !== null) {
         this.enabled = soundParam.toLowerCase() !== 'off';
         console.log(`Sound enabled set from query parameter: ${this.enabled}`);
-        // クエリパラメーター指定時はlocalStorageの音量のみ復元
-        const savedVolume = localStorage.getItem('soundVolume');
-        if (savedVolume !== null) {
-          this.volume = parseFloat(savedVolume);
+      } else {
+        // クエリパラメーターがない場合はlocalStorageから復元
+        const savedEnabled = localStorage.getItem('soundEnabled');
+        if (savedEnabled !== null) {
+          this.enabled = savedEnabled === 'true';
         }
-        return;
       }
       
-      // クエリパラメーターがない場合はlocalStorageから復元
+      // ?soundset=dual / ?soundset=fighting / ?soundset=auto が指定されている場合は、それを優先
+      if (soundsetParam !== null) {
+        const normalizedSoundset = soundsetParam.toLowerCase();
+        if (['auto', 'dual', 'fighting'].includes(normalizedSoundset)) {
+          this.soundset = normalizedSoundset;
+          console.log(`Soundset set from query parameter: ${this.soundset}`);
+        }
+      } else {
+        // クエリパラメーターがない場合はlocalStorageから復元
+        const savedSoundset = localStorage.getItem('soundSoundset');
+        if (savedSoundset !== null) {
+          this.soundset = savedSoundset;
+        }
+      }
+      
+      // 音量の復元
       const savedVolume = localStorage.getItem('soundVolume');
       if (savedVolume !== null) {
         this.volume = parseFloat(savedVolume);
-      }
-
-      const savedEnabled = localStorage.getItem('soundEnabled');
-      if (savedEnabled !== null) {
-        this.enabled = savedEnabled === 'true';
       }
     } catch (error) {
       console.warn('Failed to load sound settings:', error);

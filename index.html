@@ -109,6 +109,28 @@
             <span id="volume-value">50%</span>
           </div>
           
+          <!-- サウンドセット選択 -->
+          <details class="setting-section">
+            <summary>🎵 サウンドセット</summary>
+            <p class="setting-description">
+              再生するサウンドを選択します。「自動」の場合、各コントローラー固有のサウンドが使用されます。
+            </p>
+            <div class="soundset-options">
+              <label class="soundset-option">
+                <input type="radio" name="soundset" value="auto" onchange="changeSoundset(this.value)" checked />
+                <span>自動（コントローラーごと）</span>
+              </label>
+              <label class="soundset-option">
+                <input type="radio" name="soundset" value="dual" onchange="changeSoundset(this.value)" />
+                <span>DualSense</span>
+              </label>
+              <label class="soundset-option">
+                <input type="radio" name="soundset" value="fighting" onchange="changeSoundset(this.value)" />
+                <span>Fighting Stick Mini</span>
+              </label>
+            </div>
+          </details>
+          
           <!-- OBS用URL生成 -->
           <details class="setting-section" open>
             <summary>🎥 OBS用URL（ブラウザソース）</summary>
