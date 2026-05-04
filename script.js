@@ -1459,12 +1459,37 @@ async function initSoundSystem() {
   // AudioContextの初期化
   await soundManager.init();
 
+  // サウンドセット設定を取得
+  const soundset = soundManager.getSoundset();
+
+  // サウンドセットに応じた参照設定を決定
+  let dualsenseSounds = null;
+  let fightingSounds = null;
+  
+  // DualSenseとFighting Stick Miniのサウンド定義を取得
+  for (const config of ALL_CONFIGS) {
+    if (config.id === 'dualsense' && config.sounds) {
+      dualsenseSounds = config.sounds;
+    }
+    if (config.id === 'fightingStickMini' && config.sounds) {
+      fightingSounds = config.sounds;
+    }
+  }
+
   // すべてのコントローラー設定からサウンドファイルを収集
   const soundMap = {};
   for (const config of ALL_CONFIGS) {
     if (!config.sounds) continue;
 
-    for (const [category, paths] of Object.entries(config.sounds)) {
+    // サウンドセットに応じて使用するサウンド定義を選択
+    let soundsToUse = config.sounds;
+    if (soundset === 'dual' && dualsenseSounds) {
+      soundsToUse = dualsenseSounds;
+    } else if (soundset === 'fighting' && fightingSounds) {
+      soundsToUse = fightingSounds;
+    }
+
+    for (const [category, paths] of Object.entries(soundsToUse)) {
       const soundIdPrefix = `${config.id}_${category}`;
       if (paths.press) {
         soundMap[`${soundIdPrefix}_press`] = paths.press;
@@ -1499,6 +1524,15 @@ function initSoundUI() {
   if (enabledCheckbox) {
     enabledCheckbox.checked = soundManager.isEnabled();
   }
+
+  // サウンドセットの初期化
+  const soundset = soundManager.getSoundset();
+  const soundsetRadios = document.querySelectorAll('input[name="soundset"]');
+  soundsetRadios.forEach(radio => {
+    if (radio.value === soundset) {
+      radio.checked = true;
+    }
+  });
 }
 
 /**
@@ -1506,20 +1540,8 @@ function initSoundUI() {
  */
 function openSoundSettings() {
   const modal = document.getElementById('sound-modal');
-  const modalContent = modal?.querySelector('.modal-content');
-  const settingsBtn = document.getElementById('btn-sound-settings');
   
-  if (modal && modalContent && settingsBtn) {
-    // 歯車ボタンの位置を取得
-    const btnRect = settingsBtn.getBoundingClientRect();
-    
-    // モーダルを歯車ボタンの下に配置
-    const topPosition = btnRect.bottom + 8; // ボタンの下に8pxの余白
-    const rightPosition = window.innerWidth - btnRect.right; // 右端からの距離を合わせる
-    
-    modalContent.style.top = `${topPosition}px`;
-    modalContent.style.right = `${rightPosition}px`;
-    
+  if (modal) {
     modal.style.display = 'block';
     
     // OBS用URLを更新
@@ -1560,6 +1582,21 @@ function updateVolume(value) {
   if (volumeValue) {
     volumeValue.textContent = `${value}%`;
   }
+  
+  // OBS用URLを更新
+  updateObsUrl();
+}
+
+/**
+ * サウンドセットを変更
+ * @param {string} soundset - 'auto', 'dual', 'fighting'
+ */
+async function changeSoundset(soundset) {
+  // サウンドセットを保存
+  soundManager.setSoundset(soundset);
+  
+  // サウンドを再読み込み
+  await initSoundSystem();
   
   // OBS用URLを更新
   updateObsUrl();
@@ -1637,6 +1674,12 @@ function generateObsUrl() {
   const soundEnabled = soundManager.isEnabled();
   params.push(`sound=${soundEnabled ? 'on' : 'off'}`);
   
+  // soundset パラメーター
+  const soundset = soundManager.getSoundset();
+  if (soundset !== 'auto') {
+    params.push(`soundset=${soundset}`);
+  }
+  
   // URLを組み立て
   if (params.length > 0) {
     return `${baseUrl}?${params.join('&')}`;
@@ -1669,6 +1712,12 @@ function generateWindowUrl() {
   // sound パラメーター
   const soundEnabled = soundManager.isEnabled();
   params.push(`sound=${soundEnabled ? 'on' : 'off'}`);
+  
+  // soundset パラメーター
+  const soundset = soundManager.getSoundset();
+  if (soundset !== 'auto') {
+    params.push(`soundset=${soundset}`);
+  }
   
   // URLを組み立て
   if (params.length > 0) {
