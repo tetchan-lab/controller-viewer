@@ -1048,8 +1048,8 @@ function getEffectiveSoundId(config, soundCategory, buttonIndex = null) {
       // 十字キー → Fighting Stick Miniのレバー
       return 'fightingStickMini_lever';
     } else if (soundCategory === 'buttons') {
-      // L3(index=10), R3(index=11) → Fighting Stick Miniの上部ボタン
-      if (buttonIndex === 10 || buttonIndex === 11) {
+      // L3(index=10), R3(index=11), PS(index=16) → Fighting Stick Miniの上部ボタン
+      if (buttonIndex === 10 || buttonIndex === 11 || buttonIndex === 16) {
         return 'fightingStickMini_upbtn';
       }
       // その他のボタン（×□△○R1R2L1L2など） → Fighting Stick Miniのボタン
