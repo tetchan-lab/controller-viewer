@@ -1021,38 +1021,44 @@ function getEffectiveSoundId(config, soundCategory, buttonIndex = null) {
   }
 
   // Fighting Stick Mini + soundset=dual の場合
+  // 基本的に全てDualSenseのサウンドに切り替える
   if (config.id === 'fightingStickMini' && soundset === 'dual') {
     if (soundCategory === 'lever') {
       // レバー → DualSenseの十字キー
       return 'dualsense_dpad';
+    } else if (soundCategory === 'buttons') {
+      // ボタン（×□△○R1R2L1L2） → DualSenseのボタン
+      return 'dualsense_buttons';
     } else if (soundCategory === 'upbtn') {
       // 上部ボタン → DualSenseのcreate_optionsまたはbuttons
-      // Share(index=8) → create_options、その他 → buttons
-      if (buttonIndex === 8) {
+      // Share(index=8), Options(index=9) → create_options
+      if (buttonIndex === 8 || buttonIndex === 9) {
         return 'dualsense_create_options';
       }
+      // その他（PS/L3/R3） → buttons
       return 'dualsense_buttons';
     }
   }
   
   // DualSense + soundset=fighting の場合
+  // 基本的に全てFighting Stick Miniのサウンドに切り替えるが、
+  // 存在しないサウンド（stick, touch）は元のまま
   if (config.id === 'dualsense' && soundset === 'fighting') {
     if (soundCategory === 'dpad') {
       // 十字キー → Fighting Stick Miniのレバー
       return 'fightingStickMini_lever';
-    } else if (soundCategory === 'create_options') {
-      // Create/Options → Fighting Stick Miniの上部ボタン
-      return 'fightingStickMini_upbtn';
     } else if (soundCategory === 'buttons') {
-      // L3/R3のみ → Fighting Stick Miniの上部ボタン
-      // L3(index=10), R3(index=11)
+      // L3(index=10), R3(index=11) → Fighting Stick Miniの上部ボタン
       if (buttonIndex === 10 || buttonIndex === 11) {
         return 'fightingStickMini_upbtn';
       }
-      // その他のボタンは元のまま
-      return `${config.id}_${soundCategory}`;
-    } else if (soundCategory === 'stick') {
-      // アナログスティック → DualSenseのまま
+      // その他のボタン（×□△○R1R2L1L2など） → Fighting Stick Miniのボタン
+      return 'fightingStickMini_buttons';
+    } else if (soundCategory === 'create_options') {
+      // Create/Options → Fighting Stick Miniの上部ボタン
+      return 'fightingStickMini_upbtn';
+    } else if (soundCategory === 'stick' || soundCategory === 'touch') {
+      // アナログスティック/Touch → DualSenseのまま（Fighting Stick Miniに存在しない）
       return `${config.id}_${soundCategory}`;
     }
   }
