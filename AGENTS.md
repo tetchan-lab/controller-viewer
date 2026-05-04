@@ -4,7 +4,7 @@
 
 ## 共通規約の参照
 
-**重要**: まず `.github/copilot-instructions.md` を読み取り、ワークスペース全体の共通規約を適用してください。
+**重要**: まず [copilot-instructions.md](../.github/copilot-instructions.md) を読み取り、ワークスペース全体の共通規約を適用してください。
 
 ## プロジェクト概要
 
