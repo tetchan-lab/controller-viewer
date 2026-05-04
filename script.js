@@ -370,6 +370,7 @@ function updateStickImg(stick, gp, config) {
   // アナログ軸を優先し、ニュートラルなら d-pad ボタンで補完
   let ax = gp.axes[stick.axisX] || 0;
   let ay = gp.axes[stick.axisY] || 0;
+  
   if (Math.abs(ax) < 0.1 && Math.abs(ay) < 0.1) {
     // config.buttons に ↑↓←→ がなくても動くよう固定インデックスで直読み
     const dpadUp    = stick.dpadUp    ?? 12;
@@ -384,7 +385,29 @@ function updateStickImg(stick, gp, config) {
     const len = Math.sqrt(ax * ax + ay * ay);
     if (len > 1) { ax /= len; ay /= len; }
   }
-
+  
+  // レバー軸の回転適用（lever-label-override.jsで設定された場合）
+  // d-pad処理後に適用することで、物理ボタンの入力も回転される
+  if (stick.rotateAngle) {
+    const angle = stick.rotateAngle;
+    const origAx = ax;
+    const origAy = ay;
+    
+    if (angle === 90) {
+      // 90度回転: 物理的な上→左、下→右、左→上、右→下
+      ax = -origAy;
+      ay = origAx;
+    } else if (angle === 180) {
+      // 180度回転: 物理的な上→下、下→上、左→右、右→左
+      ax = -origAx;
+      ay = -origAy;
+    } else if (angle === 270) {
+      // 270度回転: 物理的な上→右、下→左、左→下、右→上
+      ax = origAy;
+      ay = -origAx;
+    }
+  }
+  
   const bx = ballNX + ax * tilt;
   const by = ballNY + ay * tilt;
 
