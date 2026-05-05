@@ -256,6 +256,9 @@ http://localhost:8080/?controller=myController&debug
 
 - `?keyboard=off` - キーボード/マウス入力を無効化（実ゲームパッドのみ）
 - `?device=0` - デバイス0番のみ受け付ける（複数コントローラー使用時）
+- `?soundset=dual` - DualSenseのサウンドを使用（コントローラー種別に関わらず）
+- `?soundset=fighting` - Fighting Stick Miniのサウンドを使用（コントローラー種別に関わらず）
+- `?rotate=270` - レバー軸を270度回転（Fighting Stick Mini専用、縦置きアケコン対応）
 
 詳細は **[README.md - クエリパラメーター一覧](../README.md#クエリパラメーター一覧)** を参照してください。
 

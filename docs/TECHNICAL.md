@@ -23,6 +23,8 @@ controller-viewer/
 ├── script.js                    # Gamepad API ポーリング・描画ロジック
 ├── config.js                    # ★ ボタン座標・デバイス名パターンの設定ファイル
 ├── keyboard-input.js            # キーボード/マウス入力を仮想ゲームパッド状態に変換
+├── touch-input.js               # タッチ入力を仮想ゲームパッド状態に変換（スマホ対応）
+├── lever-rotation.js            # レバー軸回転機能（縦置きアケコン対応）
 ├── sound-manager.js             # Web Audio API によるサウンド管理
 ├── docs/
 │   ├── CONFIGURATION.md         # カスタマイズガイド（座標計測・新規コントローラー追加）
@@ -61,6 +63,8 @@ controller-viewer/
 | `script.js` | Gamepad API ポーリング、オーバーレイ描画、デバイス自動判定 |
 | `config.js` | **設定の中心**：ボタン座標、デバイス名パターン、サウンドパス |
 | `keyboard-input.js` | キーボード/マウスイベントを仮想ゲームパッド状態に変換（`?keyboard=on/off` で制御） |
+| `touch-input.js` | タッチイベントを仮想ゲームパッド状態に変換（スマホ・タブレット対応） |
+| `lever-rotation.js` | レバー軸回転機能（`?rotate=90/180/270` で制御、Fighting Stick Mini専用） |
 | `sound-manager.js` | Web Audio API によるサウンド管理、音量調整、ローディング |
 
 ---
@@ -302,6 +306,165 @@ document.addEventListener('touchstart', initSoundSystemOnce, { once: true });
 各コントローラーの実機から録音した音声ファイル（MP3形式）を使用しています。  
 録音手順や音声編集の詳細は **[../sounds/README.md](../sounds/README.md)** を参照してください。
 
+### サウンドセット選択機能
+
+コントローラーの種類に関わらず、好きなサウンドセットを選択できる機能を実装しています。
+
+#### 実装の詳細
+
+`sound-manager.js` の `SoundManager` クラスが `soundset` プロパティを管理：
+
+```js
+// sound-manager.js
+class SoundManager {
+  constructor() {
+    this.soundset = 'auto'; // 'auto', 'dual', 'fighting'
+    // ...
+  }
+  
+  setSoundset(soundset) {
+    if (['auto', 'dual', 'fighting'].includes(soundset)) {
+      this.soundset = soundset;
+      this.saveSettings();
+    }
+  }
+  
+  getSoundset() {
+    return this.soundset;
+  }
+}
+```
+
+#### サウンドセットの種類
+
+| サウンドセット | 説明 | 使用するサウンドファイル |
+|---|---|---|
+| `auto`（デフォルト） | コントローラーの種類に応じて自動的に選択 | DualSense → `dualsense/`, Fighting Stick Mini → `fightingStickMini/` |
+| `dual` | DualSense のサウンドを使用 | `sounds/dualsense/` |
+| `fighting` | Fighting Stick Mini のサウンドを使用 | `sounds/fightingStickMini/` |
+
+#### サウンドロード処理（script.js）
+
+コントローラー設定とサウンドセット設定の両方を考慮してサウンドファイルをロードします：
+
+```js
+// script.js
+async function initSoundSystem() {
+  const config = state.currentConfig;
+  if (!config || !config.sounds) return;
+  
+  const soundset = soundManager.getSoundset();
+  
+  // auto: 現在のコントローラー設定に従う
+  if (soundset === 'auto') {
+    await soundManager.loadSounds(config.sounds);
+    return;
+  }
+  
+  // Fighting Stick Mini + soundset=dual の場合
+  // DualSenseのサウンドを使用
+  if (config.id === 'fightingStickMini' && soundset === 'dual') {
+    await soundManager.loadSounds(DUALSENSE_CONFIG.sounds);
+    return;
+  }
+  
+  // DualSense + soundset=fighting の場合
+  // Fighting Stick Miniのサウンドを使用
+  if (config.id === 'dualsense' && soundset === 'fighting') {
+    await soundManager.loadSounds(FIGHTING_STICK_MINI_CONFIG.sounds);
+    return;
+  }
+  
+  // その他: 現在のコントローラー設定に従う
+  await soundManager.loadSounds(config.sounds);
+}
+```
+
+#### URLクエリパラメーター
+
+`?soundset=` パラメーターで初期値を指定できます：
+
+```
+# DualSenseでFighting Stick Miniのサウンドを使用
+https://tetchan-lab.github.io/controller-viewer/?controller=dualsense&soundset=fighting
+
+# Fighting Stick MiniでDualSenseのサウンドを使用
+https://tetchan-lab.github.io/controller-viewer/?controller=fightingStickMini&soundset=dual
+```
+
+設定は localStorage に保存され、次回起動時も維持されます。
+
+---
+
+## レバー軸回転機能（縦置きアケコン対応）
+
+Fighting Stick Mini を縦置きで使用する際に、レバーの方向軸を回転させる機能を実装しています。
+
+### 実装の詳細
+
+`lever-rotation.js` がURLパラメーター `?rotate=` を読み取り、  
+`FIGHTING_STICK_MINI_CONFIG.sticks[]` の `rotateAngle` プロパティを設定します。
+
+```js
+// lever-rotation.js
+(function() {
+  const params = new URLSearchParams(location.search);
+  
+  if (params.get('rotate')) {
+    const angle = parseInt(params.get('rotate'), 10);
+    const lever = FIGHTING_STICK_MINI_CONFIG.sticks.find(s => s.id === 'Lever');
+    
+    if (lever && [90, 180, 270].includes(angle)) {
+      lever.rotateAngle = angle;
+      console.log(`[lever-rotation] レバー軸を${angle}度回転します`);
+    }
+  }
+})();
+```
+
+### 回転の仕組み
+
+スティック描画処理（`script.js` の `drawSticks()`）が `rotateAngle` を読み取り、  
+レバーの入力方向を回転行列で変換します。
+
+```js
+// script.js
+function drawSticks(config, gamepad) {
+  for (const stick of config.sticks) {
+    let x = gamepad.axes[stick.axisX] || 0;
+    let y = gamepad.axes[stick.axisY] || 0;
+    
+    // レバー回転処理
+    if (stick.rotateAngle) {
+      const rad = stick.rotateAngle * Math.PI / 180;
+      const cos = Math.cos(rad);
+      const sin = Math.sin(rad);
+      const rotatedX = x * cos - y * sin;
+      const rotatedY = x * sin + y * cos;
+      x = rotatedX;
+      y = rotatedY;
+    }
+    
+    // スティック描画処理...
+  }
+}
+```
+
+### 対応デバイス
+
+この機能は **Fighting Stick Mini** 専用です。  
+DualSense など他のコントローラーの `sticks[]` に `rotateAngle` が設定されていても無視されます。
+
+### 使用例
+
+```
+# レバー軸を90度回転
+https://tetchan-lab.github.io/controller-viewer/?controller=fightingStickMini&rotate=90
+
+# レバー軸を270度回転（右回転）
+https://tetchan-lab.github.io/controller-viewer/?controller=fightingStickMini&rotate=270
+```
+
 ---
 
 ## OBS用URL生成機能
@@ -350,6 +513,8 @@ function generateObsUrl() {
 
 ```javascript
 function extractDeviceKeyword(gamepadId) {
+  if (!gamepadId) return '';
+  
   const idLower = gamepadId.toLowerCase();
   
   // DualSense系
@@ -360,7 +525,7 @@ function extractDeviceKeyword(gamepadId) {
   // Fighting Stick Mini（XBOX 360互換モードで動作）
   // ID例: "XBOX 360 Controller For Windows (STANDARD GAMEPAD)"
   if (idLower.includes('for windows')) {
-    return 'windows';  // URLパラメーター: device=windows
+    return 'windows';
   }
   
   // Xbox系
@@ -374,9 +539,9 @@ function extractDeviceKeyword(gamepadId) {
     return 'switch';
   }
   
-  // フォールバック: IDの最初の単語
-  const firstWord = gamepadId.split(' ')[0].toLowerCase();
-  return firstWord || 'gamepad';
+  // その他：最初の単語を抽出（スペース、括弧、ハイフンで分割）
+  const match = idLower.match(/^([a-z0-9]+)/);
+  return match ? match[1] : 'gamepad';
 }
 ```
 
@@ -384,6 +549,38 @@ function extractDeviceKeyword(gamepadId) {
 - 返すキーワードは必ずデバイスIDに含まれる文字列とする
 - `matchesDeviceFilter()` が `includes()` でパターンマッチするため、部分一致で動作
 - Fighting Stick Mini は "XBOX 360 Controller For Windows" なので `'windows'` を返す
+- OBS用URLでは、Xbox系デバイス（Fighting Stick Mini含む）は `'xbox'` に統一される
+
+**OBS用URL生成での特殊処理:**
+
+```javascript
+function generateObsUrl() {
+  // ...
+  
+  // device パラメーター
+  if (state.activeGamepad) {
+    const idLower = state.activeGamepad.id.toLowerCase();
+    // Xbox系デバイス（Fighting Stick Mini含む）は xbox で統一
+    if (idLower.includes('xbox')) {
+      params.push('device=xbox');
+    } else {
+      // DualSenseなど他のデバイス
+      const deviceKeyword = extractDeviceKeyword(state.activeGamepad.id);
+      if (deviceKeyword) {
+        params.push(`device=${deviceKeyword}`);
+      }
+    }
+  }
+  
+  // ...
+}
+```
+
+**理由:**  
+Fighting Stick Mini の ID は "XBOX 360 Controller For Windows" であり、  
+`extractDeviceKeyword()` は `'windows'` を返しますが、  
+OBS環境では Xbox 360 互換デバイス全般を `'xbox'` で統一した方が分かりやすいため、  
+OBS用URL生成時のみ特別処理を行っています。
 
 #### UI更新トリガー
 
@@ -527,6 +724,10 @@ https://tetchan-lab.github.io/controller-viewer/?controller=dualsense&device=xbo
 | サウンドファイルのパス | `config.js` | `sounds.{category}.press/release` |
 | ボタンとサウンドの紐付け | `config.js` | `buttons[].soundCategory` |
 | サウンドの初期音量 | `sound-manager.js` | `this.volume = 0.5` |
+| サウンドセットの初期値 | `sound-manager.js` | `this.soundset = 'auto'` |
+| キーボード入力のキーマッピング | `keyboard-input.js` | `keyMappings` オブジェクト |
+| タッチ入力の有効/無効 | `touch-input.js` | （常に有効、無効化オプションなし） |
+| レバー軸の回転角度 | URL パラメーター | `?rotate=90/180/270` |
 | 新しいコントローラー追加 | `config.js` | 新オブジェクトを追加 + `ALL_CONFIGS` に追記 |
 
 ### 設計原則

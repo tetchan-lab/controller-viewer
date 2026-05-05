@@ -8,8 +8,11 @@
 **主な更新履歴:**
 - 2026/04/28：**入力サウンド機能の追加（実機からサウンド収録）**
 - 2026/04/30：**すべてのSTANDARD GAMEPADデバイスに対応、デバイス選択機能を追加**
-- 2026/04/30：**キーボード/マウス入力対応（ゲームパッド未接続でも動作）**
+- 2026/04/30：**キーボード/マウス入力対応（ブラウザでの動作確認用）**
 - 2026/05/01：**OBS用URL自動生成機能を設定モーダルに追加**
+- 2026/05/03：**タッチ入力対応（スマホ・タブレットでの動作確認用）**
+- 2026/05/04：**レバー軸回転機能の追加（縦置きアケコン対応）**
+- 2026/05/05：**サウンドセット切り替え機能の追加**
 
 OBS などのブラウザソース（Browser Source）として読み込むだけで使えます。
 
@@ -233,6 +236,25 @@ OBS用URLと別のURLになるため手間がかかります。OBS音量ミキ�
 
 ---
 
+## タッチ入力（スマホ・タブレット対応）
+
+スマートフォンやタブレットでは、タッチ操作でコントローラー入力をシミュレートできます。  
+画面上のボタンやスティックをタップ・ドラッグすることで、実際のコントローラーと同じように操作できます。
+
+### 操作方法
+
+- **ボタン**: タップして押す、離すと離れる
+- **スティック**: ドラッグして傾ける、離すとニュートラルに戻る
+- **複数タッチ**: 複数のボタンを同時にタップして同時押し可能
+
+### 注意事項
+
+- タッチ入力は自動的に有効化されます（無効化オプションなし）
+- 実ゲームパッドと同時に使用した場合は、両方の入力がマージされます
+- OBS のブラウザソースはタッチイベントを受け取れません
+
+---
+
 ## キーボード/マウス入力
 
 ゲームパッドが手元にない場合でも、キーボードとマウスでコントローラー入力をシミュレートできます。  
@@ -331,6 +353,37 @@ OBS で複数のブラウザソースを使用して異なるコントローラ�
 
 ---
 
+## レバー軸回転機能（縦置きアケコン対応）
+
+Fighting Stick Mini を縦置きで使用する場合、レバーの方向軸を回転させることができます。  
+URLクエリパラメーター `?rotate=` で回転角度を指定します。
+
+### 使用方法
+
+```
+# レバー軸を90度回転
+https://tetchan-lab.github.io/controller-viewer/?controller=fightingStickMini&rotate=90
+
+# レバー軸を180度回転
+https://tetchan-lab.github.io/controller-viewer/?controller=fightingStickMini&rotate=180
+
+# レバー軸を270度回転
+https://tetchan-lab.github.io/controller-viewer/?controller=fightingStickMini&rotate=270
+```
+
+### 対応デバイス
+
+この機能は **Fighting Stick Mini** 専用です。  
+DualSense など他のコントローラーでは無効です。
+
+### 用途
+
+- 縦置きアーケードキャビネット（縦シューティングゲーム用筐体）での使用
+- 画面の向きに合わせてレバー方向を調整
+- 配信・録画時のレイアウト調整
+
+---
+
 ## サウンドシステム
 
 このアプリは **Web Audio API** を使用して、実際のコントローラーから録音した生音をリアルタイムで再生します。
@@ -374,6 +427,35 @@ OBS で使用する場合は、**OBS の音量ミキサーを使う**ことを�
 
 サウンドファイルの準備方法や詳細な技術仕様は **[sounds/README.md](sounds/README.md)** と **[docs/TECHNICAL.md](docs/TECHNICAL.md)** を参照してください。
 
+### サウンドセット選択機能
+
+コントローラーの種類に関わらず、好きなサウンドセットを選択できます。  
+設定モーダル（⚙️）から選択するか、URLクエリパラメーター `?soundset=` で指定できます。
+
+#### サウンドセットの種類
+
+| サウンドセット | 説明 |
+|---|---|
+| `auto`（デフォルト） | コントローラーの種類に応じて自動的にサウンドを選択 |
+| `dual` | DualSense (PS5) のサウンドを使用 |
+| `fighting` | Fighting Stick Mini のサウンドを使用 |
+
+#### 使用例
+
+```
+# DualSenseでFighting Stick Miniのサウンドを使用
+https://tetchan-lab.github.io/controller-viewer/?controller=dualsense&soundset=fighting
+
+# Fighting Stick MiniでDualSenseのサウンドを使用
+https://tetchan-lab.github.io/controller-viewer/?controller=fightingStickMini&soundset=dual
+
+# サウンドセットを自動判定（デフォルト）
+https://tetchan-lab.github.io/controller-viewer/?controller=dualsense&soundset=auto
+```
+
+この機能により、例えば「DualSenseを使っているが、アケコンの音が好き」という場合に、  
+Fighting Stick Mini のサウンドを使用しながら DualSense の入力を可視化できます。
+
 ---
 
 ## クエリパラメーター一覧
@@ -388,6 +470,8 @@ URLにクエリパラメーターを追加することで、表示や動作を�
 | | `054c:0ce6`（ベンダー:プロダクトID） | USB識別子で指定（最も確実） | `?device=054c:0ce6` |
 | `?keyboard=` | `on` / `off` | キーボード/マウス入力の有効/無効 | `?keyboard=off` |
 | `?sound=` | `on` / `off` | サウンド再生の有効/無効（OBS用） | `?sound=off` |
+| `?soundset=` | `auto` / `dual` / `fighting` | サウンドセットの選択（auto=自動判定） | `?soundset=dual` |
+| `?rotate=` | `90` / `180` / `270` | レバー軸の回転角度（Fighting Stick Mini用、縦置きアケコン対応） | `?rotate=270` |
 | `?debug` | （値不要） | デバッグモード（座標確認用） | `?debug` |
 
 ### 使用例
@@ -407,6 +491,12 @@ https://tetchan-lab.github.io/controller-viewer/?debug
 
 # キーボード/マウス入力を無効化（実ゲームパッドのみ）
 https://tetchan-lab.github.io/controller-viewer/?keyboard=off
+
+# DualSenseでFighting Stick Miniのサウンドを使用
+https://tetchan-lab.github.io/controller-viewer/?controller=dualsense&soundset=fighting
+
+# Fighting Stick Miniでレバー軸を270度回転（縦置きアケコン対応）
+https://tetchan-lab.github.io/controller-viewer/?controller=fightingStickMini&rotate=270
 
 # 複数パラメーターの組み合わせ（サウンドオフ＋デバイス指定）
 https://tetchan-lab.github.io/controller-viewer/?controller=dualsense&device=0&sound=off
