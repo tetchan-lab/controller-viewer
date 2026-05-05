@@ -120,6 +120,35 @@ ffmpeg -f lavfi -i anullsrc=r=44100:cl=mono -t 0.05 -q:a 9 silence.mp3
    - モーダルウィンドウのスライダーで0〜100%の音量調整
    - localStorageに設定を永続化
 
+### サウンドセット選択機能
+
+コントローラーの種類に関わらず、好きなサウンドセットを選択できます。
+
+#### サウンドセットの種類
+
+| サウンドセット | 説明 | 使用するサウンドファイル |
+|---|---|---|
+| `auto`（デフォルト） | コントローラーの種類に応じて自動的に選択 | DualSense → `dualsense/`, Fighting Stick Mini → `fightingStickMini/` |
+| `dual` | DualSense のサウンドを使用 | `sounds/dualsense/` |
+| `fighting` | Fighting Stick Mini のサウンドを使用 | `sounds/fightingStickMini/` |
+
+#### 使用方法
+
+**設定モーダルから選択:**
+- 画面右上の歯車アイコン（⚙️）をクリック
+- 「サウンドセット」のラジオボタンで選択
+
+**URLクエリパラメーターで指定:**
+```
+# DualSenseでFighting Stick Miniのサウンドを使用
+https://tetchan-lab.github.io/controller-viewer/?controller=dualsense&soundset=fighting
+
+# Fighting Stick MiniでDualSenseのサウンドを使用
+https://tetchan-lab.github.io/controller-viewer/?controller=fightingStickMini&soundset=dual
+```
+
+設定は localStorage に保存され、次回起動時も維持されます。
+
 ## トラブルシューティング
 
 ### 音が鳴らない場合
