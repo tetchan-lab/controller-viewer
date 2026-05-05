@@ -44,6 +44,14 @@
           title="サウンド設定">
           ⚙️
         </button>
+        <!-- カラー設定ボタン -->
+        <button
+          class="ctrl-btn settings-btn"
+          id="btn-color-settings"
+          onclick="openColorSettings()"
+          title="カラー設定">
+          💎
+        </button>
       </div>
     </div>
 
@@ -174,12 +182,59 @@
       </div>
     </div>
 
+    <!-- カラー設定モーダル -->
+    <div id="color-modal" class="modal" style="display: none;">
+      <div class="modal-overlay" onclick="closeColorSettings()"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>カラー設定</h2>
+          <button class="modal-close" onclick="closeColorSettings()">×</button>
+        </div>
+        <div class="modal-body">
+          
+          <!-- DualSense 設定 -->
+          <details class="setting-section" open>
+            <summary>🎮 DualSense</summary>
+            <div class="color-setting-row">
+              <label for="dualsense-stick-color">アナログスティック色</label>
+              <input type="color" id="dualsense-stick-color" value="#e82832" />
+            </div>
+            <div class="color-setting-row">
+              <label for="dualsense-mask-color">マスク色</label>
+              <input type="color" id="dualsense-mask-color" value="#1a1a1a" />
+            </div>
+          </details>
+          
+          <!-- Fighting Stick Mini 設定 -->
+          <details class="setting-section" open>
+            <summary>🕹️ Fighting Stick Mini</summary>
+            <div class="color-setting-row">
+              <label for="fightingstick-lever-color">レバー色</label>
+              <input type="color" id="fightingstick-lever-color" value="#e82832" />
+            </div>
+            <div class="color-setting-row">
+              <label for="fightingstick-mask-color">マスク色（ボール・シャフト）</label>
+              <input type="color" id="fightingstick-mask-color" value="#1c3005" />
+            </div>
+          </details>
+          
+          <!-- リセットボタン -->
+          <div class="setting-row">
+            <button class="reset-btn" id="color-reset-btn">デフォルトに戻す</button>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- サウンドマネージャー -->
   <script src="sound-manager.js"></script>
   <!-- 設定ファイル（ボタン座標・デバイス名パターン） -->
   <script src="config.js"></script>
+  <!-- カラーカスタマイザー（色設定管理） -->
+  <script src="color-customizer.js"></script>
   <!-- レバー回転スクリプト（URLパラメータでレバー軸を回転） -->
   <script src="lever-rotation.js"></script>
   <!-- キーボード/マウス入力を仮想ゲームパッド状態に変換 -->

@@ -760,3 +760,74 @@ details.setting-section[open] summary::before {
   }
 }
 
+/* ============================================================
+   カラー設定用スタイル
+   ============================================================ */
+
+/* カラーピッカーの行 */
+.color-setting-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+  margin: 8px 0;
+}
+
+.color-setting-row label {
+  font-size: 0.9rem;
+  color: #ccc;
+  flex: 1;
+}
+
+.color-setting-row input[type="color"] {
+  width: 60px;
+  height: 36px;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  background: #2a2a2a;
+  cursor: pointer;
+  padding: 2px;
+  transition: border-color 0.15s;
+}
+
+.color-setting-row input[type="color"]:hover {
+  border-color: #1a7fc0;
+}
+
+.color-setting-row input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 2px;
+}
+
+.color-setting-row input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 4px;
+}
+
+.color-setting-row input[type="color"]::-moz-color-swatch {
+  border: none;
+  border-radius: 4px;
+}
+
+/* リセットボタン */
+.reset-btn {
+  width: 100%;
+  padding: 10px 16px;
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  color: #ccc;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  margin-top: 8px;
+}
+
+.reset-btn:hover {
+  background: #383838;
+  border-color: #4a4a4a;
+  color: #fff;
+}
+
+.reset-btn:active {
+  background: #1a1a1a;
+}
