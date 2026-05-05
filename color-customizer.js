@@ -29,8 +29,20 @@ class ColorCustomizer {
       }
     };
     
+    // URLパラメーターから色が指定されているかチェック
+    this.isColorFromURL = this.hasColorInURL();
+    
     // 保存された設定を読み込む
     this.settings = this.loadSettings();
+  }
+
+  /**
+   * URLパラメーターに色指定があるかチェック
+   * @returns {boolean}
+   */
+  hasColorInURL() {
+    const params = new URLSearchParams(window.location.search);
+    return params.has('stick-color') || params.has('mask-color');
   }
 
   /**
@@ -38,6 +50,13 @@ class ColorCustomizer {
    * @returns {object} 設定オブジェクト
    */
   loadSettings() {
+    // URLパラメーターから色設定を取得（優先）
+    const urlColors = this.getColorsFromURL();
+    if (urlColors) {
+      return urlColors;
+    }
+    
+    // LocalStorageから設定を読み込む
     try {
       const saved = localStorage.getItem(this.storageKey);
       if (saved) {
@@ -61,6 +80,45 @@ class ColorCustomizer {
   }
 
   /**
+   * URLパラメーターから色設定を取得
+   * @returns {object|null} 色設定オブジェクトまたはnull
+   */
+  getColorsFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    const stickColor = params.get('stick-color');
+    const maskColor = params.get('mask-color');
+    const controller = params.get('controller');
+    
+    // パラメーターが存在しない場合はnull
+    if (!stickColor && !maskColor) {
+      return null;
+    }
+    
+    // デフォルト設定をベースにする
+    const settings = JSON.parse(JSON.stringify(this.defaultColors));
+    
+    // コントローラータイプに応じて色を適用
+    if (controller === 'dualsense') {
+      if (stickColor) settings.dualsense.stick = this.normalizeColor(stickColor);
+      if (maskColor) settings.dualsense.mask = this.normalizeColor(maskColor);
+    } else if (controller === 'fightingStickMini') {
+      if (stickColor) settings.fightingStickMini.lever = this.normalizeColor(stickColor);
+      if (maskColor) settings.fightingStickMini.mask = this.normalizeColor(maskColor);
+    }
+    
+    return settings;
+  }
+
+  /**
+   * カラーコードを正規化（#を付ける）
+   * @param {string} color - カラーコード（"ff0000" or "#ff0000"）
+   * @returns {string} 正規化されたカラーコード（"#ff0000"）
+   */
+  normalizeColor(color) {
+    return color.startsWith('#') ? color : `#${color}`;
+  }
+
+  /**
    * LocalStorageに設定を保存する
    */
   saveSettings() {
@@ -79,6 +137,10 @@ class ColorCustomizer {
     this.settings.dualsense.stick = color;
     this.saveSettings();
     this.applyDualSenseColors();
+    // URL表示を更新
+    if (typeof updateObsUrl === "function") {
+      updateObsUrl();
+    }
   }
 
   /**
@@ -89,6 +151,10 @@ class ColorCustomizer {
     this.settings.dualsense.mask = color;
     this.saveSettings();
     this.applyDualSenseColors();
+    // URL表示を更新
+    if (typeof updateObsUrl === "function") {
+      updateObsUrl();
+    }
   }
 
   /**
@@ -99,6 +165,10 @@ class ColorCustomizer {
     this.settings.fightingStickMini.lever = color;
     this.saveSettings();
     this.applyFightingStickColors();
+    // URL表示を更新
+    if (typeof updateObsUrl === "function") {
+      updateObsUrl();
+    }
   }
 
   /**
@@ -109,6 +179,10 @@ class ColorCustomizer {
     this.settings.fightingStickMini.mask = color;
     this.saveSettings();
     this.applyFightingStickColors();
+    // URL表示を更新
+    if (typeof updateObsUrl === "function") {
+      updateObsUrl();
+    }
   }
 
   /**
@@ -131,10 +205,8 @@ class ColorCustomizer {
       }
     });
     
-    // 再描画をトリガー（script.jsのrenderController関数を呼び出し）
-    if (typeof renderController === "function") {
-      renderController();
-    }
+    // 再描画をトリガー
+    this.reapplyCurrentConfig();
   }
 
   /**
@@ -160,9 +232,25 @@ class ColorCustomizer {
     });
     
     // 再描画をトリガー
-    if (typeof renderController === "function") {
-      renderController();
+    this.reapplyCurrentConfig();
+  }
+
+  /**
+   * 現在のコントローラー設定を再適用して再描画をトリガー
+   */
+  reapplyCurrentConfig() {
+    // script.jsのstate.currentConfigが存在すれば、applyConfigで再描画
+    if (typeof state !== "undefined" && state.currentConfig && typeof applyConfig === "function") {
+      applyConfig(state.currentConfig);
     }
+  }
+
+  /**
+   * 現在の設定を取得（外部から参照するため）
+   * @returns {object} 現在の色設定
+   */
+  getSettings() {
+    return this.settings;
   }
 
   /**
@@ -258,17 +346,24 @@ class ColorCustomizer {
 let colorCustomizer;
 
 /**
- * DOMContentLoaded時に初期化
+ * 即時初期化（config.jsの読み込み直後に色を適用するため）
  */
-document.addEventListener("DOMContentLoaded", () => {
+(function initColorCustomizer() {
   colorCustomizer = new ColorCustomizer();
-  colorCustomizer.initializeUI();
   
-  // 少し遅延させてから色設定を適用（config.jsの読み込みを待つため）
-  setTimeout(() => {
-    colorCustomizer.applyAllColors();
-  }, 100);
-});
+  // config.jsに色設定を即座に適用
+  colorCustomizer.applyAllColors();
+  
+  // DOM読み込み後にUIを初期化
+  if (document.readyState === 'loading') {
+    document.addEventListener("DOMContentLoaded", () => {
+      colorCustomizer.initializeUI();
+    });
+  } else {
+    // DOMが既に読み込まれている場合は即座に初期化
+    colorCustomizer.initializeUI();
+  }
+})();
 
 /**
  * カラーカスタマイザー設定モーダルを開く（グローバル関数）

@@ -1734,6 +1734,22 @@ function generateObsUrl() {
     params.push(`soundset=${soundset}`);
   }
   
+  // color パラメーター（カラーカスタマイザーが有効な場合）
+  if (typeof colorCustomizer !== "undefined" && colorCustomizer && state.currentConfig) {
+    const settings = colorCustomizer.getSettings();
+    if (state.currentConfig.id === 'dualsense') {
+      const stickColor = settings.dualsense.stick.replace('#', '');
+      const maskColor = settings.dualsense.mask.replace('#', '');
+      params.push(`stick-color=${stickColor}`);
+      params.push(`mask-color=${maskColor}`);
+    } else if (state.currentConfig.id === 'fightingStickMini') {
+      const leverColor = settings.fightingStickMini.lever.replace('#', '');
+      const maskColor = settings.fightingStickMini.mask.replace('#', '');
+      params.push(`stick-color=${leverColor}`);
+      params.push(`mask-color=${maskColor}`);
+    }
+  }
+  
   // URLを組み立て
   if (params.length > 0) {
     return `${baseUrl}?${params.join('&')}`;
@@ -1771,6 +1787,22 @@ function generateWindowUrl() {
   const soundset = soundManager.getSoundset();
   if (soundset !== 'auto') {
     params.push(`soundset=${soundset}`);
+  }
+  
+  // color パラメーター（カラーカスタマイザーが有効な場合）
+  if (typeof colorCustomizer !== "undefined" && colorCustomizer && state.currentConfig) {
+    const settings = colorCustomizer.getSettings();
+    if (state.currentConfig.id === 'dualsense') {
+      const stickColor = settings.dualsense.stick.replace('#', '');
+      const maskColor = settings.dualsense.mask.replace('#', '');
+      params.push(`stick-color=${stickColor}`);
+      params.push(`mask-color=${maskColor}`);
+    } else if (state.currentConfig.id === 'fightingStickMini') {
+      const leverColor = settings.fightingStickMini.lever.replace('#', '');
+      const maskColor = settings.fightingStickMini.mask.replace('#', '');
+      params.push(`stick-color=${leverColor}`);
+      params.push(`mask-color=${maskColor}`);
+    }
   }
   
   // URLを組み立て
