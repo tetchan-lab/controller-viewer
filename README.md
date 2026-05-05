@@ -13,6 +13,7 @@
 - 2026/05/03：**タッチ入力対応（スマホ・タブレットでの動作確認用）**
 - 2026/05/04：**レバー軸回転機能の追加（縦置きアケコン対応）**
 - 2026/05/05：**サウンドセット切り替え機能の追加**
+- 2026/05/06：**カラーカスタマイズ機能の追加（スティック・レバー・マスクの色変更、URLパラメーター対応）**
 
 OBS などのブラウザソース（Browser Source）として読み込むだけで使えます。
 
@@ -27,6 +28,7 @@ OBS などのブラウザソース（Browser Source）として読み込むだ�
 - [OBS での使い方](#obs-での使い方)
 - [キーボード/マウス入力](#キーボードマウス入力)
 - [デバイス選択機能](#デバイス選択機能)
+- [カラーカスタマイズ](#カラーカスタマイズ)
 - [サウンドシステム](#サウンドシステム)
 - [クエリパラメーター一覧](#クエリパラメーター一覧)
 - [カスタマイズ・技術仕様](#カスタマイズ技術仕様)
@@ -57,7 +59,8 @@ OBS などのブラウザソース（Browser Source）として読み込むだ�
 - **デバイス選択機能** - 複数コントローラー同時接続時に特定デバイスのみ表示
 - **キーボード/マウス入力対応** - ゲームパッド未接続でも動作、実機と併用可能
 - **リアルタイムサウンド再生** - 実機から収録した生音を再生（音量調整・ON/OFF 可能）
-- **OBS 用 URL 自動生成** - 設定モーダルから現在の設定を反映した URL をワンクリックでコピー
+- **カラーカスタマイズ機能** - スティック・レバー・マスクの色をウェブUIで変更可能（URLパラメーター対応）
+- **OBS 用 URL 自動生成** - 設定モーダルから現在の設定（カラー含む）を反映した URL をワンクリックでコピー
 - **OBS 対応** - 配信・録画用に最適化された透過表示とクエリパラメーター指定
 - **レスポンシブ対応** - スマホ・タブレット・PCで正しく表示
 
@@ -132,13 +135,15 @@ GitHub Pages で公開されているため、ローカルサーバーなしで�
 
 1. ブラウザで https://tetchan-lab.github.io/controller-viewer/ を開く
 2. コントローラーを接続する
-3. 画面右上の **歯車アイコン（⚙️）** をクリック
-4. 「OBS用URL生成」セクションに現在の設定を反映したURLが自動生成される
+3. **（任意）宝石アイコン（💎）** をクリックしてカラーをカスタマイズ
+4. 画面右上の **歯車アイコン（⚙️）** をクリック
+5. 「OBS用URL生成」セクションに現在の設定を反映したURLが自動生成される
    - コントローラー設定（DualSense / Fighting Stick Mini）
    - デバイス識別（複数接続時に自動区別）
    - サウンドのON/OFF状態
-5. **📋 URLをコピー** ボタンをクリック
-6. OBSのブラウザソースにペースト
+   - カラー設定（スティック・レバー・マスクの色）
+6. **📋 URLをコピー** ボタンをクリック
+7. OBSのブラウザソースにペースト
 
 > **メリット:** クエリパラメーターを手動で組み立てる必要がなく、デバイスIDも自動的に抽出されるため、  
 > 複数のコントローラーを使用する場合でも簡単に設定できます。
@@ -384,6 +389,68 @@ DualSense など他のコントローラーでは無効です。
 
 ---
 
+## カラーカスタマイズ
+
+コントローラーのスティック・レバー・マスクの色をウェブUIで自由に変更できます。  
+設定は **LocalStorage** に保存され、ページリロード後も維持されます。
+
+### 機能
+
+- **DualSense**: アナログスティック色とマスク色を個別に変更（左右まとめて）
+- **Fighting Stick Mini**: レバー色とマスク色（ボール・シャフト）を個別に変更
+- **リアルタイム反映**: カラーピッカーで色を選択すると即座に反映
+- **URL パラメーター対応**: 設定した色情報を URL に含めて OBS で使用可能
+
+### 使い方
+
+#### 通常ブラウザでの設定
+
+1. https://tetchan-lab.github.io/controller-viewer/ を開く
+2. 画面右上の **宝石アイコン（💎）** をクリック
+3. カラーピッカーで好みの色を選択
+4. 設定は自動的に保存される
+
+#### OBS での使用
+
+通常ブラウザで色を設定した後、**歯車アイコン（⚙️）** から OBS用URLを生成すると、  
+色情報も自動的に URL に含まれます。
+
+生成される URL 例：
+```
+https://tetchan-lab.github.io/controller-viewer/?controller=dualsense&stick-color=e82832&mask-color=1a1a1a
+```
+
+この URL を OBS のブラウザソースに貼り付けるだけで、設定した色が反映されます。  
+**LocalStorage は不要**なので、OBS 側で個別に設定する必要はありません。
+
+### URL パラメーターで直接指定
+
+URL パラメーターを使って、直接色を指定することもできます。
+
+| パラメーター | 説明 | 適用先 |
+|---|---|---|
+| `stick-color` | スティック/レバーの色（16進数、#なし） | DualSense: アナログスティック<br>Fighting Stick Mini: レバー |
+| `mask-color` | マスク形状の色（16進数、#なし） | DualSense: スティックマスク<br>Fighting Stick Mini: レバーマスク（ボール・シャフト） |
+
+**例：**
+```
+# DualSenseのアナログスティックを赤、マスクを黒に
+?controller=dualsense&stick-color=ff0000&mask-color=000000
+
+# Fighting Stick Miniのレバーを青、マスクを緑に
+?controller=fightingStickMini&stick-color=0000ff&mask-color=1c3005
+```
+
+### 優先順位
+
+色設定は以下の優先順位で適用されます：
+
+1. **URL パラメーター** - 最優先（OBS用）
+2. **LocalStorage** - 通常ブラウザで保存した設定
+3. **デフォルト色** - 設定がない場合
+
+---
+
 ## サウンドシステム
 
 このアプリは **Web Audio API** を使用して、実際のコントローラーから録音した生音をリアルタイムで再生します。
@@ -471,6 +538,8 @@ URLにクエリパラメーターを追加することで、表示や動作を�
 | `?keyboard=` | `on` / `off` | キーボード/マウス入力の有効/無効 | `?keyboard=off` |
 | `?sound=` | `on` / `off` | サウンド再生の有効/無効（OBS用） | `?sound=off` |
 | `?soundset=` | `auto` / `dual` / `fighting` | サウンドセットの選択（auto=自動判定） | `?soundset=dual` |
+| `?stick-color=` | 16進数カラーコード（#なし） | スティック/レバーの色（DualSense=アナログスティック、Fighting Stick Mini=レバー） | `?stick-color=e82832` |
+| `?mask-color=` | 16進数カラーコード（#なし） | マスク形状の色（DualSense=スティックマスク、Fighting Stick Mini=レバーマスク） | `?mask-color=1a1a1a` |
 | `?rotate=` | `90` / `180` / `270` | レバー軸の回転角度（Fighting Stick Mini用、縦置きアケコン対応） | `?rotate=270` |
 | `?debug` | （値不要） | デバッグモード（座標確認用） | `?debug` |
 
@@ -498,8 +567,14 @@ https://tetchan-lab.github.io/controller-viewer/?controller=dualsense&soundset=f
 # Fighting Stick Miniでレバー軸を270度回転（縦置きアケコン対応）
 https://tetchan-lab.github.io/controller-viewer/?controller=fightingStickMini&rotate=270
 
-# 複数パラメーターの組み合わせ（サウンドオフ＋デバイス指定）
-https://tetchan-lab.github.io/controller-viewer/?controller=dualsense&device=0&sound=off
+# カラーカスタマイズ（DualSenseのアナログスティックを赤、マスクを黒に）
+https://tetchan-lab.github.io/controller-viewer/?controller=dualsense&stick-color=ff0000&mask-color=000000
+
+# カラーカスタマイズ（Fighting Stick Miniのレバーを青、マスクを緑に）
+https://tetchan-lab.github.io/controller-viewer/?controller=fightingStickMini&stick-color=0000ff&mask-color=1c3005
+
+# 複数パラメーターの組み合わせ（サウンドオフ＋デバイス指定＋カラー）
+https://tetchan-lab.github.io/controller-viewer/?controller=dualsense&device=0&sound=off&stick-color=e82832&mask-color=1a1a1a
 ```
 
 ---
