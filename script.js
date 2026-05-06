@@ -427,6 +427,11 @@ function updateStickImg(stick, gp, config) {
     hl.setAttribute("cx", String(bx - ballR * 0.22));
     hl.setAttribute("cy", String(by - ballR * 0.30));
   }
+  
+  // 色アニメーション（動きの強さに応じて明るくする）
+  const intensity = Math.min(1, Math.sqrt(ax * ax + ay * ay));
+  const baseColor = stick.stickColor || "#c8222a";
+  updateStickColor(stick.id, intensity, baseColor, "lever");
 }
 
 /**
@@ -732,6 +737,11 @@ function updateAnalogStick(stick, gp) {
   if (grooves) {
     grooves.setAttribute("transform", `translate(${ax * tilt}, ${ay * tilt})`);
   }
+  
+  // 色アニメーション（動きの強さに応じて明るくする）
+  const intensity = Math.min(1, Math.sqrt(ax * ax + ay * ay));
+  const baseColor = stick.stickColor || "#1a1a1a";
+  updateStickColor(stick.id, intensity, baseColor, "stick");
 }
 
 
