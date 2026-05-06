@@ -431,7 +431,7 @@ function updateStickImg(stick, gp, config) {
   // 色アニメーション（動きの強さに応じて明るくする）
   const intensity = Math.min(1, Math.sqrt(ax * ax + ay * ay));
   const baseColor = stick.stickColor || "#c8222a";
-  updateStickColor(stick.id, intensity, baseColor, "lever");
+  updateStickColor(stick.id, intensity, baseColor, "lever", config);
 }
 
 /**
@@ -701,8 +701,9 @@ function buildAnalogStickOverlay(stick) {
  *
  * @param {object}  stick
  * @param {Gamepad} gp
+ * @param {object}  config
  */
-function updateAnalogStick(stick, gp) {
+function updateAnalogStick(stick, gp, config) {
   const centerX = stick.cx;
   const centerY = stick.cy;
   const ballR   = stick.stickBallRadius ?? 20;
@@ -741,7 +742,7 @@ function updateAnalogStick(stick, gp) {
   // 色アニメーション（動きの強さに応じて明るくする）
   const intensity = Math.min(1, Math.sqrt(ax * ax + ay * ay));
   const baseColor = stick.stickColor || "#1a1a1a";
-  updateStickColor(stick.id, intensity, baseColor, "stick");
+  updateStickColor(stick.id, intensity, baseColor, "stick", config);
 }
 
 
@@ -1236,7 +1237,7 @@ function tick() {
       updateStickSoundState(gp, stick, axisX, axisY, 0.3, "lever", config);
     } else if (stick.stickBallRadius !== undefined || stick.stickMaskShapes !== undefined) {
       // カスタムアナログスティック（SVG版）を更新
-      updateAnalogStick(stick, gp);
+      updateAnalogStick(stick, gp, config);
 
       // アナログスティックのサウンド処理
       updateStickSoundState(gp, stick, axisX, axisY, 0.2, "stick", config);

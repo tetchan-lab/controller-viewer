@@ -17,10 +17,12 @@
  * @param {number} intensity - 動きの強さ（0〜1）
  * @param {string} baseColor - 元の色（例: "#e82832"）
  * @param {string} type - "stick" または "lever"
+ * @param {object} config - コントローラー設定（明るさ調整量を取得）
  */
-function updateStickColor(stickId, intensity, baseColor, type) {
-  // 明るさ調整量を計算（最大+80程度）
-  const brightnessBoost = Math.floor(intensity * 80);
+function updateStickColor(stickId, intensity, baseColor, type, config) {
+  // config から明るさ調整量を取得（デフォルト: 20）
+  const maxBoost = config?.stickBrightnessBoost ?? 20;
+  const brightnessBoost = Math.floor(intensity * maxBoost);
   
   if (type === "lever") {
     // レバーの場合：シャフトとボールの両方を更新
