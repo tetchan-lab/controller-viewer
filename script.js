@@ -1404,6 +1404,24 @@ function getDeviceFilter() {
 }
 
 /**
+ * ?brightness= パラメーターから明るさ調整量を取得する。
+ * 指定がなければ null を返す（config の設定値を使用）。
+ * 
+ * 指定方法:
+ *   ?brightness=50         → 0〜255 の数値で指定
+ * 
+ * @returns {number|null}
+ */
+function getBrightnessBoost() {
+  const params = new URLSearchParams(window.location.search);
+  const value = params.get("brightness");
+  if (!value) return null;
+  const num = parseInt(value, 10);
+  // 0〜255 の範囲内でクランプ
+  return isNaN(num) ? null : Math.max(0, Math.min(255, num));
+}
+
+/**
  * ゲームパッドがデバイスフィルターに一致するかチェックする。
  * 
  * @param {Gamepad} gamepad - チェック対象のゲームパッド
@@ -1443,6 +1461,7 @@ function matchesDeviceFilter(gamepad, filter) {
 (function init() {
   const queryConfig = getQueryConfig();
   const deviceFilter = getDeviceFilter();
+  const brightnessBoost = getBrightnessBoost();
 
   // デバイスフィルターを状態に保存
   if (deviceFilter) {
@@ -1455,10 +1474,19 @@ function matchesDeviceFilter(gamepad, filter) {
     document.getElementById("hint").style.display = "none";
     // body に透過背景クラスを付与（OBS等でクロマキー合成しやすいように）
     document.body.classList.add("transparent-bg");
+    // 明るさ調整量をクエリパラメーターで上書き
+    if (brightnessBoost !== null) {
+      queryConfig.stickBrightnessBoost = brightnessBoost;
+    }
     applyConfig(queryConfig);
     state.pinnedConfigId = queryConfig.id;
   } else {
-    applyConfig(DUALSENSE_CONFIG);
+    // デフォルト設定にも明るさ上書きを適用
+    const defaultConfig = DUALSENSE_CONFIG;
+    if (brightnessBoost !== null) {
+      defaultConfig.stickBrightnessBoost = brightnessBoost;
+    }
+    applyConfig(defaultConfig);
   }
 
   // デバッグモードのバッジ表示
@@ -1761,6 +1789,15 @@ function generateObsUrl() {
     }
   }
   
+  // brightness パラメーター（明るさ調整）
+  if (state.currentConfig && state.currentConfig.stickBrightnessBoost !== undefined) {
+    const boost = state.currentConfig.stickBrightnessBoost;
+    // デフォルト値（20）と異なる場合のみURLに追加
+    if (boost !== 20) {
+      params.push(`brightness=${boost}`);
+    }
+  }
+  
   // URLを組み立て
   if (params.length > 0) {
     return `${baseUrl}?${params.join('&')}`;
@@ -1813,6 +1850,15 @@ function generateWindowUrl() {
       const maskColor = settings.fightingStickMini.mask.replace('#', '');
       params.push(`stick-color=${leverColor}`);
       params.push(`mask-color=${maskColor}`);
+    }
+  }
+  
+  // brightness パラメーター（明るさ調整）
+  if (state.currentConfig && state.currentConfig.stickBrightnessBoost !== undefined) {
+    const boost = state.currentConfig.stickBrightnessBoost;
+    // デフォルト値（20）と異なる場合のみURLに追加
+    if (boost !== 20) {
+      params.push(`brightness=${boost}`);
     }
   }
   
