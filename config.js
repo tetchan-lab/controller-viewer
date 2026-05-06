@@ -76,7 +76,7 @@ const DUALSENSE_CONFIG = {
    *                          デフォルト: 20（控えめ）
    *                          推奨範囲: 20〜80（20=控えめ、50=標準、80=明るめ）
    */
-  stickBrightnessBoost: 25,
+  stickBrightnessBoost: 20,
 
   /**
    * ボタン定義
@@ -208,7 +208,7 @@ const FIGHTING_STICK_MINI_CONFIG = {
    *                          デフォルト: 20（控えめ）
    *                          推奨範囲: 20〜80（20=控えめ、50=標準、80=明るめ）
    */
-  stickBrightnessBoost: 25,
+  stickBrightnessBoost: 20,
 
   /**
    * ボタン定義
