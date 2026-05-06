@@ -71,6 +71,14 @@ const DUALSENSE_CONFIG = {
   },
 
   /**
+   * スティック・レバーの明るさ調整
+   *   stickBrightnessBoost : スティック/レバーが動いたときの最大明るさ調整量（0〜255）
+   *                          デフォルト: 20（控えめ）
+   *                          推奨範囲: 20〜80（20=控えめ、50=標準、80=明るめ）
+   */
+  stickBrightnessBoost: 25,
+
+  /**
    * ボタン定義
    *   index : Gamepad API の buttons[] インデックス
    *   label : 表示ラベル
@@ -193,6 +201,14 @@ const FIGHTING_STICK_MINI_CONFIG = {
       release: "sounds/fightingStickMini/upbtn-release.mp3"
     }
   },
+
+  /**
+   * スティック・レバーの明るさ調整
+   *   stickBrightnessBoost : スティック/レバーが動いたときの最大明るさ調整量（0〜255）
+   *                          デフォルト: 20（控えめ）
+   *                          推奨範囲: 20〜80（20=控えめ、50=標準、80=明るめ）
+   */
+  stickBrightnessBoost: 25,
 
   /**
    * ボタン定義

@@ -36,12 +36,12 @@
           title="使用するゲームパッドを選択">
           <option value="auto">すべてのデバイス</option>
         </select>
-        <!-- サウンド設定ボタン -->
+        <!-- 配信設定ボタン -->
         <button
           class="ctrl-btn settings-btn"
           id="btn-sound-settings"
           onclick="openSoundSettings()"
-          title="サウンド設定">
+          title="配信設定">
           ⚙️
         </button>
         <!-- カラー設定ボタン -->
@@ -78,6 +78,9 @@
       デバイス指定例:
       <a href="index.html?controller=dualsense&device=0"><code>index.html?controller=dualsense&device=0</code></a> (index 0のみ) /
       <a href="index.html?controller=fightingStickMini&device=1"><code>index.html?controller=fightingStickMini&device=1</code></a> (index 1のみ)<br>
+      明るさ調整例:
+      <a href="index.html?controller=dualsense&brightness=50"><code>index.html?controller=dualsense&brightness=50</code></a> (標準) /
+      <a href="index.html?controller=fightingStickMini&brightness=80"><code>index.html?controller=fightingStickMini&brightness=80</code></a> (明るめ)<br>
       デバッグモード（座標確認用）:
       <a href="index.html?debug"><code>index.html?debug</code></a><br>
       使い方（外部リンク）：
@@ -90,12 +93,12 @@
       <div id="browser-info-content"></div>
     </div>
 
-    <!-- サウンド設定モーダル -->
+    <!-- 配信設定モーダル -->
     <div id="sound-modal" class="modal" style="display: none;">
       <div class="modal-overlay" onclick="closeSoundSettings()"></div>
       <div class="modal-content">
         <div class="modal-header">
-          <h2>サウンド設定</h2>
+          <h2>配信設定</h2>
           <button class="modal-close" onclick="closeSoundSettings()">×</button>
         </div>
         <div class="modal-body">
@@ -203,6 +206,17 @@
               <label for="dualsense-mask-color">マスク色</label>
               <input type="color" id="dualsense-mask-color" value="#1a1a1a" />
             </div>
+            <div class="color-setting-row">
+              <label for="dualsense-brightness">スティック明るさ（動作時）</label>
+              <input
+                type="range"
+                id="dualsense-brightness"
+                min="0"
+                max="100"
+                value="20"
+                oninput="updateBrightness('dualsense', this.value)" />
+              <span id="dualsense-brightness-value">20</span>
+            </div>
           </details>
           
           <!-- Fighting Stick Mini 設定 -->
@@ -215,6 +229,18 @@
             <div class="color-setting-row">
               <label for="fightingstick-mask-color">マスク色（ボール・シャフト）</label>
               <input type="color" id="fightingstick-mask-color" value="#1c3005" />
+            </div>
+            <div class="color-setting-row">
+              <label for="fightingstick-brightness">レバー明るさ（動作時）</label>
+              <input
+                type="range"
+                id="fightingstick-brightness"
+                min="0"
+                max="100"
+                value="20"
+                oninput="updateBrightness('fightingStickMini', this.value)" />
+              <span id="fightingstick-brightness-value">20</span>
+            </div>
             </div>
           </details>
           
@@ -241,6 +267,8 @@
   <script src="keyboard-input.js"></script>
   <!-- タッチ入力を仮想ゲームパッド状態に変換 -->
   <script src="touch-input.js"></script>
+  <!-- スティック・レバー色アニメーション -->
+  <script src="stick-color-animator.js"></script>
   <!-- メインスクリプト（Gamepad API ポーリング・描画） -->
   <script src="script.js"></script>
 </body>

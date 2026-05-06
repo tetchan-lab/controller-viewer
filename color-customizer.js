@@ -21,11 +21,13 @@ class ColorCustomizer {
     this.defaultColors = {
       dualsense: {
         stick: "#e82832",      // アナログスティック色
-        mask: "#1a1a1a"        // マスク色
+        mask: "#1a1a1a",       // マスク色
+        brightness: 20         // スティック明るさ（0〜100）
       },
       fightingStickMini: {
         lever: "#e82832",      // レバー色
-        mask: "#1c3005"        // マスク色（ボール周辺とシャフト）
+        mask: "#1c3005",       // マスク色（ボール周辺とシャフト）
+        brightness: 20         // レバー明るさ（0〜100）
       }
     };
     
@@ -186,6 +188,44 @@ class ColorCustomizer {
   }
 
   /**
+   * スティック/レバーの明るさを設定
+   * @param {string} controller - "dualsense" または "fightingStickMini"
+   * @param {number} brightness - 明るさ（0〜100）
+   */
+  setBrightness(controller, brightness) {
+    const value = Math.max(0, Math.min(100, parseInt(brightness, 10)));
+    this.settings[controller].brightness = value;
+    this.saveSettings();
+    this.applyBrightness(controller);
+    // URL表示を更新
+    if (typeof updateObsUrl === "function") {
+      updateObsUrl();
+    }
+  }
+
+  /**
+   * 指定コントローラーの明るさ設定をconfig.jsに適用
+   * @param {string} controller - "dualsense" または "fightingStickMini"
+   */
+  applyBrightness(controller) {
+    const brightness = this.settings[controller].brightness;
+    
+    if (controller === "dualsense" && typeof DUALSENSE_CONFIG !== "undefined") {
+      DUALSENSE_CONFIG.stickBrightnessBoost = brightness;
+    } else if (controller === "fightingStickMini" && typeof FIGHTING_STICK_MINI_CONFIG !== "undefined") {
+      FIGHTING_STICK_MINI_CONFIG.stickBrightnessBoost = brightness;
+    }
+    
+    // 現在表示中のコントローラーの場合、設定を即座に反映
+    if (typeof state !== "undefined" && state.currentConfig) {
+      if ((controller === "dualsense" && state.currentConfig.id === "dualsense") ||
+          (controller === "fightingStickMini" && state.currentConfig.id === "fightingStickMini")) {
+        state.currentConfig.stickBrightnessBoost = brightness;
+      }
+    }
+  }
+
+  /**
    * DualSenseの色設定をconfig.jsに適用
    */
   applyDualSenseColors() {
@@ -259,6 +299,8 @@ class ColorCustomizer {
   applyAllColors() {
     this.applyDualSenseColors();
     this.applyFightingStickColors();
+    this.applyBrightness("dualsense");
+    this.applyBrightness("fightingStickMini");
   }
 
   /**
@@ -278,14 +320,23 @@ class ColorCustomizer {
     const inputs = {
       "dualsense-stick-color": this.settings.dualsense.stick,
       "dualsense-mask-color": this.settings.dualsense.mask,
+      "dualsense-brightness": this.settings.dualsense.brightness,
       "fightingstick-lever-color": this.settings.fightingStickMini.lever,
-      "fightingstick-mask-color": this.settings.fightingStickMini.mask
+      "fightingstick-mask-color": this.settings.fightingStickMini.mask,
+      "fightingstick-brightness": this.settings.fightingStickMini.brightness
     };
     
     for (const [id, value] of Object.entries(inputs)) {
       const input = document.getElementById(id);
       if (input) {
         input.value = value;
+        // スライダーの場合は表示値も更新
+        if (id.includes("brightness")) {
+          const valueDisplay = document.getElementById(id + "-value");
+          if (valueDisplay) {
+            valueDisplay.textContent = value;
+          }
+        }
       }
     }
   }
@@ -328,6 +379,26 @@ class ColorCustomizer {
       fightingStickMaskInput.addEventListener("input", (e) => {
         this.setFightingStickMaskColor(e.target.value);
       });
+    }
+    
+    // DualSense 明るさスライダー
+    const dualsenseBrightnessInput = document.getElementById("dualsense-brightness");
+    if (dualsenseBrightnessInput) {
+      dualsenseBrightnessInput.value = this.settings.dualsense.brightness;
+      const dualsenseBrightnessValue = document.getElementById("dualsense-brightness-value");
+      if (dualsenseBrightnessValue) {
+        dualsenseBrightnessValue.textContent = this.settings.dualsense.brightness;
+      }
+    }
+    
+    // Fighting Stick Mini 明るさスライダー
+    const fightingStickBrightnessInput = document.getElementById("fightingstick-brightness");
+    if (fightingStickBrightnessInput) {
+      fightingStickBrightnessInput.value = this.settings.fightingStickMini.brightness;
+      const fightingStickBrightnessValue = document.getElementById("fightingstick-brightness-value");
+      if (fightingStickBrightnessValue) {
+        fightingStickBrightnessValue.textContent = this.settings.fightingStickMini.brightness;
+      }
     }
     
     // リセットボタン
@@ -385,5 +456,23 @@ function closeColorSettings() {
   const modal = document.getElementById("color-modal");
   if (modal) {
     modal.style.display = "none";
+  }
+}
+
+/**
+ * スティック/レバーの明るさを更新（グローバル関数）
+ * @param {string} controller - "dualsense" または "fightingStickMini"
+ * @param {number} value - 明るさ（0〜100）
+ */
+function updateBrightness(controller, value) {
+  if (!colorCustomizer) return;
+  
+  // 明るさを設定
+  colorCustomizer.setBrightness(controller, value);
+  
+  // 表示値を更新
+  const valueDisplay = document.getElementById(`${controller === "dualsense" ? "dualsense" : "fightingstick"}-brightness-value`);
+  if (valueDisplay) {
+    valueDisplay.textContent = value;
   }
 }

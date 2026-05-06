@@ -427,6 +427,11 @@ function updateStickImg(stick, gp, config) {
     hl.setAttribute("cx", String(bx - ballR * 0.22));
     hl.setAttribute("cy", String(by - ballR * 0.30));
   }
+  
+  // 色アニメーション（動きの強さに応じて明るくする）
+  const intensity = Math.min(1, Math.sqrt(ax * ax + ay * ay));
+  const baseColor = stick.stickColor || "#c8222a";
+  updateStickColor(stick.id, intensity, baseColor, "lever", config);
 }
 
 /**
@@ -696,8 +701,9 @@ function buildAnalogStickOverlay(stick) {
  *
  * @param {object}  stick
  * @param {Gamepad} gp
+ * @param {object}  config
  */
-function updateAnalogStick(stick, gp) {
+function updateAnalogStick(stick, gp, config) {
   const centerX = stick.cx;
   const centerY = stick.cy;
   const ballR   = stick.stickBallRadius ?? 20;
@@ -732,6 +738,11 @@ function updateAnalogStick(stick, gp) {
   if (grooves) {
     grooves.setAttribute("transform", `translate(${ax * tilt}, ${ay * tilt})`);
   }
+  
+  // 色アニメーション（動きの強さに応じて明るくする）
+  const intensity = Math.min(1, Math.sqrt(ax * ax + ay * ay));
+  const baseColor = stick.stickColor || "#1a1a1a";
+  updateStickColor(stick.id, intensity, baseColor, "stick", config);
 }
 
 
@@ -1226,7 +1237,7 @@ function tick() {
       updateStickSoundState(gp, stick, axisX, axisY, 0.3, "lever", config);
     } else if (stick.stickBallRadius !== undefined || stick.stickMaskShapes !== undefined) {
       // カスタムアナログスティック（SVG版）を更新
-      updateAnalogStick(stick, gp);
+      updateAnalogStick(stick, gp, config);
 
       // アナログスティックのサウンド処理
       updateStickSoundState(gp, stick, axisX, axisY, 0.2, "stick", config);
@@ -1393,6 +1404,24 @@ function getDeviceFilter() {
 }
 
 /**
+ * ?brightness= パラメーターから明るさ調整量を取得する。
+ * 指定がなければ null を返す（config の設定値を使用）。
+ * 
+ * 指定方法:
+ *   ?brightness=50         → 0〜255 の数値で指定
+ * 
+ * @returns {number|null}
+ */
+function getBrightnessBoost() {
+  const params = new URLSearchParams(window.location.search);
+  const value = params.get("brightness");
+  if (!value) return null;
+  const num = parseInt(value, 10);
+  // 0〜255 の範囲内でクランプ
+  return isNaN(num) ? null : Math.max(0, Math.min(255, num));
+}
+
+/**
  * ゲームパッドがデバイスフィルターに一致するかチェックする。
  * 
  * @param {Gamepad} gamepad - チェック対象のゲームパッド
@@ -1432,6 +1461,7 @@ function matchesDeviceFilter(gamepad, filter) {
 (function init() {
   const queryConfig = getQueryConfig();
   const deviceFilter = getDeviceFilter();
+  const brightnessBoost = getBrightnessBoost();
 
   // デバイスフィルターを状態に保存
   if (deviceFilter) {
@@ -1444,10 +1474,19 @@ function matchesDeviceFilter(gamepad, filter) {
     document.getElementById("hint").style.display = "none";
     // body に透過背景クラスを付与（OBS等でクロマキー合成しやすいように）
     document.body.classList.add("transparent-bg");
+    // 明るさ調整量をクエリパラメーターで上書き
+    if (brightnessBoost !== null) {
+      queryConfig.stickBrightnessBoost = brightnessBoost;
+    }
     applyConfig(queryConfig);
     state.pinnedConfigId = queryConfig.id;
   } else {
-    applyConfig(DUALSENSE_CONFIG);
+    // デフォルト設定にも明るさ上書きを適用
+    const defaultConfig = DUALSENSE_CONFIG;
+    if (brightnessBoost !== null) {
+      defaultConfig.stickBrightnessBoost = brightnessBoost;
+    }
+    applyConfig(defaultConfig);
   }
 
   // デバッグモードのバッジ表示
@@ -1750,6 +1789,15 @@ function generateObsUrl() {
     }
   }
   
+  // brightness パラメーター（明るさ調整）
+  if (state.currentConfig && state.currentConfig.stickBrightnessBoost !== undefined) {
+    const boost = state.currentConfig.stickBrightnessBoost;
+    // デフォルト値（20）と異なる場合のみURLに追加
+    if (boost !== 20) {
+      params.push(`brightness=${boost}`);
+    }
+  }
+  
   // URLを組み立て
   if (params.length > 0) {
     return `${baseUrl}?${params.join('&')}`;
@@ -1802,6 +1850,15 @@ function generateWindowUrl() {
       const maskColor = settings.fightingStickMini.mask.replace('#', '');
       params.push(`stick-color=${leverColor}`);
       params.push(`mask-color=${maskColor}`);
+    }
+  }
+  
+  // brightness パラメーター（明るさ調整）
+  if (state.currentConfig && state.currentConfig.stickBrightnessBoost !== undefined) {
+    const boost = state.currentConfig.stickBrightnessBoost;
+    // デフォルト値（20）と異なる場合のみURLに追加
+    if (boost !== 20) {
+      params.push(`brightness=${boost}`);
     }
   }
   
