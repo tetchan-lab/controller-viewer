@@ -1777,20 +1777,30 @@ function generateObsUrl() {
   if (typeof colorCustomizer !== "undefined" && colorCustomizer && state.currentConfig) {
     const settings = colorCustomizer.getSettings();
     if (state.currentConfig.id === 'dualsense') {
-      const stickColor = settings.dualsense.stick.replace('#', '');
-      const maskColor = settings.dualsense.mask.replace('#', '');
-      params.push(`stick-color=${stickColor}`);
-      params.push(`mask-color=${maskColor}`);
+      // デフォルト値と異なる場合のみパラメータを追加
+      const stickColor = settings.dualsense.stick;
+      const maskColor = settings.dualsense.mask;
+      if (stickColor !== '#e82832') {
+        params.push(`stick-color=${stickColor.replace('#', '')}`);
+      }
+      if (maskColor !== '#1a1a1a') {
+        params.push(`mask-color=${maskColor.replace('#', '')}`);
+      }
       // 動作時の色が設定されている場合のみ追加
       if (settings.dualsense.activeStick) {
         const activeStickColor = settings.dualsense.activeStick.replace('#', '');
         params.push(`active-stick-color=${activeStickColor}`);
       }
     } else if (state.currentConfig.id === 'fightingStickMini') {
-      const leverColor = settings.fightingStickMini.lever.replace('#', '');
-      const maskColor = settings.fightingStickMini.mask.replace('#', '');
-      params.push(`stick-color=${leverColor}`);
-      params.push(`mask-color=${maskColor}`);
+      // デフォルト値と異なる場合のみパラメータを追加
+      const leverColor = settings.fightingStickMini.lever;
+      const maskColor = settings.fightingStickMini.mask;
+      if (leverColor !== '#e82832') {
+        params.push(`stick-color=${leverColor.replace('#', '')}`);
+      }
+      if (maskColor !== '#1c3005') {
+        params.push(`mask-color=${maskColor.replace('#', '')}`);
+      }
       // 動作時の色が設定されている場合のみ追加
       if (settings.fightingStickMini.activeLever) {
         const activeLeverColor = settings.fightingStickMini.activeLever.replace('#', '');
@@ -1851,20 +1861,30 @@ function generateWindowUrl() {
   if (typeof colorCustomizer !== "undefined" && colorCustomizer && state.currentConfig) {
     const settings = colorCustomizer.getSettings();
     if (state.currentConfig.id === 'dualsense') {
-      const stickColor = settings.dualsense.stick.replace('#', '');
-      const maskColor = settings.dualsense.mask.replace('#', '');
-      params.push(`stick-color=${stickColor}`);
-      params.push(`mask-color=${maskColor}`);
+      // デフォルト値と異なる場合のみパラメータを追加
+      const stickColor = settings.dualsense.stick;
+      const maskColor = settings.dualsense.mask;
+      if (stickColor !== '#e82832') {
+        params.push(`stick-color=${stickColor.replace('#', '')}`);
+      }
+      if (maskColor !== '#1a1a1a') {
+        params.push(`mask-color=${maskColor.replace('#', '')}`);
+      }
       // 動作時の色が設定されている場合のみ追加
       if (settings.dualsense.activeStick) {
         const activeStickColor = settings.dualsense.activeStick.replace('#', '');
         params.push(`active-stick-color=${activeStickColor}`);
       }
     } else if (state.currentConfig.id === 'fightingStickMini') {
-      const leverColor = settings.fightingStickMini.lever.replace('#', '');
-      const maskColor = settings.fightingStickMini.mask.replace('#', '');
-      params.push(`stick-color=${leverColor}`);
-      params.push(`mask-color=${maskColor}`);
+      // デフォルト値と異なる場合のみパラメータを追加
+      const leverColor = settings.fightingStickMini.lever;
+      const maskColor = settings.fightingStickMini.mask;
+      if (leverColor !== '#e82832') {
+        params.push(`stick-color=${leverColor.replace('#', '')}`);
+      }
+      if (maskColor !== '#1c3005') {
+        params.push(`mask-color=${maskColor.replace('#', '')}`);
+      }
       // 動作時の色が設定されている場合のみ追加
       if (settings.fightingStickMini.activeLever) {
         const activeLeverColor = settings.fightingStickMini.activeLever.replace('#', '');
