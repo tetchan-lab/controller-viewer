@@ -1,7 +1,11 @@
 /**
  * stick-color-animator.js
  * ============================================================
- * スティック・レバーが動いたときに色を明るくするアニメーション機能。
+ * スティック・レバーが動いたときに色を変更・明るくするアニメーション機能。
+ * 
+ * - activeStickColor が設定されている場合はその色を使用
+ * - 設定されていない場合は stickColor（baseColor）を使用
+ * - さらに stickBrightnessBoost で明るさを調整
  * 
  * 依存: script.js (_adjustHexColor 関数を使用)
  * ============================================================
@@ -15,21 +19,24 @@
  * 
  * @param {string} stickId - スティックID（例: "LS", "RS", "Lever"）
  * @param {number} intensity - 動きの強さ（0〜1）
- * @param {string} baseColor - 元の色（例: "#e82832"）
+ * @param {string} baseColor - 元の色（静止時の色、例: "#e82832"）
  * @param {string} type - "stick" または "lever"
- * @param {object} config - コントローラー設定（明るさ調整量を取得）
+ * @param {object} config - コントローラー設定（activeStickColor と明るさ調整量を取得）
  */
 function updateStickColor(stickId, intensity, baseColor, type, config) {
+  // 動作時の色を取得（activeStickColor が設定されていればそれを使用、なければ baseColor）
+  const activeColor = config?.activeStickColor || baseColor;
+  
   // config から明るさ調整量を取得（デフォルト: 20）
   const maxBoost = config?.stickBrightnessBoost ?? 20;
   const brightnessBoost = Math.floor(intensity * maxBoost);
   
   if (type === "lever") {
     // レバーの場合：シャフトとボールの両方を更新
-    updateLeverColor(stickId, brightnessBoost, baseColor);
+    updateLeverColor(stickId, brightnessBoost, activeColor);
   } else if (type === "stick") {
     // アナログスティックの場合：ボールのみ更新
-    updateAnalogStickColor(stickId, brightnessBoost, baseColor);
+    updateAnalogStickColor(stickId, brightnessBoost, activeColor);
   }
 }
 
