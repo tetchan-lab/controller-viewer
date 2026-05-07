@@ -46,7 +46,7 @@ class ColorCustomizer {
    */
   hasColorInURL() {
     const params = new URLSearchParams(window.location.search);
-    return params.has('stick-color') || params.has('mask-color');
+    return params.has('stick-color') || params.has('mask-color') || params.has('active-stick-color');
   }
 
   /**
@@ -90,11 +90,12 @@ class ColorCustomizer {
   getColorsFromURL() {
     const params = new URLSearchParams(window.location.search);
     const stickColor = params.get('stick-color');
+    const activeStickColor = params.get('active-stick-color');
     const maskColor = params.get('mask-color');
     const controller = params.get('controller');
     
     // パラメーターが存在しない場合はnull
-    if (!stickColor && !maskColor) {
+    if (!stickColor && !activeStickColor && !maskColor) {
       return null;
     }
     
@@ -104,9 +105,11 @@ class ColorCustomizer {
     // コントローラータイプに応じて色を適用
     if (controller === 'dualsense') {
       if (stickColor) settings.dualsense.stick = this.normalizeColor(stickColor);
+      if (activeStickColor) settings.dualsense.activeStick = this.normalizeColor(activeStickColor);
       if (maskColor) settings.dualsense.mask = this.normalizeColor(maskColor);
     } else if (controller === 'fightingStickMini') {
       if (stickColor) settings.fightingStickMini.lever = this.normalizeColor(stickColor);
+      if (activeStickColor) settings.fightingStickMini.activeLever = this.normalizeColor(activeStickColor);
       if (maskColor) settings.fightingStickMini.mask = this.normalizeColor(maskColor);
     }
     

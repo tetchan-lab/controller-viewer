@@ -1781,11 +1781,21 @@ function generateObsUrl() {
       const maskColor = settings.dualsense.mask.replace('#', '');
       params.push(`stick-color=${stickColor}`);
       params.push(`mask-color=${maskColor}`);
+      // 動作時の色が設定されている場合のみ追加
+      if (settings.dualsense.activeStick) {
+        const activeStickColor = settings.dualsense.activeStick.replace('#', '');
+        params.push(`active-stick-color=${activeStickColor}`);
+      }
     } else if (state.currentConfig.id === 'fightingStickMini') {
       const leverColor = settings.fightingStickMini.lever.replace('#', '');
       const maskColor = settings.fightingStickMini.mask.replace('#', '');
       params.push(`stick-color=${leverColor}`);
       params.push(`mask-color=${maskColor}`);
+      // 動作時の色が設定されている場合のみ追加
+      if (settings.fightingStickMini.activeLever) {
+        const activeLeverColor = settings.fightingStickMini.activeLever.replace('#', '');
+        params.push(`active-stick-color=${activeLeverColor}`);
+      }
     }
   }
   
@@ -1845,11 +1855,21 @@ function generateWindowUrl() {
       const maskColor = settings.dualsense.mask.replace('#', '');
       params.push(`stick-color=${stickColor}`);
       params.push(`mask-color=${maskColor}`);
+      // 動作時の色が設定されている場合のみ追加
+      if (settings.dualsense.activeStick) {
+        const activeStickColor = settings.dualsense.activeStick.replace('#', '');
+        params.push(`active-stick-color=${activeStickColor}`);
+      }
     } else if (state.currentConfig.id === 'fightingStickMini') {
       const leverColor = settings.fightingStickMini.lever.replace('#', '');
       const maskColor = settings.fightingStickMini.mask.replace('#', '');
       params.push(`stick-color=${leverColor}`);
       params.push(`mask-color=${maskColor}`);
+      // 動作時の色が設定されている場合のみ追加
+      if (settings.fightingStickMini.activeLever) {
+        const activeLeverColor = settings.fightingStickMini.activeLever.replace('#', '');
+        params.push(`active-stick-color=${activeLeverColor}`);
+      }
     }
   }
   
