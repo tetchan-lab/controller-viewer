@@ -431,7 +431,7 @@ function updateStickImg(stick, gp, config) {
   // 色アニメーション（動きの強さに応じて明るくする）
   const intensity = Math.min(1, Math.sqrt(ax * ax + ay * ay));
   const baseColor = stick.stickColor || "#c8222a";
-  updateStickColor(stick.id, intensity, baseColor, "lever", config);
+  updateStickColor(stick.id, intensity, baseColor, "lever", config, stick);
 }
 
 /**
@@ -742,7 +742,7 @@ function updateAnalogStick(stick, gp, config) {
   // 色アニメーション（動きの強さに応じて明るくする）
   const intensity = Math.min(1, Math.sqrt(ax * ax + ay * ay));
   const baseColor = stick.stickColor || "#1a1a1a";
-  updateStickColor(stick.id, intensity, baseColor, "stick", config);
+  updateStickColor(stick.id, intensity, baseColor, "stick", config, stick);
 }
 
 

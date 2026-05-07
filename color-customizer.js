@@ -355,11 +355,11 @@ class ColorCustomizer {
   updateUIInputs() {
     const inputs = {
       "dualsense-stick-color": this.settings.dualsense.stick,
-      "dualsense-active-stick-color": this.settings.dualsense.activeStick || "",
+      "dualsense-active-stick-color": this.settings.dualsense.activeStick || this.settings.dualsense.stick,
       "dualsense-mask-color": this.settings.dualsense.mask,
       "dualsense-brightness": this.settings.dualsense.brightness,
       "fightingstick-lever-color": this.settings.fightingStickMini.lever,
-      "fightingstick-active-lever-color": this.settings.fightingStickMini.activeLever || "",
+      "fightingstick-active-lever-color": this.settings.fightingStickMini.activeLever || this.settings.fightingStickMini.lever,
       "fightingstick-mask-color": this.settings.fightingStickMini.mask,
       "fightingstick-brightness": this.settings.fightingStickMini.brightness
     };
@@ -404,7 +404,7 @@ class ColorCustomizer {
     // DualSense 動作時のスティック色
     const dualsenseActiveStickInput = document.getElementById("dualsense-active-stick-color");
     if (dualsenseActiveStickInput) {
-      dualsenseActiveStickInput.value = this.settings.dualsense.activeStick || "";
+      dualsenseActiveStickInput.value = this.settings.dualsense.activeStick || this.settings.dualsense.stick;
       dualsenseActiveStickInput.addEventListener("input", (e) => {
         this.setDualSenseActiveStickColor(e.target.value);
       });
@@ -431,7 +431,7 @@ class ColorCustomizer {
     // Fighting Stick Mini 動作時のレバー色
     const fightingStickActiveLeverInput = document.getElementById("fightingstick-active-lever-color");
     if (fightingStickActiveLeverInput) {
-      fightingStickActiveLeverInput.value = this.settings.fightingStickMini.activeLever || "";
+      fightingStickActiveLeverInput.value = this.settings.fightingStickMini.activeLever || this.settings.fightingStickMini.lever;
       fightingStickActiveLeverInput.addEventListener("input", (e) => {
         this.setFightingStickActiveLeverColor(e.target.value);
       });
