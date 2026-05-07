@@ -71,11 +71,15 @@ const DUALSENSE_CONFIG = {
   },
 
   /**
-   * スティック・レバーの明るさ調整
-   *   stickBrightnessBoost : スティック/レバーが動いたときの最大明るさ調整量（0〜255）
+   * スティック・レバーの色と明るさ調整
+   *   activeStickColor     : スティック/レバーが動いたときの色（未設定の場合は stickColor と同じ）
+   *                          デフォルト: null（静止時と同じ色を使用）
+   *   stickBrightnessBoost : 動作時の色にさらに加算する明るさ調整量（0〜255）
    *                          デフォルト: 20（控えめ）
    *                          推奨範囲: 20〜80（20=控えめ、50=標準、80=明るめ）
+   *                          activeStickColor を設定している場合は、その色に加算される
    */
+  activeStickColor: null,
   stickBrightnessBoost: 20,
 
   /**
@@ -138,6 +142,7 @@ const DUALSENSE_CONFIG = {
       stickBallRadius: 40,
       stickTilt: 20,
       stickColor: "#e82832",
+      activeStickColor: null,  // 動作時の色（nullの場合は stickColor を使用）
       stickMaskShapes: [
         { type: "circle", cx: 272, cy: 262, r: 50, fill: "#1a1a1a", gradient: true }  // 固定球体（グラデーション有効）
       ]
@@ -153,6 +158,7 @@ const DUALSENSE_CONFIG = {
       stickBallRadius: 40,
       stickTilt: 20,
       stickColor: "#e82832",
+      activeStickColor: null,  // 動作時の色（nullの場合は stickColor を使用）
       stickMaskShapes: [
         { type: "circle", cx: 527, cy: 262, r: 50, fill: "#1a1a1a", gradient: true }  // 固定球体（グラデーション有効）
       ]
@@ -203,11 +209,15 @@ const FIGHTING_STICK_MINI_CONFIG = {
   },
 
   /**
-   * スティック・レバーの明るさ調整
-   *   stickBrightnessBoost : スティック/レバーが動いたときの最大明るさ調整量（0〜255）
+   * スティック・レバーの色と明るさ調整
+   *   activeStickColor     : スティック/レバーが動いたときの色（未設定の場合は stickColor と同じ）
+   *                          デフォルト: null（静止時と同じ色を使用）
+   *   stickBrightnessBoost : 動作時の色にさらに加算する明るさ調整量（0〜255）
    *                          デフォルト: 20（控えめ）
    *                          推奨範囲: 20〜80（20=控えめ、50=標準、80=明るめ）
+   *                          activeStickColor を設定している場合は、その色に加算される
    */
+  activeStickColor: null,
   stickBrightnessBoost: 20,
 
   /**
@@ -256,6 +266,7 @@ const FIGHTING_STICK_MINI_CONFIG = {
       stickTilt: 24,                     // 最大傾き量 px（デフォルト：20）
       stickShaftWidth: 30,               // シャフトの太さ px
       stickColor: "#e82832",            // ボール・シャフトの色（デフォルト：#c8222a）
+      activeStickColor: null,            // 動作時の色（nullの場合は stickColor を使用）
       stickMaskShapes: [
         // 元写真のレバーを视覚的に消す覚い形状
         { type: "circle",  cx: 194, cy: 73,  r: 60,           fill: "#1c3005" }, // ボール周辺（背景グリーン）
