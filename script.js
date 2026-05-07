@@ -57,13 +57,23 @@ const elements = {
  */
 function applyConfig(config) {
   state.currentConfig = config;
+  
+  const wrapper = document.getElementById("controller-wrapper");
 
-  // 画像を差し替える
-  elements.controllerImg.src = config.image;
-  elements.controllerImg.alt = config.name;
+  // レンダリングモードによる分岐
+  if (config.renderMode === "simple") {
+    // 簡易モード: 画像を非表示、背景色を設定
+    elements.controllerImg.style.display = "none";
+    wrapper.style.backgroundColor = config.backgroundColor || "#1a1a1a";
+  } else {
+    // 通常モード: 画像を表示
+    elements.controllerImg.style.display = "block";
+    elements.controllerImg.src = config.image;
+    elements.controllerImg.alt = config.name;
+    wrapper.style.backgroundColor = "transparent";
+  }
 
   // コンテナのサイズを設定
-  const wrapper = document.getElementById("controller-wrapper");
   wrapper.style.width  = config.imageWidth  + "px";
   wrapper.style.height = config.imageHeight + "px";
 
@@ -81,10 +91,20 @@ function applyConfig(config) {
   updateActiveButton(config.id);
 
   // 画像読み込み完了後にスケール調整（スマホ対応）
-  if (elements.controllerImg.complete) {
-    updateOverlayScale();
+  // 簡易モードの場合はスケール調整をスキップ（画像がないため）
+  if (config.renderMode === "simple") {
+    // 簡易モードではスケール調整不要（wrapper サイズは固定）
+    elements.overlayLayer.style.transform = 'none';
+    elements.overlayLayer.style.width = config.imageWidth + 'px';
+    elements.overlayLayer.style.height = config.imageHeight + 'px';
+    elements.stickCanvas.style.transform = 'none';
   } else {
-    elements.controllerImg.addEventListener('load', updateOverlayScale, { once: true });
+    // 通常モード: 画像読み込み完了後にスケール調整
+    if (elements.controllerImg.complete) {
+      updateOverlayScale();
+    } else {
+      elements.controllerImg.addEventListener('load', updateOverlayScale, { once: true });
+    }
   }
 }
 
@@ -146,9 +166,21 @@ function buildOverlays(config) {
     el.style.width  = btn.w + "px";
     el.style.height = btn.h + "px";
 
+    // 簡易モードの場合はボタンの色を適用
+    if (config.renderMode === "simple" && btn.color) {
+      el.style.backgroundColor = btn.color;
+      el.style.opacity = "0.3";  // 静止時は半透明
+    }
+
     const labelEl = document.createElement("span");
     labelEl.className = "btn-label";
     labelEl.textContent = btn.label;
+    
+    // 簡易モードの場合はラベルの色を適用
+    if (config.renderMode === "simple" && btn.labelColor) {
+      labelEl.style.color = btn.labelColor;
+    }
+    
     el.appendChild(labelEl);
 
     elements.overlayLayer.appendChild(el);
@@ -320,15 +352,18 @@ function buildStickImgOverlay(stick) {
   }
 
   // ── シャフト ──────────────────────────────────────────────
-  const shaftColor = color ? _adjustHexColor(color, -40) : "#c8c8c8";
-  const shaft = document.createElementNS(ns, "line");
-  shaft.id = "lever-shaft-custom-" + stick.id;
-  shaft.setAttribute("x1", String(baseX));  shaft.setAttribute("y1", String(baseY));
-  shaft.setAttribute("x2", String(ballNX)); shaft.setAttribute("y2", String(ballNY));
-  shaft.setAttribute("stroke", shaftColor);
-  shaft.setAttribute("stroke-width", String(shaftW));
-  shaft.setAttribute("stroke-linecap", "round");
-  svg.appendChild(shaft);
+  // 簡易モードの場合はシャフトを描画しない
+  if (!stick.simpleMode) {
+    const shaftColor = color ? _adjustHexColor(color, -40) : "#c8c8c8";
+    const shaft = document.createElementNS(ns, "line");
+    shaft.id = "lever-shaft-custom-" + stick.id;
+    shaft.setAttribute("x1", String(baseX));  shaft.setAttribute("y1", String(baseY));
+    shaft.setAttribute("x2", String(ballNX)); shaft.setAttribute("y2", String(ballNY));
+    shaft.setAttribute("stroke", shaftColor);
+    shaft.setAttribute("stroke-width", String(shaftW));
+    shaft.setAttribute("stroke-linecap", "round");
+    svg.appendChild(shaft);
+  }
 
   // ── ボール ────────────────────────────────────────────────
   const ball = document.createElementNS(ns, "circle");
@@ -415,7 +450,8 @@ function updateStickImg(stick, gp, config) {
   const ball  = document.getElementById("lever-ball-custom-"  + stick.id);
   const hl    = document.getElementById("lever-hl-custom-"    + stick.id);
 
-  if (shaft) {
+  // 簡易モードの場合はシャフトを更新しない
+  if (shaft && !stick.simpleMode) {
     shaft.setAttribute("x2", String(bx));
     shaft.setAttribute("y2", String(by));
   }
@@ -755,7 +791,7 @@ function updateAnalogStick(stick, gp, config) {
  * @param {string} configId - "dualsense" | "fightingStickMini"
  */
 function switchController(configId) {
-  const config = ALL_CONFIGS.find((c) => c.id === configId);
+  const config = ALL_CONFIGS_WITH_SIMPLE.find((c) => c.id === configId);
   if (!config) return;
   applyConfig(config);
 
@@ -784,6 +820,12 @@ function switchController(configId) {
 function updateActiveButton(configId) {
   elements.btnDualSense.classList.toggle("active", configId === "dualsense");
   elements.btnFSMini.classList.toggle("active",    configId === "fightingStickMini");
+  
+  // 簡易版ボタンが存在する場合
+  const btnFSMiniSimple = document.getElementById("btn-fightingStickMiniSimple");
+  if (btnFSMiniSimple) {
+    btnFSMiniSimple.classList.toggle("active", configId === "fightingStickMiniSimple");
+  }
 }
 
 /**

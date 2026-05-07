@@ -277,13 +277,114 @@ const FIGHTING_STICK_MINI_CONFIG = {
 };
 
 // ----------------------------------------------------------------
+// Fighting Stick Mini (簡易版) - 画像なしのシンプル描画
+// ----------------------------------------------------------------
+const FIGHTING_STICK_SIMPLE_CONFIG = {
+  id: "fightingStickMiniSimple",
+  name: "Fighting Stick Mini (簡易版)",
+
+  /** 画像を使用しないシンプルモード */
+  renderMode: "simple",
+
+  /** デバイス名パターンは通常版と同じ（手動切り替え専用なので自動判定には使わない） */
+  deviceNamePatterns: [],
+
+  /** 画像の代わりに背景色を使用 */
+  backgroundColor: "#1a1a1a",
+  imageWidth: 800,
+  imageHeight: 425,
+
+  /** サウンド定義（通常版と同じ） */
+  sounds: {
+    lever: {
+      press: "sounds/fightingStickMini/lever-press.mp3",
+      release: "sounds/fightingStickMini/lever-release.mp3"
+    },
+    buttons: {
+      press: "sounds/fightingStickMini/btn-press.mp3",
+      release: "sounds/fightingStickMini/btn-release.mp3"
+    },
+    upbtn: {
+      press: "sounds/fightingStickMini/upbtn-press.mp3",
+      release: "sounds/fightingStickMini/upbtn-release.mp3"
+    }
+  },
+
+  activeStickColor: null,
+  stickBrightnessBoost: 20,
+
+  /**
+   * ボタン定義（簡易版）
+   * 斜め角度からの画像を使わないため、すべて正円（w = h）で表示
+   */
+  buttons: [
+    // ── フェイスボタン（上段 左→右: □ △ R1 L1）──────────
+    { index:  2, label: "□",      x: 417, y: 169, w: 60, h: 60, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
+    { index:  3, label: "△",      x: 502, y: 156, w: 60, h: 60, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
+    { index:  5, label: "R1",     x: 589, y: 150, w: 60, h: 60, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
+    { index:  4, label: "L1",     x: 678, y: 150, w: 60, h: 60, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
+
+    // ── フェイスボタン（下段 左→右: × ○ R2 L2）──────
+    { index:  0, label: "×",      x: 418, y: 210, w: 60, h: 60, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
+    { index:  1, label: "○",      x: 506, y: 198, w: 60, h: 60, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
+    { index:  7, label: "R2",     x: 596, y: 192, w: 62, h: 62, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
+    { index:  6, label: "L2",     x: 688, y: 191, w: 66, h: 66, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
+
+    // ── 特殊ボタン（天板中央ストリップ）─────────────────
+    { index: 16, label: "PS",      x: 404, y: 120, w: 30, h: 30, soundCategory: "upbtn", color: "#95a5a6", labelColor: "#fff" },
+    { index:  8, label: "Share",   x: 458, y: 120, w: 22, h: 22, soundCategory: "upbtn", color: "#95a5a6", labelColor: "#fff" },
+    { index:  9, label: "Options", x: 506, y: 120, w: 22, h: 22, soundCategory: "upbtn", color: "#95a5a6", labelColor: "#fff" },
+    { index: 10, label: "L3",      x: 553, y: 121, w: 22, h: 22, soundCategory: "upbtn", color: "#95a5a6", labelColor: "#fff" },
+    { index: 11, label: "R3",      x: 601, y: 120, w: 22, h: 22, soundCategory: "upbtn", color: "#95a5a6", labelColor: "#fff" },
+
+    // ── レバー方向表示（d-padボタンとして認識される場合）──
+    { index: 12, label: "↑", x: 181, y: 140, w: 0, h: 0, soundCategory: "lever" },  // サイズ0で非表示
+    { index: 13, label: "↓", x: 181, y: 240, w: 0, h: 0, soundCategory: "lever" },
+    { index: 14, label: "←", x: 130, y: 189, w: 0, h: 0, soundCategory: "lever" },
+    { index: 15, label: "→", x: 230, y: 189, w: 0, h: 0, soundCategory: "lever" },
+  ],
+
+  /**
+   * レバー定義（簡易版）
+   * シャフト/ベースディスクを描画せず、ボールとマスクのみ表示
+   */
+  sticks: [
+    { 
+      id: "Lever", 
+      label: "Lever", 
+      type: "lever", 
+      axisX: 0, 
+      axisY: 1, 
+      cx: 181, 
+      cy: 189, 
+      radius: 63,
+      stickBallRadius: 50,               // ボール半径（簡易版では少し大きめ）
+      stickTilt: 24,                     // 最大傾き量 px
+      stickColor: "#e82832",             // ボール色
+      activeStickColor: null,
+      simpleMode: true,                  // 🆕 シンプルモード（シャフト/ベース非描画）
+      stickMaskShapes: [
+        // 簡易版ではマスクは円形のみ
+        { type: "circle", cx: 181, cy: 189, r: 45, fill: "#2c2c2c", gradient: false }
+      ] 
+    },
+  ],
+};
+
+// ----------------------------------------------------------------
 // デバイス自動判定ロジック
 // ----------------------------------------------------------------
 
 /**
  * 登録済みの全コントローラー設定（優先順位順に並べる）
+ * 簡易版は自動判定に含めず、手動切り替え専用とする
  */
 const ALL_CONFIGS = [DUALSENSE_CONFIG, FIGHTING_STICK_MINI_CONFIG];
+
+/**
+ * 手動切り替え可能な全設定（簡易版を含む）
+ */
+const ALL_CONFIGS_WITH_SIMPLE = [DUALSENSE_CONFIG, FIGHTING_STICK_MINI_CONFIG, FIGHTING_STICK_SIMPLE_CONFIG];
 
 /**
  * Gamepad の id 文字列から最適な設定を返す。
