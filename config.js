@@ -277,13 +277,119 @@ const FIGHTING_STICK_MINI_CONFIG = {
 };
 
 // ----------------------------------------------------------------
+// Fighting Stick Mini (簡易版) - 画像なしのシンプル描画
+// ----------------------------------------------------------------
+const FIGHTING_STICK_SIMPLE_CONFIG = {
+  id: "fightingStickMiniSimple",
+  name: "Fighting Stick Mini (簡易版)",
+
+  /** 画像を使用しないシンプルモード */
+  renderMode: "simple",
+
+  /** デバイス名パターンは通常版と同じ（手動切り替え専用なので自動判定には使わない） */
+  deviceNamePatterns: [],
+
+  /** 画像の代わりに背景色を使用 */
+  backgroundColor: "#00ff00",  // クロマキー用の緑
+  imageWidth: 800,
+  imageHeight: 425,
+
+  /** サウンド定義（通常版と同じ） */
+  sounds: {
+    lever: {
+      press: "sounds/fightingStickMini/lever-press.mp3",
+      release: "sounds/fightingStickMini/lever-release.mp3"
+    },
+    buttons: {
+      press: "sounds/fightingStickMini/btn-press.mp3",
+      release: "sounds/fightingStickMini/btn-release.mp3"
+    },
+    upbtn: {
+      press: "sounds/fightingStickMini/upbtn-press.mp3",
+      release: "sounds/fightingStickMini/upbtn-release.mp3"
+    }
+  },
+
+  activeStickColor: null,
+  stickBrightnessBoost: 20,
+
+  /**
+   * ボタン定義（簡易版）
+   * 斜め角度からの画像を使わないため、すべて正円（w = h）で表示
+   * color: 静止時の背景色（完全不透明）
+   * pressedColor: 押下時の背景色（完全不透明）
+   * labelColor: ラベルの色（静止時/押下時共有）
+   */
+  buttons: [
+    // ── フェイスボタン（上段 左→右: □ △ R1 L1）──────────
+    { index:  2, label: "□",      x: 417, y: 170, w: 60, h: 60, soundCategory: "buttons", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
+    { index:  3, label: "△",      x: 495, y: 150, w: 60, h: 60, soundCategory: "buttons", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
+    { index:  5, label: "R1",     x: 573, y: 140, w: 60, h: 60, soundCategory: "buttons", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
+    { index:  4, label: "L1",     x: 651, y: 143, w: 60, h: 60, soundCategory: "buttons", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
+
+    // ── フェイスボタン（下段 左→右: × ○ R2 L2）──────
+    { index:  0, label: "×",      x: 418, y: 250, w: 60, h: 60, soundCategory: "buttons", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
+    { index:  1, label: "○",      x: 496, y: 230, w: 60, h: 60, soundCategory: "buttons", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
+    { index:  7, label: "R2",     x: 574, y: 220, w: 60, h: 60, soundCategory: "buttons", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
+    { index:  6, label: "L2",     x: 652, y: 223, w: 60, h: 60, soundCategory: "buttons", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
+
+    // ── 特殊ボタン（天板中央ストリップ）─────────────────
+    { index: 16, label: "PS",      x: 404, y: 70, w: 30, h: 30, soundCategory: "upbtn", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#ffffffca" },
+    { index:  8, label: "Share",   x: 452, y: 70, w: 22, h: 22, soundCategory: "upbtn", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#ffffffca" },
+    { index:  9, label: "Options", x: 500, y: 70, w: 22, h: 22, soundCategory: "upbtn", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#ffffffca" },
+    { index: 10, label: "L3",      x: 548, y: 70, w: 22, h: 22, soundCategory: "upbtn", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#ffffffca" },
+    { index: 11, label: "R3",      x: 596, y: 70, w: 22, h: 22, soundCategory: "upbtn", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#ffffffca" },
+
+    // ── レバー方向表示（d-padボタンとして認識される場合）──
+    { index: 12, label: "↑", x: 181, y: 140, w: 0, h: 0, soundCategory: "lever" },  // サイズ0で非表示
+    { index: 13, label: "↓", x: 181, y: 240, w: 0, h: 0, soundCategory: "lever" },
+    { index: 14, label: "←", x: 130, y: 189, w: 0, h: 0, soundCategory: "lever" },
+    { index: 15, label: "→", x: 230, y: 189, w: 0, h: 0, soundCategory: "lever" },
+  ],
+
+  /**
+   * レバー定義（簡易版）
+   * シャフト/ベースディスクを描画せず、ボールとマスクのみ表示
+   */
+  sticks: [
+    { 
+      id: "Lever", 
+      label: "Lever", 
+      type: "lever", 
+      axisX: 0, 
+      axisY: 1, 
+      cx: 181, 
+      cy: 209, 
+      radius: 63,
+      stickBallX: 181,                   // ニュートラル時のボール中心X（簡易版では cx と同じ）
+      stickBallY: 209,                   // ニュートラル時のボール中心Y（簡易版では cy と同じ）
+      stickBallRadius: 56,               // ボール半径（簡易版では少し大きめ）
+      stickTilt: 24,                     // 最大傾き量 px
+      stickColor: "#e82832",             // ボール色
+      activeStickColor: null,
+      simpleMode: true,                  // 🆕 シンプルモード（シャフト/ベース非描画）
+      stickMaskShapes: [
+        // 簡易版ではレバーの動きが分かるようにマスクは暗い色で目立たなくする
+        { type: "circle", cx: 181, cy: 209, r: 60, fill: "#1a1a1a", gradient: false }
+      ] 
+    },
+  ],
+};
+
+// ----------------------------------------------------------------
 // デバイス自動判定ロジック
 // ----------------------------------------------------------------
 
 /**
  * 登録済みの全コントローラー設定（優先順位順に並べる）
+ * 簡易版は自動判定に含めず、手動切り替え専用とする
  */
 const ALL_CONFIGS = [DUALSENSE_CONFIG, FIGHTING_STICK_MINI_CONFIG];
+
+/**
+ * 手動切り替え可能な全設定（簡易版を含む）
+ */
+const ALL_CONFIGS_WITH_SIMPLE = [DUALSENSE_CONFIG, FIGHTING_STICK_MINI_CONFIG, FIGHTING_STICK_SIMPLE_CONFIG];
 
 /**
  * Gamepad の id 文字列から最適な設定を返す。

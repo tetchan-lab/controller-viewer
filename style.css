@@ -230,6 +230,22 @@ body {
   transform: translateY(-0.10em);
 }
 
+/* ── L1,R1,L2,R2ボタン専用ラベル（オプション） ─────────────── */
+.btn-overlay[data-label="L1"] .btn-label,
+.btn-overlay[data-label="R1"] .btn-label,
+.btn-overlay[data-label="L2"] .btn-label,
+.btn-overlay[data-label="R2"] .btn-label {
+  font-size: 0px;
+}
+.btn-overlay.pressed[data-label="L1"] .btn-label,
+.btn-overlay.pressed[data-label="R1"] .btn-label,
+.btn-overlay.pressed[data-label="L2"] .btn-label,
+.btn-overlay.pressed[data-label="R2"] .btn-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #cecece;
+}
+
 /* ── スティックオーバーレイ ─────────────────────────────────── */
 .stick-overlay {
   position: absolute;
@@ -631,7 +647,7 @@ details.setting-section[open] summary::before {
   #controller-wrapper {
     width: 100% !important;
     max-width: 500px;
-    height: auto !important;
+    /* height は script.js の updateOverlayScale() で動的に計算されるため、auto を指定しない */
   }
 
   #controller-image {
