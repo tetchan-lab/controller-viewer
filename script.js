@@ -155,9 +155,6 @@ function buildOverlays(config) {
   elements.overlayLayer.innerHTML = "";
 
   for (const btn of config.buttons) {
-    // サイズが0のボタンはスキップ（非表示用）
-    if (btn.w === 0 || btn.h === 0) continue;
-    
     const el = document.createElement("div");
     el.className = "btn-overlay";
     el.dataset.index = btn.index;
@@ -170,6 +167,11 @@ function buildOverlays(config) {
     el.style.top    = (btn.y - btn.h / 2) + "px";
     el.style.width  = btn.w + "px";
     el.style.height = btn.h + "px";
+    
+    // サイズが0のボタンは視覚的に非表示（サウンド処理のみ有効）
+    if (btn.w === 0 || btn.h === 0) {
+      el.style.display = "none";
+    }
 
     // 簡易モードの場合は静止時の背景色を設定（クロマキー背景が透けないように）
     if (config.renderMode === "simple" && btn.color) {
