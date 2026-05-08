@@ -74,8 +74,10 @@ function applyConfig(config) {
   }
 
   // コンテナのサイズを設定
-  wrapper.style.width  = config.imageWidth  + "px";
-  wrapper.style.height = config.imageHeight + "px";
+  // max-widthを使用してレスポンシブ対応（スマホサイズで縮小）
+  wrapper.style.maxWidth = config.imageWidth  + "px";
+  wrapper.style.width    = "100%";  // スマホでは親要素の幅に合わせる
+  wrapper.style.height   = config.imageHeight + "px";
 
   // canvas サイズを合わせる
   elements.stickCanvas.width  = config.imageWidth;
@@ -91,13 +93,9 @@ function applyConfig(config) {
   updateActiveButton(config.id);
 
   // 画像読み込み完了後にスケール調整（スマホ対応）
-  // 簡易モードの場合はスケール調整をスキップ（画像がないため）
   if (config.renderMode === "simple") {
-    // 簡易モードではスケール調整不要（wrapper サイズは固定）
-    elements.overlayLayer.style.transform = 'none';
-    elements.overlayLayer.style.width = config.imageWidth + 'px';
-    elements.overlayLayer.style.height = config.imageHeight + 'px';
-    elements.stickCanvas.style.transform = 'none';
+    // 簡易モード: 即座にスケール調整（画像読み込み不要）
+    updateOverlayScale();
   } else {
     // 通常モード: 画像読み込み完了後にスケール調整
     if (elements.controllerImg.complete) {
@@ -117,10 +115,14 @@ function updateOverlayScale() {
 
   const wrapper = document.getElementById("controller-wrapper");
   const img = elements.controllerImg;
+  const config = state.currentConfig;
   
   // 画像の実際の表示サイズを取得
-  const actualWidth = img.offsetWidth;
-  const configWidth = state.currentConfig.imageWidth;
+  // 簡易モードの場合は wrapper の幅を使用（画像が display:none のため）
+  const actualWidth = (config.renderMode === "simple") 
+    ? wrapper.offsetWidth 
+    : img.offsetWidth;
+  const configWidth = config.imageWidth;
   
   // スケール比率を計算
   const scale = actualWidth / configWidth;
@@ -153,6 +155,9 @@ function buildOverlays(config) {
   elements.overlayLayer.innerHTML = "";
 
   for (const btn of config.buttons) {
+    // サイズが0のボタンはスキップ（非表示用）
+    if (btn.w === 0 || btn.h === 0) continue;
+    
     const el = document.createElement("div");
     el.className = "btn-overlay";
     el.dataset.index = btn.index;

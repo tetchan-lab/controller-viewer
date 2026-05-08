@@ -290,7 +290,7 @@ const FIGHTING_STICK_SIMPLE_CONFIG = {
   deviceNamePatterns: [],
 
   /** 画像の代わりに背景色を使用 */
-  backgroundColor: "#1a1a1a",
+  backgroundColor: "#00ff00",
   imageWidth: 800,
   imageHeight: 425,
 
@@ -319,23 +319,23 @@ const FIGHTING_STICK_SIMPLE_CONFIG = {
    */
   buttons: [
     // ── フェイスボタン（上段 左→右: □ △ R1 L1）──────────
-    { index:  2, label: "□",      x: 417, y: 169, w: 60, h: 60, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
-    { index:  3, label: "△",      x: 502, y: 156, w: 60, h: 60, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
-    { index:  5, label: "R1",     x: 589, y: 150, w: 60, h: 60, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
-    { index:  4, label: "L1",     x: 678, y: 150, w: 60, h: 60, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
+    { index:  2, label: "□",      x: 417, y: 170, w: 60, h: 60, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
+    { index:  3, label: "△",      x: 495, y: 150, w: 60, h: 60, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
+    { index:  5, label: "R1",     x: 573, y: 140, w: 60, h: 60, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
+    { index:  4, label: "L1",     x: 651, y: 143, w: 60, h: 60, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
 
     // ── フェイスボタン（下段 左→右: × ○ R2 L2）──────
-    { index:  0, label: "×",      x: 418, y: 210, w: 60, h: 60, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
-    { index:  1, label: "○",      x: 506, y: 198, w: 60, h: 60, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
-    { index:  7, label: "R2",     x: 596, y: 192, w: 62, h: 62, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
-    { index:  6, label: "L2",     x: 688, y: 191, w: 66, h: 66, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
+    { index:  0, label: "×",      x: 418, y: 250, w: 60, h: 60, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
+    { index:  1, label: "○",      x: 496, y: 230, w: 60, h: 60, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
+    { index:  7, label: "R2",     x: 574, y: 220, w: 60, h: 60, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
+    { index:  6, label: "L2",     x: 652, y: 223, w: 60, h: 60, soundCategory: "buttons", color: "#3498db", labelColor: "#fff" },
 
     // ── 特殊ボタン（天板中央ストリップ）─────────────────
-    { index: 16, label: "PS",      x: 404, y: 120, w: 30, h: 30, soundCategory: "upbtn", color: "#95a5a6", labelColor: "#fff" },
-    { index:  8, label: "Share",   x: 458, y: 120, w: 22, h: 22, soundCategory: "upbtn", color: "#95a5a6", labelColor: "#fff" },
-    { index:  9, label: "Options", x: 506, y: 120, w: 22, h: 22, soundCategory: "upbtn", color: "#95a5a6", labelColor: "#fff" },
-    { index: 10, label: "L3",      x: 553, y: 121, w: 22, h: 22, soundCategory: "upbtn", color: "#95a5a6", labelColor: "#fff" },
-    { index: 11, label: "R3",      x: 601, y: 120, w: 22, h: 22, soundCategory: "upbtn", color: "#95a5a6", labelColor: "#fff" },
+    { index: 16, label: "PS",      x: 404, y: 70, w: 30, h: 30, soundCategory: "upbtn", color: "#95a5a6", labelColor: "#fff" },
+    { index:  8, label: "Share",   x: 452, y: 70, w: 22, h: 22, soundCategory: "upbtn", color: "#95a5a6", labelColor: "#fff" },
+    { index:  9, label: "Options", x: 500, y: 70, w: 22, h: 22, soundCategory: "upbtn", color: "#95a5a6", labelColor: "#fff" },
+    { index: 10, label: "L3",      x: 548, y: 70, w: 22, h: 22, soundCategory: "upbtn", color: "#95a5a6", labelColor: "#fff" },
+    { index: 11, label: "R3",      x: 596, y: 70, w: 22, h: 22, soundCategory: "upbtn", color: "#95a5a6", labelColor: "#fff" },
 
     // ── レバー方向表示（d-padボタンとして認識される場合）──
     { index: 12, label: "↑", x: 181, y: 140, w: 0, h: 0, soundCategory: "lever" },  // サイズ0で非表示
@@ -358,14 +358,16 @@ const FIGHTING_STICK_SIMPLE_CONFIG = {
       cx: 181, 
       cy: 189, 
       radius: 63,
-      stickBallRadius: 50,               // ボール半径（簡易版では少し大きめ）
+      stickBallX: 181,                   // ニュートラル時のボール中心X（簡易版では cx と同じ）
+      stickBallY: 189,                   // ニュートラル時のボール中心Y（簡易版では cy と同じ）
+      stickBallRadius: 56,               // ボール半径（簡易版では少し大きめ）
       stickTilt: 24,                     // 最大傾き量 px
       stickColor: "#e82832",             // ボール色
       activeStickColor: null,
       simpleMode: true,                  // 🆕 シンプルモード（シャフト/ベース非描画）
       stickMaskShapes: [
-        // 簡易版ではマスクは円形のみ
-        { type: "circle", cx: 181, cy: 189, r: 45, fill: "#2c2c2c", gradient: false }
+        // 簡易版では画像がないため、マスクは暗い色で目立たなくする
+        { type: "circle", cx: 181, cy: 189, r: 56, fill: "#1a1a1a", gradient: false }
       ] 
     },
   ],

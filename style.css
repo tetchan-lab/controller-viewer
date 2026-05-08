@@ -631,7 +631,7 @@ details.setting-section[open] summary::before {
   #controller-wrapper {
     width: 100% !important;
     max-width: 500px;
-    height: auto !important;
+    /* height は script.js の updateOverlayScale() で動的に計算されるため、auto を指定しない */
   }
 
   #controller-image {
