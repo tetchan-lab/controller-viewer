@@ -4,8 +4,17 @@
 // index.htmlのscriptタグでconfig.jsの前に読み込んでください
 
 (function() {
-    if (typeof FIGHTING_STICK_MINI_CONFIG === 'undefined') {
-        console.warn('[lever-rotation] FIGHTING_STICK_MINI_CONFIGが未定義のため終了');
+    // FIGHTING_STICK_MINI_CONFIG と FIGHTING_STICK_SIMPLE_CONFIG の両方をチェック
+    const configs = [];
+    if (typeof FIGHTING_STICK_MINI_CONFIG !== 'undefined') {
+        configs.push({ name: 'FIGHTING_STICK_MINI_CONFIG', config: FIGHTING_STICK_MINI_CONFIG });
+    }
+    if (typeof FIGHTING_STICK_SIMPLE_CONFIG !== 'undefined') {
+        configs.push({ name: 'FIGHTING_STICK_SIMPLE_CONFIG', config: FIGHTING_STICK_SIMPLE_CONFIG });
+    }
+    
+    if (configs.length === 0) {
+        console.warn('[lever-rotation] Fighting Stick設定が未定義のため終了');
         return;
     }
     
@@ -22,13 +31,17 @@
     // レバー軸の回転
     if (params.rotate) {
         const angle = parseInt(params.rotate, 10);
-        const lever = FIGHTING_STICK_MINI_CONFIG.sticks.find(s => s.id === 'Lever');
         
-        if (lever) {
-            lever.rotateAngle = angle;
-            console.log(`[lever-rotation] レバー軸を${angle}度回転します`);
-        } else {
-            console.warn('[lever-rotation] Leverスティックが見つかりません');
-        }
+        // 両方の設定に対してレバー回転を適用
+        configs.forEach(({ name, config }) => {
+            const lever = config.sticks.find(s => s.id === 'Lever');
+            
+            if (lever) {
+                lever.rotateAngle = angle;
+                console.log(`[lever-rotation] ${name}: レバー軸を${angle}度回転します`);
+            } else {
+                console.warn(`[lever-rotation] ${name}: Leverスティックが見つかりません`);
+            }
+        });
     }
 })();
