@@ -171,17 +171,16 @@ function buildOverlays(config) {
     el.style.width  = btn.w + "px";
     el.style.height = btn.h + "px";
 
-    // 簡易モードの場合はボタンの色を適用
+    // 簡易モードの場合は静止時の背景色を設定（クロマキー背景が透けないように）
     if (config.renderMode === "simple" && btn.color) {
       el.style.backgroundColor = btn.color;
-      el.style.opacity = "0.3";  // 静止時は半透明
     }
 
     const labelEl = document.createElement("span");
     labelEl.className = "btn-label";
     labelEl.textContent = btn.label;
     
-    // 簡易モードの場合はラベルの色を適用
+    // 簡易モードでラベル色が指定されている場合のみ適用
     if (config.renderMode === "simple" && btn.labelColor) {
       labelEl.style.color = btn.labelColor;
     }
@@ -1237,6 +1236,17 @@ function tick() {
     const pressed = btn.pressed || btn.value > 0.5;
     el.classList.toggle("pressed", pressed);
 
+    // 簡易モードの場合、押下状態に応じて背景色を切り替え（完全不透明）
+    if (config.renderMode === "simple") {
+      const btnConfig = config.buttons.find(b => b.index === idx);
+      if (btnConfig && btnConfig.color) {
+        el.style.backgroundColor = pressed ? btnConfig.pressedColor : btnConfig.color;
+        // CSSのfilterとborderを無効化（簡易モードでは不要）
+        el.style.filter = "none";
+        el.style.border = "none";
+      }
+    }
+
     // アナログ値（L2/R2など）をCSS変数に渡して視覚的な強度表現に使用可能
     if (typeof btn.value === "number") {
       el.style.setProperty("--analog-value", btn.value.toFixed(2));
@@ -1431,7 +1441,7 @@ function getQueryConfig() {
   const params = new URLSearchParams(window.location.search);
   const id = params.get("controller");
   if (!id) return null;
-  return ALL_CONFIGS.find((c) => c.id === id) || null;
+  return ALL_CONFIGS_WITH_SIMPLE.find((c) => c.id === id) || null;
 }
 
 /**
