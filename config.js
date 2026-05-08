@@ -290,7 +290,7 @@ const FIGHTING_STICK_SIMPLE_CONFIG = {
   deviceNamePatterns: [],
 
   /** 画像の代わりに背景色を使用 */
-  backgroundColor: "#00ff00",
+  backgroundColor: "#1a1a1a",
   imageWidth: 800,
   imageHeight: 425,
 

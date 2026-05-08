@@ -1615,7 +1615,7 @@ async function initSoundSystem() {
   let fightingSounds = null;
   
   // DualSenseとFighting Stick Miniのサウンド定義を取得
-  for (const config of ALL_CONFIGS) {
+  for (const config of ALL_CONFIGS_WITH_SIMPLE) {
     if (config.id === 'dualsense' && config.sounds) {
       dualsenseSounds = config.sounds;
     }
@@ -1626,7 +1626,7 @@ async function initSoundSystem() {
 
   // すべてのコントローラー設定からサウンドファイルを収集（全サウンドをロード）
   const soundMap = {};
-  for (const config of ALL_CONFIGS) {
+  for (const config of ALL_CONFIGS_WITH_SIMPLE) {
     if (!config.sounds) continue;
 
     for (const [category, paths] of Object.entries(config.sounds)) {
