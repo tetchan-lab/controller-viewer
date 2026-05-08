@@ -359,10 +359,10 @@ const FIGHTING_STICK_SIMPLE_CONFIG = {
       axisX: 0, 
       axisY: 1, 
       cx: 181, 
-      cy: 189, 
+      cy: 209, 
       radius: 63,
       stickBallX: 181,                   // ニュートラル時のボール中心X（簡易版では cx と同じ）
-      stickBallY: 189,                   // ニュートラル時のボール中心Y（簡易版では cy と同じ）
+      stickBallY: 209,                   // ニュートラル時のボール中心Y（簡易版では cy と同じ）
       stickBallRadius: 56,               // ボール半径（簡易版では少し大きめ）
       stickTilt: 24,                     // 最大傾き量 px
       stickColor: "#e82832",             // ボール色
@@ -370,7 +370,7 @@ const FIGHTING_STICK_SIMPLE_CONFIG = {
       simpleMode: true,                  // 🆕 シンプルモード（シャフト/ベース非描画）
       stickMaskShapes: [
         // 簡易版ではレバーの動きが分かるようにマスクは暗い色で目立たなくする
-        { type: "circle", cx: 181, cy: 189, r: 56, fill: "#1a1a1a", gradient: false }
+        { type: "circle", cx: 181, cy: 209, r: 60, fill: "#1a1a1a", gradient: false }
       ] 
     },
   ],
