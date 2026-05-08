@@ -32,7 +32,7 @@ body {
 
 /* ── ステータスバー ─────────────────────────────────────────── */
 #status-bar {
-  width: 800px;
+  width: 850px;
   max-width: 100%;
   display: flex;
   align-items: center;
