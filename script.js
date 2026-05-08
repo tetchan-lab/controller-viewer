@@ -176,6 +176,7 @@ function buildOverlays(config) {
     // 簡易モードの場合は静止時の背景色を設定（クロマキー背景が透けないように）
     if (config.renderMode === "simple" && btn.color) {
       el.style.backgroundColor = btn.color;
+      el.style.boxShadow = "0px 3px 5px rgba(0, 0, 0, 0.5)";  // 真下に影（上から見下ろした立体感）
     }
 
     const labelEl = document.createElement("span");
@@ -1243,6 +1244,10 @@ function tick() {
       const btnConfig = config.buttons.find(b => b.index === idx);
       if (btnConfig && btnConfig.color) {
         el.style.backgroundColor = pressed ? btnConfig.pressedColor : btnConfig.color;
+        // 押下時は影を浅く、静止時は深く
+        el.style.boxShadow = pressed 
+          ? "0px 1px 2px rgba(0, 0, 0, 0.3)"  // 押下時は浅く
+          : "0px 3px 5px rgba(0, 0, 0, 0.5)";  // 静止時は深く
         // CSSのfilterとborderを無効化（簡易モードでは不要）
         el.style.filter = "none";
         el.style.border = "none";
