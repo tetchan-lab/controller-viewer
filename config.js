@@ -389,14 +389,10 @@ const FIGHTING_STICK_SIMPLE_CONFIG = {
 
 /**
  * 登録済みの全コントローラー設定（優先順位順に並べる）
- * 簡易版は自動判定に含めず、手動切り替え専用とする
+ * ここに新しいコントローラー設定を追加してください。
  */
-const ALL_CONFIGS = [DUALSENSE_CONFIG, FIGHTING_STICK_MINI_CONFIG];
+const ALL_CONFIGS = [DUALSENSE_CONFIG, FIGHTING_STICK_MINI_CONFIG, FIGHTING_STICK_SIMPLE_CONFIG];
 
-/**
- * 手動切り替え可能な全設定（簡易版を含む）
- */
-const ALL_CONFIGS_WITH_SIMPLE = [DUALSENSE_CONFIG, FIGHTING_STICK_MINI_CONFIG, FIGHTING_STICK_SIMPLE_CONFIG];
 
 /**
  * Gamepad の id 文字列から最適な設定を返す。
