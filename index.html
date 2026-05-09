@@ -203,7 +203,7 @@
         <div class="modal-body">
           
           <!-- DualSense 設定 -->
-          <details class="setting-section" open>
+          <details class="setting-section">
             <summary>🎮 DualSense</summary>
             <div class="color-setting-row">
               <label for="dualsense-stick-color">アナログスティック色（静止時）</label>
@@ -232,7 +232,7 @@
           </details>
           
           <!-- Fighting Stick Mini 設定 -->
-          <details class="setting-section" open>
+          <details class="setting-section">
             <summary>🕹️ Fighting Stick Mini</summary>
             <div class="color-setting-row">
               <label for="fightingstick-lever-color">レバー色（静止時）</label>
@@ -258,11 +258,10 @@
                 oninput="updateBrightness('fightingStickMini', this.value)" />
               <span id="fightingstick-brightness-value">20</span>
             </div>
-            </div>
           </details>
           
           <!-- Fighting Stick Mini (簡易版) 設定 -->
-          <details class="setting-section" open>
+          <details class="setting-section">
             <summary>🕹️ Fighting Stick Mini（簡易版）</summary>
             <div class="color-setting-row">
               <label for="simple-bgcolor">背景色（クロマキー用）</label>
@@ -285,7 +284,7 @@
               <input type="color" id="simple-mask-color" value="#1c3005" />
             </div>
             <div class="color-setting-row">
-              <label for="simple-brightness">明るさ: <span id="simple-brightness-value">20</span></label>
+              <label for="simple-brightness">レバー明るさ（動作時）</label>
               <input 
                 type="range" 
                 id="simple-brightness" 
@@ -294,6 +293,7 @@
                 value="20" 
                 oninput="updateBrightness('fightingStickMiniSimple', this.value)" 
               />
+              <span id="simple-brightness-value">20</span>
             </div>
           </details>
           
