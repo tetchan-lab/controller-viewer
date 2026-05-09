@@ -290,7 +290,7 @@ const FIGHTING_STICK_SIMPLE_CONFIG = {
   deviceNamePatterns: [],
 
   /** 画像の代わりに背景色を使用 */
-  backgroundColor: "#00ff00",  // クロマキー用の緑
+  backgroundColor: "#d1d1d1",  // UI上でクロマキー用に変更可能
   imageWidth: 800,
   imageHeight: 425,
 
@@ -322,23 +322,23 @@ const FIGHTING_STICK_SIMPLE_CONFIG = {
    */
   buttons: [
     // ── フェイスボタン（上段 左→右: □ △ R1 L1）──────────
-    { index:  2, label: "□",      x: 417, y: 170, w: 60, h: 60, soundCategory: "buttons", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
-    { index:  3, label: "△",      x: 495, y: 150, w: 60, h: 60, soundCategory: "buttons", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
-    { index:  5, label: "R1",     x: 573, y: 140, w: 60, h: 60, soundCategory: "buttons", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
-    { index:  4, label: "L1",     x: 651, y: 143, w: 60, h: 60, soundCategory: "buttons", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
+    { index:  2, label: "□",      x: 417, y: 170, w: 60, h: 60, soundCategory: "buttons", color: "rgb(45, 45, 45)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
+    { index:  3, label: "△",      x: 495, y: 150, w: 60, h: 60, soundCategory: "buttons", color: "rgb(45, 45, 45)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
+    { index:  5, label: "R1",     x: 573, y: 140, w: 60, h: 60, soundCategory: "buttons", color: "rgb(45, 45, 45)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
+    { index:  4, label: "L1",     x: 651, y: 143, w: 60, h: 60, soundCategory: "buttons", color: "rgb(45, 45, 45)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
 
     // ── フェイスボタン（下段 左→右: × ○ R2 L2）──────
-    { index:  0, label: "×",      x: 418, y: 250, w: 60, h: 60, soundCategory: "buttons", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
-    { index:  1, label: "○",      x: 496, y: 230, w: 60, h: 60, soundCategory: "buttons", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
-    { index:  7, label: "R2",     x: 574, y: 220, w: 60, h: 60, soundCategory: "buttons", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
-    { index:  6, label: "L2",     x: 652, y: 223, w: 60, h: 60, soundCategory: "buttons", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
+    { index:  0, label: "×",      x: 418, y: 250, w: 60, h: 60, soundCategory: "buttons", color: "rgb(45, 45, 45)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
+    { index:  1, label: "○",      x: 496, y: 230, w: 60, h: 60, soundCategory: "buttons", color: "rgb(45, 45, 45)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
+    { index:  7, label: "R2",     x: 574, y: 220, w: 60, h: 60, soundCategory: "buttons", color: "rgb(45, 45, 45)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
+    { index:  6, label: "L2",     x: 652, y: 223, w: 60, h: 60, soundCategory: "buttons", color: "rgb(45, 45, 45)", pressedColor: "rgb(220, 30, 40)", labelColor: "#fff" },
 
     // ── 特殊ボタン（天板中央ストリップ）─────────────────
-    { index: 16, label: "PS",      x: 404, y: 70, w: 30, h: 30, soundCategory: "upbtn", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#ffffffca" },
-    { index:  8, label: "Share",   x: 452, y: 70, w: 22, h: 22, soundCategory: "upbtn", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#ffffffca" },
-    { index:  9, label: "Options", x: 500, y: 70, w: 22, h: 22, soundCategory: "upbtn", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#ffffffca" },
-    { index: 10, label: "L3",      x: 548, y: 70, w: 22, h: 22, soundCategory: "upbtn", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#ffffffca" },
-    { index: 11, label: "R3",      x: 596, y: 70, w: 22, h: 22, soundCategory: "upbtn", color: "rgb(0, 0, 0)", pressedColor: "rgb(220, 30, 40)", labelColor: "#ffffffca" },
+    { index: 16, label: "PS",      x: 404, y: 70, w: 30, h: 30, soundCategory: "upbtn", color: "rgb(45, 45, 45)", pressedColor: "rgb(220, 30, 40)", labelColor: "#ffffffca" },
+    { index:  8, label: "Share",   x: 452, y: 70, w: 22, h: 22, soundCategory: "upbtn", color: "rgb(45, 45, 45)", pressedColor: "rgb(220, 30, 40)", labelColor: "#ffffffca" },
+    { index:  9, label: "Options", x: 500, y: 70, w: 22, h: 22, soundCategory: "upbtn", color: "rgb(45, 45, 45)", pressedColor: "rgb(220, 30, 40)", labelColor: "#ffffffca" },
+    { index: 10, label: "L3",      x: 548, y: 70, w: 22, h: 22, soundCategory: "upbtn", color: "rgb(45, 45, 45)", pressedColor: "rgb(220, 30, 40)", labelColor: "#ffffffca" },
+    { index: 11, label: "R3",      x: 596, y: 70, w: 22, h: 22, soundCategory: "upbtn", color: "rgb(45, 45, 45)", pressedColor: "rgb(220, 30, 40)", labelColor: "#ffffffca" },
 
     // ── レバー方向表示（d-padボタンとして認識される場合）──
     { index: 12, label: "↑", x: 181, y: 140, w: 0, h: 0, soundCategory: "lever" },  // サイズ0で非表示
@@ -370,7 +370,7 @@ const FIGHTING_STICK_SIMPLE_CONFIG = {
       simpleMode: true,                  // 🆕 シンプルモード（シャフト/ベース非描画）
       stickMaskShapes: [
         // 簡易版ではレバーの動きが分かるようにマスクは暗い色で目立たなくする
-        { type: "circle", cx: 181, cy: 209, r: 60, fill: "#1a1a1a", gradient: false }
+        { type: "circle", cx: 181, cy: 209, r: 60, fill: "#000000", gradient: false }
       ] 
     },
   ],

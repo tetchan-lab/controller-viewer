@@ -261,6 +261,42 @@
             </div>
           </details>
           
+          <!-- Fighting Stick Mini (簡易版) 設定 -->
+          <details class="setting-section" open>
+            <summary>🕹️ Fighting Stick Mini（簡易版）</summary>
+            <div class="color-setting-row">
+              <label for="simple-bgcolor">背景色（クロマキー用）</label>
+              <input type="color" id="simple-bgcolor" value="#00ff00" />
+              <button class="preset-btn" onclick="colorCustomizer.setSimpleBgColor('#00ff00'); document.getElementById('simple-bgcolor').value='#00ff00';" title="緑">🟢</button>
+              <button class="preset-btn" onclick="colorCustomizer.setSimpleBgColor('#0000ff'); document.getElementById('simple-bgcolor').value='#0000ff';" title="青">🔵</button>
+              <button class="preset-btn" onclick="colorCustomizer.setSimpleBgColor('#ff00ff'); document.getElementById('simple-bgcolor').value='#ff00ff';" title="マゼンタ">🟣</button>
+            </div>
+            <div class="color-setting-row">
+              <label for="simple-lever-color">レバー色（静止時）</label>
+              <input type="color" id="simple-lever-color" value="#e82832" />
+            </div>
+            <div class="color-setting-row">
+              <label for="simple-active-lever-color">レバー色（動作時）</label>
+              <input type="color" id="simple-active-lever-color" value="#e82832" />
+              <span class="hint">未設定時は静止時と同じ</span>
+            </div>
+            <div class="color-setting-row">
+              <label for="simple-mask-color">マスク色（ボール）</label>
+              <input type="color" id="simple-mask-color" value="#1c3005" />
+            </div>
+            <div class="color-setting-row">
+              <label for="simple-brightness">明るさ: <span id="simple-brightness-value">20</span></label>
+              <input 
+                type="range" 
+                id="simple-brightness" 
+                min="0" 
+                max="100" 
+                value="20" 
+                oninput="colorCustomizer.setBrightness('fightingStickMiniSimple', this.value); document.getElementById('simple-brightness-value').textContent=this.value;" 
+              />
+            </div>
+          </details>
+          
           <!-- リセットボタン -->
           <div class="setting-row">
             <button class="reset-btn" id="color-reset-btn">デフォルトに戻す</button>

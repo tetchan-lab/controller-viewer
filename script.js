@@ -64,7 +64,9 @@ function applyConfig(config) {
   if (config.renderMode === "simple") {
     // 簡易モード: 画像を非表示、背景色を設定
     elements.controllerImg.style.display = "none";
-    wrapper.style.backgroundColor = config.backgroundColor || "#1a1a1a";
+    // クエリパラメーターまたはlocalStorageから背景色を取得（なければconfigのデフォルト値）
+    const bgcolor = colorCustomizer.getBgColor() || config.backgroundColor;
+    wrapper.style.backgroundColor = bgcolor;
   } else {
     // 通常モード: 画像を表示
     elements.controllerImg.style.display = "block";
@@ -1344,10 +1346,29 @@ function drawStickIndicator(ctx, stick, axisX, axisY) {
   ctx.lineWidth = 2;
   ctx.stroke();
 
-  // スティック位置のドット
+  // スティック位置のドット（カラーカスタマイザーから色を取得）
+  const isMoving = Math.abs(axisX) > 0.1 || Math.abs(axisY) > 0.1;
+  let leverColor = "rgba(220, 40, 50, 0.85)"; // デフォルト色
+  
+  if (typeof colorCustomizer !== 'undefined' && colorCustomizer) {
+    const settings = colorCustomizer.getSettings();
+    // 動作時の色が設定されている場合は動作時の色を、なければ静止時の色を使用
+    const colorHex = isMoving && settings.fightingStickMini.activeLever 
+      ? settings.fightingStickMini.activeLever 
+      : settings.fightingStickMini.lever;
+    
+    // 16進カラーをrgbaに変換（不透明度0.85）
+    if (colorHex) {
+      const r = parseInt(colorHex.slice(1, 3), 16);
+      const g = parseInt(colorHex.slice(3, 5), 16);
+      const b = parseInt(colorHex.slice(5, 7), 16);
+      leverColor = `rgba(${r}, ${g}, ${b}, 0.85)`;
+    }
+  }
+  
   ctx.beginPath();
   ctx.arc(dotX, dotY, 8, 0, Math.PI * 2);
-  ctx.fillStyle = "rgba(220, 40, 50, 0.85)";
+  ctx.fillStyle = leverColor;
   ctx.fill();
 }
 
@@ -1484,6 +1505,8 @@ function getBrightnessBoost() {
   // 0〜255 の範囲内でクランプ
   return isNaN(num) ? null : Math.max(0, Math.min(255, num));
 }
+
+
 
 /**
  * ゲームパッドがデバイスフィルターに一致するかチェックする。
@@ -1759,6 +1782,30 @@ async function changeSoundset(soundset) {
   updateObsUrl();
 }
 
+// ── カラー設定 ────────────────────────────────────────────────
+
+/**
+ * カラー設定モーダルを開く
+ */
+function openColorSettings() {
+  const modal = document.getElementById('color-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+  }
+}
+
+/**
+ * カラー設定モーダルを閉じる
+ */
+function closeColorSettings() {
+  const modal = document.getElementById('color-modal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+
+
 // ── OBS用URL生成 ──────────────────────────────────────────────
 
 /**
@@ -1855,7 +1902,7 @@ function generateObsUrl() {
         const activeStickColor = settings.dualsense.activeStick.replace('#', '');
         params.push(`active-stick-color=${activeStickColor}`);
       }
-    } else if (state.currentConfig.id === 'fightingStickMini') {
+    } else if (state.currentConfig.id === 'fightingStickMini' || state.currentConfig.id === 'fightingStickMiniSimple') {
       // デフォルト値と異なる場合のみパラメータを追加
       const leverColor = settings.fightingStickMini.lever;
       const maskColor = settings.fightingStickMini.mask;
@@ -1879,6 +1926,18 @@ function generateObsUrl() {
     // デフォルト値（20）と異なる場合のみURLに追加
     if (boost !== 20) {
       params.push(`brightness=${boost}`);
+    }
+  }
+  
+  // bgcolor パラメーター（簡易版背景色）
+  if (state.currentConfig && state.currentConfig.renderMode === 'simple') {
+    if (typeof colorCustomizer !== 'undefined' && colorCustomizer) {
+      const settings = colorCustomizer.getSettings();
+      const bgcolor = settings.fightingStickMiniSimple.bg;
+      if (bgcolor && bgcolor !== '#00ff00') {
+        // デフォルト値（#00ff00）と異なる場合のみURLに追加
+        params.push(`bgcolor=${bgcolor.replace('#', '')}`);
+      }
     }
   }
   
@@ -1939,7 +1998,7 @@ function generateWindowUrl() {
         const activeStickColor = settings.dualsense.activeStick.replace('#', '');
         params.push(`active-stick-color=${activeStickColor}`);
       }
-    } else if (state.currentConfig.id === 'fightingStickMini') {
+    } else if (state.currentConfig.id === 'fightingStickMini' || state.currentConfig.id === 'fightingStickMiniSimple') {
       // デフォルト値と異なる場合のみパラメータを追加
       const leverColor = settings.fightingStickMini.lever;
       const maskColor = settings.fightingStickMini.mask;
@@ -1963,6 +2022,18 @@ function generateWindowUrl() {
     // デフォルト値（20）と異なる場合のみURLに追加
     if (boost !== 20) {
       params.push(`brightness=${boost}`);
+    }
+  }
+  
+  // bgcolor パラメーター（簡易版背景色）
+  if (state.currentConfig && state.currentConfig.renderMode === 'simple') {
+    if (typeof colorCustomizer !== 'undefined' && colorCustomizer) {
+      const settings = colorCustomizer.getSettings();
+      const bgcolor = settings.fightingStickMiniSimple.bg;
+      if (bgcolor && bgcolor !== '#00ff00') {
+        // デフォルト値（#00ff00）と異なる場合のみURLに追加
+        params.push(`bgcolor=${bgcolor.replace('#', '')}`);
+      }
     }
   }
   

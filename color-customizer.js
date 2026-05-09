@@ -30,6 +30,13 @@ class ColorCustomizer {
         activeLever: null,     // 動作時の色（nullの場合はleverと同じ）
         mask: "#1c3005",       // マスク色（ボール周辺とシャフト）
         brightness: 20         // レバー明るさ（0〜100）
+      },
+      fightingStickMiniSimple: {
+        lever: "#e82832",      // レバー色
+        activeLever: null,     // 動作時の色（nullの場合はleverと同じ）
+        mask: "#1c3005",       // マスク色（ボール周辺とシャフト）
+        brightness: 20,        // レバー明るさ（0〜100）
+        bg: "#00ff00"          // 背景色（クロマキー用の緑）
       }
     };
     
@@ -46,41 +53,40 @@ class ColorCustomizer {
    */
   hasColorInURL() {
     const params = new URLSearchParams(window.location.search);
-    return params.has('stick-color') || params.has('mask-color') || params.has('active-stick-color');
+    return params.has('stick-color') || params.has('mask-color') || params.has('active-stick-color') || params.has('bgcolor');
   }
 
   /**
    * LocalStorageから設定を読み込む
+   * 優先順位: URLパラメーター > localStorage > デフォルト値
    * @returns {object} 設定オブジェクト
    */
   loadSettings() {
-    // URLパラメーターから色設定を取得（優先）
-    const urlColors = this.getColorsFromURL();
-    if (urlColors) {
-      return urlColors;
-    }
+    // 1. デフォルト設定をベースにする
+    let settings = JSON.parse(JSON.stringify(this.defaultColors));
     
-    // LocalStorageから設定を読み込む
+    // 2. localStorageから読み込んでマージ
     try {
       const saved = localStorage.getItem(this.storageKey);
       if (saved) {
         const parsed = JSON.parse(saved);
-        // デフォルト設定とマージして不足しているプロパティを補完
-        return {
-          dualsense: {
-            ...this.defaultColors.dualsense,
-            ...parsed.dualsense
-          },
-          fightingStickMini: {
-            ...this.defaultColors.fightingStickMini,
-            ...parsed.fightingStickMini
-          }
-        };
+        settings.dualsense = { ...settings.dualsense, ...parsed.dualsense };
+        settings.fightingStickMini = { ...settings.fightingStickMini, ...parsed.fightingStickMini };
+        settings.fightingStickMiniSimple = { ...settings.fightingStickMiniSimple, ...parsed.fightingStickMiniSimple };
       }
     } catch (e) {
       console.warn("カラー設定の読み込みに失敗しました:", e);
     }
-    return JSON.parse(JSON.stringify(this.defaultColors));
+    
+    // 3. URLパラメーターで上書き（最優先）
+    const urlColors = this.getColorsFromURL();
+    if (urlColors) {
+      if (urlColors.dualsense) settings.dualsense = { ...settings.dualsense, ...urlColors.dualsense };
+      if (urlColors.fightingStickMini) settings.fightingStickMini = { ...settings.fightingStickMini, ...urlColors.fightingStickMini };
+      if (urlColors.fightingStickMiniSimple) settings.fightingStickMiniSimple = { ...settings.fightingStickMiniSimple, ...urlColors.fightingStickMiniSimple };
+    }
+    
+    return settings;
   }
 
   /**
@@ -92,28 +98,36 @@ class ColorCustomizer {
     const stickColor = params.get('stick-color');
     const activeStickColor = params.get('active-stick-color');
     const maskColor = params.get('mask-color');
+    const bgColor = params.get('bgcolor');
     const controller = params.get('controller');
     
     // パラメーターが存在しない場合はnull
-    if (!stickColor && !activeStickColor && !maskColor) {
+    if (!stickColor && !activeStickColor && !maskColor && !bgColor) {
       return null;
     }
     
-    // デフォルト設定をベースにする
-    const settings = JSON.parse(JSON.stringify(this.defaultColors));
+    const result = {};
     
     // コントローラータイプに応じて色を適用
     if (controller === 'dualsense') {
-      if (stickColor) settings.dualsense.stick = this.normalizeColor(stickColor);
-      if (activeStickColor) settings.dualsense.activeStick = this.normalizeColor(activeStickColor);
-      if (maskColor) settings.dualsense.mask = this.normalizeColor(maskColor);
+      result.dualsense = {};
+      if (stickColor) result.dualsense.stick = this.normalizeColor(stickColor);
+      if (activeStickColor) result.dualsense.activeStick = this.normalizeColor(activeStickColor);
+      if (maskColor) result.dualsense.mask = this.normalizeColor(maskColor);
     } else if (controller === 'fightingStickMini') {
-      if (stickColor) settings.fightingStickMini.lever = this.normalizeColor(stickColor);
-      if (activeStickColor) settings.fightingStickMini.activeLever = this.normalizeColor(activeStickColor);
-      if (maskColor) settings.fightingStickMini.mask = this.normalizeColor(maskColor);
+      result.fightingStickMini = {};
+      if (stickColor) result.fightingStickMini.lever = this.normalizeColor(stickColor);
+      if (activeStickColor) result.fightingStickMini.activeLever = this.normalizeColor(activeStickColor);
+      if (maskColor) result.fightingStickMini.mask = this.normalizeColor(maskColor);
+    } else if (controller === 'fightingStickMiniSimple') {
+      result.fightingStickMiniSimple = {};
+      if (stickColor) result.fightingStickMiniSimple.lever = this.normalizeColor(stickColor);
+      if (activeStickColor) result.fightingStickMiniSimple.activeLever = this.normalizeColor(activeStickColor);
+      if (maskColor) result.fightingStickMiniSimple.mask = this.normalizeColor(maskColor);
+      if (bgColor) result.fightingStickMiniSimple.bg = this.normalizeColor(bgColor);
     }
     
-    return settings;
+    return Object.keys(result).length > 0 ? result : null;
   }
 
   /**
@@ -240,7 +254,7 @@ class ColorCustomizer {
 
   /**
    * 指定コントローラーの明るさ設定をconfig.jsに適用
-   * @param {string} controller - "dualsense" または "fightingStickMini"
+   * @param {string} controller - "dualsense", "fightingStickMini", "fightingStickMiniSimple"
    */
   applyBrightness(controller) {
     const brightness = this.settings[controller].brightness;
@@ -249,12 +263,15 @@ class ColorCustomizer {
       DUALSENSE_CONFIG.stickBrightnessBoost = brightness;
     } else if (controller === "fightingStickMini" && typeof FIGHTING_STICK_MINI_CONFIG !== "undefined") {
       FIGHTING_STICK_MINI_CONFIG.stickBrightnessBoost = brightness;
+    } else if (controller === "fightingStickMiniSimple" && typeof FIGHTING_STICK_SIMPLE_CONFIG !== "undefined") {
+      FIGHTING_STICK_SIMPLE_CONFIG.stickBrightnessBoost = brightness;
     }
     
     // 現在表示中のコントローラーの場合、設定を即座に反映
     if (typeof state !== "undefined" && state.currentConfig) {
       if ((controller === "dualsense" && state.currentConfig.id === "dualsense") ||
-          (controller === "fightingStickMini" && state.currentConfig.id === "fightingStickMini")) {
+          (controller === "fightingStickMini" && state.currentConfig.id === "fightingStickMini") ||
+          (controller === "fightingStickMiniSimple" && state.currentConfig.id === "fightingStickMiniSimple")) {
         state.currentConfig.stickBrightnessBoost = brightness;
       }
     }
@@ -287,7 +304,7 @@ class ColorCustomizer {
   }
 
   /**
-   * Fighting Stick Miniの色設定をconfig.jsに適用
+   * Fighting Stick Mini（通常版）の色設定をconfig.jsに適用
    */
   applyFightingStickColors() {
     if (typeof FIGHTING_STICK_MINI_CONFIG === "undefined") return;
@@ -296,12 +313,10 @@ class ColorCustomizer {
     const activeLeverColor = this.settings.fightingStickMini.activeLever;
     const maskColor = this.settings.fightingStickMini.mask;
     
-    // レバーの色を適用
     FIGHTING_STICK_MINI_CONFIG.sticks.forEach(stick => {
       if (stick.type === "lever") {
         stick.stickColor = leverColor;
         stick.activeStickColor = activeLeverColor;
-        // マスク形状の色も更新（ボール周辺とシャフトをまとめて）
         if (stick.stickMaskShapes) {
           stick.stickMaskShapes.forEach(shape => {
             shape.fill = maskColor;
@@ -310,7 +325,31 @@ class ColorCustomizer {
       }
     });
     
-    // 再描画をトリガー
+    this.reapplyCurrentConfig();
+  }
+
+  /**
+   * Fighting Stick Mini（簡易版）の色設定をconfig.jsに適用
+   */
+  applySimpleColors() {
+    if (typeof FIGHTING_STICK_SIMPLE_CONFIG === "undefined") return;
+    
+    const leverColor = this.settings.fightingStickMiniSimple.lever;
+    const activeLeverColor = this.settings.fightingStickMiniSimple.activeLever;
+    const maskColor = this.settings.fightingStickMiniSimple.mask;
+    
+    FIGHTING_STICK_SIMPLE_CONFIG.sticks.forEach(stick => {
+      if (stick.type === "lever") {
+        stick.stickColor = leverColor;
+        stick.activeStickColor = activeLeverColor;
+        if (stick.stickMaskShapes) {
+          stick.stickMaskShapes.forEach(shape => {
+            shape.fill = maskColor;
+          });
+        }
+      }
+    });
+    
     this.reapplyCurrentConfig();
   }
 
@@ -338,8 +377,85 @@ class ColorCustomizer {
   applyAllColors() {
     this.applyDualSenseColors();
     this.applyFightingStickColors();
+    this.applySimpleColors();
     this.applyBrightness("dualsense");
     this.applyBrightness("fightingStickMini");
+    this.applyBrightness("fightingStickMiniSimple");
+  }
+
+  /**
+   * 簡易版背景色を取得
+   * @returns {string} 背景色
+   */
+  getBgColor() {
+    return this.settings.fightingStickMiniSimple.bg || this.defaultColors.fightingStickMiniSimple.bg;
+  }
+
+  /**
+   * 簡易版背景色を設定
+   * @param {string} color - 16進カラー（#rrggbb）
+   */
+  setSimpleBgColor(color) {
+    this.settings.fightingStickMiniSimple.bg = color;
+    this.saveSettings();
+    this.applySimpleBgColorToDOM(color);
+    
+    // OBS用URLを更新
+    if (typeof updateObsUrl === 'function') {
+      updateObsUrl();
+    }
+  }
+
+  /**
+   * 簡易版の背景色を画面に即座に反映
+   * @param {string} color - 背景色（#rrggbb）
+   */
+  applySimpleBgColorToDOM(color) {
+    if (typeof state !== 'undefined' && state.currentConfig && state.currentConfig.renderMode === 'simple') {
+      const wrapper = document.getElementById('controller-wrapper');
+      if (wrapper) {
+        wrapper.style.backgroundColor = color;
+      }
+    }
+  }
+
+  /**
+   * Fighting Stick Mini (簡易版) のレバー色を設定
+   * @param {string} color - カラーコード（例: "#ff0000"）
+   */
+  setSimpleLeverColor(color) {
+    this.settings.fightingStickMiniSimple.lever = color;
+    this.saveSettings();
+    this.applySimpleColors();
+    if (typeof updateObsUrl === 'function') {
+      updateObsUrl();
+    }
+  }
+
+  /**
+   * Fighting Stick Mini (簡易版) の動作時レバー色を設定
+   * @param {string} color - カラーコード（例: "#ff4444"）またはnull
+   */
+  setSimpleActiveLeverColor(color) {
+    this.settings.fightingStickMiniSimple.activeLever = color || null;
+    this.saveSettings();
+    this.applySimpleColors();
+    if (typeof updateObsUrl === 'function') {
+      updateObsUrl();
+    }
+  }
+
+  /**
+   * Fighting Stick Mini (簡易版) のマスク色を設定
+   * @param {string} color - カラーコード（例: "#1c3005"）
+   */
+  setSimpleMaskColor(color) {
+    this.settings.fightingStickMiniSimple.mask = color;
+    this.saveSettings();
+    this.applySimpleColors();
+    if (typeof updateObsUrl === 'function') {
+      updateObsUrl();
+    }
   }
 
   /**
@@ -350,6 +466,7 @@ class ColorCustomizer {
     this.saveSettings();
     this.applyAllColors();
     this.updateUIInputs();
+    this.applySimpleBgColorToDOM(this.defaultColors.fightingStickMiniSimple.bg);
   }
 
   /**
@@ -364,7 +481,12 @@ class ColorCustomizer {
       "fightingstick-lever-color": this.settings.fightingStickMini.lever,
       "fightingstick-active-lever-color": this.settings.fightingStickMini.activeLever || this.settings.fightingStickMini.lever,
       "fightingstick-mask-color": this.settings.fightingStickMini.mask,
-      "fightingstick-brightness": this.settings.fightingStickMini.brightness
+      "fightingstick-brightness": this.settings.fightingStickMini.brightness,
+      "simple-bgcolor": this.settings.fightingStickMiniSimple.bg,
+      "simple-lever-color": this.settings.fightingStickMiniSimple.lever,
+      "simple-active-lever-color": this.settings.fightingStickMiniSimple.activeLever || this.settings.fightingStickMiniSimple.lever,
+      "simple-mask-color": this.settings.fightingStickMiniSimple.mask,
+      "simple-brightness": this.settings.fightingStickMiniSimple.brightness
     };
     
     for (const [id, value] of Object.entries(inputs)) {
@@ -460,6 +582,52 @@ class ColorCustomizer {
       }
     }
     
+    // 簡易版背景色
+    const simpleBgInput = document.getElementById('simple-bgcolor');
+    if (simpleBgInput) {
+      simpleBgInput.value = this.settings.fightingStickMiniSimple.bg;
+      simpleBgInput.addEventListener('input', (e) => {
+        this.setSimpleBgColor(e.target.value);
+      });
+    }
+
+    // 簡易版レバー色（静止時）
+    const simpleLeverInput = document.getElementById('simple-lever-color');
+    if (simpleLeverInput) {
+      simpleLeverInput.value = this.settings.fightingStickMiniSimple.lever;
+      simpleLeverInput.addEventListener('input', (e) => {
+        this.setSimpleLeverColor(e.target.value);
+      });
+    }
+
+    // 簡易版レバー色（動作時）
+    const simpleActiveLeverInput = document.getElementById('simple-active-lever-color');
+    if (simpleActiveLeverInput) {
+      simpleActiveLeverInput.value = this.settings.fightingStickMiniSimple.activeLever || this.settings.fightingStickMiniSimple.lever;
+      simpleActiveLeverInput.addEventListener('input', (e) => {
+        this.setSimpleActiveLeverColor(e.target.value);
+      });
+    }
+
+    // 簡易版マスク色
+    const simpleMaskInput = document.getElementById('simple-mask-color');
+    if (simpleMaskInput) {
+      simpleMaskInput.value = this.settings.fightingStickMiniSimple.mask;
+      simpleMaskInput.addEventListener('input', (e) => {
+        this.setSimpleMaskColor(e.target.value);
+      });
+    }
+
+    // 簡易版明るさスライダー
+    const simpleBrightnessInput = document.getElementById('simple-brightness');
+    if (simpleBrightnessInput) {
+      simpleBrightnessInput.value = this.settings.fightingStickMiniSimple.brightness;
+      const simpleBrightnessValue = document.getElementById('simple-brightness-value');
+      if (simpleBrightnessValue) {
+        simpleBrightnessValue.textContent = this.settings.fightingStickMiniSimple.brightness;
+      }
+    }
+
     // リセットボタン
     const resetBtn = document.getElementById("color-reset-btn");
     if (resetBtn) {
