@@ -72,6 +72,8 @@ const DUALSENSE_CONFIG = {
 
   /**
    * スティック・レバーの色と明るさ調整
+   * ⚠ stickColor / マスクの fill はページ読み込み時に color-customizer.js で上書きされます。
+   *   色のデフォルト値を変更したい場合は color-customizer.js の defaultColors を編集してください。
    *   activeStickColor     : スティック/レバーが動いたときの色（未設定の場合は stickColor と同じ）
    *                          デフォルト: null（静止時と同じ色を使用）
    *   stickBrightnessBoost : 動作時の色にさらに加算する明るさ調整量（0〜255）
@@ -141,10 +143,11 @@ const DUALSENSE_CONFIG = {
       radius: 48,
       stickBallRadius: 40,
       stickTilt: 20,
-      stickColor: "#e82832",
+      stickColor: "#e82832",            // ⚠ color-customizer.js で管理・上書きされます
       activeStickColor: null,  // 動作時の色（nullの場合は stickColor を使用）
       stickMaskShapes: [
-        { type: "circle", cx: 272, cy: 262, r: 50, fill: "#1a1a1a", gradient: true }  // 固定球体（グラデーション有効）
+        // 固定球体（グラデーション有効）⚠ fill は color-customizer.js で上書きされます）
+        { type: "circle", cx: 272, cy: 262, r: 50, fill: "#1a1a1a", gradient: true }
       ]
     },
     { 
@@ -157,10 +160,11 @@ const DUALSENSE_CONFIG = {
       radius: 48,
       stickBallRadius: 40,
       stickTilt: 20,
-      stickColor: "#e82832",
+      stickColor: "#e82832",            // ⚠ color-customizer.js で管理・上書きされます
       activeStickColor: null,  // 動作時の色（nullの場合は stickColor を使用）
       stickMaskShapes: [
-        { type: "circle", cx: 527, cy: 262, r: 50, fill: "#1a1a1a", gradient: true }  // 固定球体（グラデーション有効）
+        // 固定球体（グラデーション有効） ⚠ fill は color-customizer.js で上書きされます
+        { type: "circle", cx: 527, cy: 262, r: 50, fill: "#1a1a1a", gradient: true }
       ]
     },
   ],
@@ -210,6 +214,8 @@ const FIGHTING_STICK_MINI_CONFIG = {
 
   /**
    * スティック・レバーの色と明るさ調整
+   * ⚠ stickColor / マスクの fill はページ読み込み時に color-customizer.js で上書きされます。
+   *   色のデフォルト値を変更したい場合は color-customizer.js の defaultColors を編集してください。
    *   activeStickColor     : スティック/レバーが動いたときの色（未設定の場合は stickColor と同じ）
    *                          デフォルト: null（静止時と同じ色を使用）
    *   stickBrightnessBoost : 動作時の色にさらに加算する明るさ調整量（0〜255）
@@ -265,12 +271,12 @@ const FIGHTING_STICK_MINI_CONFIG = {
       stickBallRadius: 56,               // ボール半径 px
       stickTilt: 24,                     // 最大傾き量 px（デフォルト：20）
       stickShaftWidth: 30,               // シャフトの太さ px
-      stickColor: "#e82832",            // ボール・シャフトの色（デフォルト：#c8222a）
+      stickColor: "#e82832",            // ボール・シャフトの色 ⚠ color-customizer.js で管理・上書きされます
       activeStickColor: null,            // 動作時の色（nullの場合は stickColor を使用）
       stickMaskShapes: [
         // 元写真のレバーを视覚的に消す覚い形状
-        { type: "circle",  cx: 194, cy: 73,  r: 60,           fill: "#1c3005" }, // ボール周辺（背景グリーン）
-        { type: "rect",    x: 176,  y: 124,  w: 36, h: 70, rx: 10, fill: "#1c3005" }, // シャフト（ボディ白）
+        { type: "circle",  cx: 194, cy: 73,  r: 60,           fill: "#1c3005" }, // ボール周辺（黒）⚠ fill は color-customizer.js で上書き
+        { type: "rect",    x: 176,  y: 124,  w: 36, h: 70, rx: 10, fill: "#1c3005" }, // シャフト（黒）⚠ fill は color-customizer.js で上書き
         //{ type: "ellipse", cx: 187, cy: 194, rx: 68, ry: 32,  fill: "#161616" }, // ベースディスク（黒）
       ] },
   ],
@@ -290,7 +296,7 @@ const FIGHTING_STICK_SIMPLE_CONFIG = {
   deviceNamePatterns: [],
 
   /** 画像の代わりに背景色を使用 */
-  backgroundColor: "#d1d1d1",  // UI上でクロマキー用に変更可能
+  backgroundColor: "#d1d1d1",  // UI上でクロマキー用に変更可能 ⚠ color-customizer.js の bg プロパティで上書きされます
   imageWidth: 800,
   imageHeight: 425,
 
@@ -365,11 +371,12 @@ const FIGHTING_STICK_SIMPLE_CONFIG = {
       stickBallY: 209,                   // ニュートラル時のボール中心Y（簡易版では cy と同じ）
       stickBallRadius: 56,               // ボール半径（簡易版では少し大きめ）
       stickTilt: 24,                     // 最大傾き量 px
-      stickColor: "#e82832",             // ボール色
+      stickColor: "#e82832",           // ボール色 ⚠ color-customizer.js で管理・上書きされます
       activeStickColor: null,
       simpleMode: true,                  // 🆕 シンプルモード（シャフト/ベース非描画）
       stickMaskShapes: [
         // 簡易版ではレバーの動きが分かるようにマスクは暗い色で目立たなくする
+        // ⚠ fill は color-customizer.js で上書きされます
         { type: "circle", cx: 181, cy: 209, r: 60, fill: "#000000", gradient: false }
       ] 
     },

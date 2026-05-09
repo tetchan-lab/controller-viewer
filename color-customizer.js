@@ -18,6 +18,14 @@
 class ColorCustomizer {
   constructor() {
     this.storageKey = "controller-color-settings";
+    // ────────────────────────────────────────────────────────────
+    // 色設定のデフォルト値（Single Source of Truth）
+    // もとは config.js の各コントローラー定義（stickColor / fill 等）に
+    // 色が書かれていましたが、UIリアルタイム変更・LocalStorage保存・
+    // URLパラメーター指定を統合するためにここへ集約されました。
+    // 色のデフォルト値を変更したい場合はここを編集してください。
+    // ページ読み込み時にこの値が config.js の色設定を上書きします。
+    // ────────────────────────────────────────────────────────────
     this.defaultColors = {
       dualsense: {
         stick: "#e82832",      // アナログスティック色
@@ -28,13 +36,13 @@ class ColorCustomizer {
       fightingStickMini: {
         lever: "#e82832",      // レバー色
         activeLever: null,     // 動作時の色（nullの場合はleverと同じ）
-        mask: "#1c3005",       // マスク色（ボール周辺とシャフト）
+        mask: "#1a1a1a",       // マスク色（ボール周辺とシャフト）
         brightness: 20         // レバー明るさ（0〜100）
       },
       fightingStickMiniSimple: {
         lever: "#e82832",      // レバー色
         activeLever: null,     // 動作時の色（nullの場合はleverと同じ）
-        mask: "#1c3005",       // マスク色（ボール周辺とシャフト）
+        mask: "#1a1a1a",       // マスク色（ボール周辺）
         brightness: 20,        // レバー明るさ（0〜100）
         bg: "#00ff00"          // 背景色（クロマキー用の緑）
       }
@@ -506,86 +514,60 @@ class ColorCustomizer {
 
   /**
    * カラーピッカーUIを初期化
+   * イベントリスナーの登録のみを行い、初期値の反映は updateUIInputs() に委ねる
    */
   initializeUI() {
     // DualSense アナログスティック色
     const dualsenseStickInput = document.getElementById("dualsense-stick-color");
     if (dualsenseStickInput) {
-      dualsenseStickInput.value = this.settings.dualsense.stick;
       dualsenseStickInput.addEventListener("input", (e) => {
         this.setDualSenseStickColor(e.target.value);
       });
     }
-    
+
     // DualSense マスク色
     const dualsenseMaskInput = document.getElementById("dualsense-mask-color");
     if (dualsenseMaskInput) {
-      dualsenseMaskInput.value = this.settings.dualsense.mask;
       dualsenseMaskInput.addEventListener("input", (e) => {
         this.setDualSenseMaskColor(e.target.value);
       });
     }
-    
+
     // DualSense 動作時のスティック色
     const dualsenseActiveStickInput = document.getElementById("dualsense-active-stick-color");
     if (dualsenseActiveStickInput) {
-      dualsenseActiveStickInput.value = this.settings.dualsense.activeStick || this.settings.dualsense.stick;
       dualsenseActiveStickInput.addEventListener("input", (e) => {
         this.setDualSenseActiveStickColor(e.target.value);
       });
     }
-    
+
     // Fighting Stick Mini レバー色
     const fightingStickLeverInput = document.getElementById("fightingstick-lever-color");
     if (fightingStickLeverInput) {
-      fightingStickLeverInput.value = this.settings.fightingStickMini.lever;
       fightingStickLeverInput.addEventListener("input", (e) => {
         this.setFightingStickLeverColor(e.target.value);
       });
     }
-    
+
     // Fighting Stick Mini マスク色
     const fightingStickMaskInput = document.getElementById("fightingstick-mask-color");
     if (fightingStickMaskInput) {
-      fightingStickMaskInput.value = this.settings.fightingStickMini.mask;
       fightingStickMaskInput.addEventListener("input", (e) => {
         this.setFightingStickMaskColor(e.target.value);
       });
     }
-    
+
     // Fighting Stick Mini 動作時のレバー色
     const fightingStickActiveLeverInput = document.getElementById("fightingstick-active-lever-color");
     if (fightingStickActiveLeverInput) {
-      fightingStickActiveLeverInput.value = this.settings.fightingStickMini.activeLever || this.settings.fightingStickMini.lever;
       fightingStickActiveLeverInput.addEventListener("input", (e) => {
         this.setFightingStickActiveLeverColor(e.target.value);
       });
     }
-    
-    // DualSense 明るさスライダー
-    const dualsenseBrightnessInput = document.getElementById("dualsense-brightness");
-    if (dualsenseBrightnessInput) {
-      dualsenseBrightnessInput.value = this.settings.dualsense.brightness;
-      const dualsenseBrightnessValue = document.getElementById("dualsense-brightness-value");
-      if (dualsenseBrightnessValue) {
-        dualsenseBrightnessValue.textContent = this.settings.dualsense.brightness;
-      }
-    }
-    
-    // Fighting Stick Mini 明るさスライダー
-    const fightingStickBrightnessInput = document.getElementById("fightingstick-brightness");
-    if (fightingStickBrightnessInput) {
-      fightingStickBrightnessInput.value = this.settings.fightingStickMini.brightness;
-      const fightingStickBrightnessValue = document.getElementById("fightingstick-brightness-value");
-      if (fightingStickBrightnessValue) {
-        fightingStickBrightnessValue.textContent = this.settings.fightingStickMini.brightness;
-      }
-    }
-    
+
     // 簡易版背景色
     const simpleBgInput = document.getElementById('simple-bgcolor');
     if (simpleBgInput) {
-      simpleBgInput.value = this.settings.fightingStickMiniSimple.bg;
       simpleBgInput.addEventListener('input', (e) => {
         this.setSimpleBgColor(e.target.value);
       });
@@ -594,7 +576,6 @@ class ColorCustomizer {
     // 簡易版レバー色（静止時）
     const simpleLeverInput = document.getElementById('simple-lever-color');
     if (simpleLeverInput) {
-      simpleLeverInput.value = this.settings.fightingStickMiniSimple.lever;
       simpleLeverInput.addEventListener('input', (e) => {
         this.setSimpleLeverColor(e.target.value);
       });
@@ -603,7 +584,6 @@ class ColorCustomizer {
     // 簡易版レバー色（動作時）
     const simpleActiveLeverInput = document.getElementById('simple-active-lever-color');
     if (simpleActiveLeverInput) {
-      simpleActiveLeverInput.value = this.settings.fightingStickMiniSimple.activeLever || this.settings.fightingStickMiniSimple.lever;
       simpleActiveLeverInput.addEventListener('input', (e) => {
         this.setSimpleActiveLeverColor(e.target.value);
       });
@@ -612,20 +592,9 @@ class ColorCustomizer {
     // 簡易版マスク色
     const simpleMaskInput = document.getElementById('simple-mask-color');
     if (simpleMaskInput) {
-      simpleMaskInput.value = this.settings.fightingStickMiniSimple.mask;
       simpleMaskInput.addEventListener('input', (e) => {
         this.setSimpleMaskColor(e.target.value);
       });
-    }
-
-    // 簡易版明るさスライダー
-    const simpleBrightnessInput = document.getElementById('simple-brightness');
-    if (simpleBrightnessInput) {
-      simpleBrightnessInput.value = this.settings.fightingStickMiniSimple.brightness;
-      const simpleBrightnessValue = document.getElementById('simple-brightness-value');
-      if (simpleBrightnessValue) {
-        simpleBrightnessValue.textContent = this.settings.fightingStickMiniSimple.brightness;
-      }
     }
 
     // リセットボタン
@@ -637,6 +606,9 @@ class ColorCustomizer {
         }
       });
     }
+
+    // 初期値を一括反映（URLパラメーター・localStorage・デフォルト値が適用済みの this.settings を使用）
+    this.updateUIInputs();
   }
 }
 
