@@ -800,7 +800,7 @@ function updateAnalogStick(stick, gp, config) {
  * @param {string} configId - "dualsense" | "fightingStickMini"
  */
 function switchController(configId) {
-  const config = ALL_CONFIGS_WITH_SIMPLE.find((c) => c.id === configId);
+  const config = ALL_CONFIGS.find((c) => c.id === configId);
   if (!config) return;
   applyConfig(config);
 
@@ -1082,9 +1082,9 @@ function getEffectiveSoundId(config, soundCategory, buttonIndex = null) {
     return `${config.id}_${soundCategory}`;
   }
 
-  // Fighting Stick Mini + soundset=dual の場合
+  // Fighting Stick Mini (通常版・簡易版) + soundset=dual の場合
   // 基本的に全てDualSenseのサウンドに切り替える
-  if (config.id === 'fightingStickMini' && soundset === 'dual') {
+  if (config.id.startsWith('fightingStickMini') && soundset === 'dual') {
     if (soundCategory === 'lever') {
       // レバー → DualSenseの十字キー
       return 'dualsense_dpad';
@@ -1469,7 +1469,7 @@ function getQueryConfig() {
   const params = new URLSearchParams(window.location.search);
   const id = params.get("controller");
   if (!id) return null;
-  return ALL_CONFIGS_WITH_SIMPLE.find((c) => c.id === id) || null;
+  return ALL_CONFIGS.find((c) => c.id === id) || null;
 }
 
 /**
@@ -1655,7 +1655,7 @@ async function initSoundSystem() {
   let fightingSounds = null;
   
   // DualSenseとFighting Stick Miniのサウンド定義を取得
-  for (const config of ALL_CONFIGS_WITH_SIMPLE) {
+  for (const config of ALL_CONFIGS) {
     if (config.id === 'dualsense' && config.sounds) {
       dualsenseSounds = config.sounds;
     }
@@ -1666,7 +1666,7 @@ async function initSoundSystem() {
 
   // すべてのコントローラー設定からサウンドファイルを収集（全サウンドをロード）
   const soundMap = {};
-  for (const config of ALL_CONFIGS_WITH_SIMPLE) {
+  for (const config of ALL_CONFIGS) {
     if (!config.sounds) continue;
 
     for (const [category, paths] of Object.entries(config.sounds)) {
