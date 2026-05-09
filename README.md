@@ -4,6 +4,8 @@
 
 配信・録画向けのゲームコントローラー入力可視化Webアプリです。
 **DualSense（PlayStation 5）** と **Fighting Stick Mini（HORI アーケードスティック）** を主な対象とし、ボタンやレバーを押すとリアルタイムで色が変わります。
+  
+OBS などのブラウザソース（Browser Source）として読み込むだけで使えます。
 
 **主な更新履歴:**
 - 2026/04/28：**入力サウンド機能の追加（実機からサウンド収録）**
@@ -14,8 +16,9 @@
 - 2026/05/04：**レバー軸回転機能の追加（縦置きアケコン対応）**
 - 2026/05/05：**サウンドセット切り替え機能の追加**
 - 2026/05/06：**カラーカスタマイズ機能の追加（スティック・レバー・マスクの色変更、URLパラメーター対応）**
-
-OBS などのブラウザソース（Browser Source）として読み込むだけで使えます。
+- 2026/05/07：**アナログスティック・レバーが動いたときに色を明るくする機能を追加**
+- 2026/05/07：**アナログスティック・レバー動作時（静止時と別）の色を設定できる機能を追加**
+- 2026/05/09：**Fighting Stick Mini 簡易版（画像なし・真上から見たレイアウト）を追加**
 
 ---
 
@@ -26,9 +29,11 @@ OBS などのブラウザソース（Browser Source）として読み込むだ�
 - [対応デバイス](#対応デバイス)
 - [セットアップ](#セットアップ)
 - [OBS での使い方](#obs-での使い方)
+- [タッチ入力](#タッチ入力スマホタブレット対応)
 - [キーボード/マウス入力](#キーボードマウス入力)
 - [デバイス選択機能](#デバイス選択機能)
 - [カラーカスタマイズ](#カラーカスタマイズ)
+- [Fighting Stick Mini 簡易版](#fighting-stick-mini-簡易版)
 - [サウンドシステム](#サウンドシステム)
 - [クエリパラメーター一覧](#クエリパラメーター一覧)
 - [カスタマイズ・技術仕様](#カスタマイズ技術仕様)
@@ -56,6 +61,7 @@ OBS などのブラウザソース（Browser Source）として読み込むだ�
 - **Gamepad API によるリアルタイム入力検出**（USB / Bluetooth 対応）
 - **すべての STANDARD GAMEPAD デバイスに対応**
   - DualSense、Fighting Stick Mini の設定を自動適用、または手動選択可能
+- **Fighting Stick Mini 簡易版（画像なし）** - 背景色を自由に変更できるシンプルモード（OBSのカラーキーにも対応）
 - **デバイス選択機能** - 複数コントローラー同時接続時に特定デバイスのみ表示
 - **キーボード/マウス入力対応** - ゲームパッド未接続でも動作、実機と併用可能
 - **リアルタイムサウンド再生** - 実機から収録した生音を再生（音量調整・ON/OFF 可能）
@@ -378,14 +384,12 @@ https://tetchan-lab.github.io/controller-viewer/?controller=fightingStickMini&ro
 
 ### 対応デバイス
 
-この機能は **Fighting Stick Mini** 専用です。  
+この機能は **Fighting Stick Mini**（通常版・簡易版）専用です。  
 DualSense など他のコントローラーでは無効です。
 
 ### 用途
 
-- 縦置きアーケードキャビネット（縦シューティングゲーム用筐体）での使用
-- 画面の向きに合わせてレバー方向を調整
-- 配信・録画時のレイアウト調整
+- デバイス縦置き使用時にレバー軸を変更する事で、表示レイアウトを崩さない。
 
 ---
 
@@ -396,8 +400,9 @@ DualSense など他のコントローラーでは無効です。
 
 ### 機能
 
-- **DualSense**: アナログスティック色とマスク色を個別に変更（左右まとめて）
-- **Fighting Stick Mini**: レバー色とマスク色（ボール・シャフト）を個別に変更
+- **DualSense**: アナログスティック色・動作時カラー・マスク色を個別に変更（左右まとめて）
+- **Fighting Stick Mini / 簡易版**: レバー色・動作時カラー・マスク色（ボール・シャフト）を個別に変更
+- **明るさ調整**: スティック/レバーの動作時の明るさを数値で指定可能（`?brightness=`）
 - **リアルタイム反映**: カラーピッカーで色を選択すると即座に反映
 - **URL パラメーター対応**: 設定した色情報を URL に含めて OBS で使用可能
 
@@ -429,8 +434,11 @@ URL パラメーターを使って、直接色を指定することもできま�
 
 | パラメーター | 説明 | 適用先 |
 |---|---|---|
-| `stick-color` | スティック/レバーの色（16進数、#なし） | DualSense: アナログスティック<br>Fighting Stick Mini: レバー |
-| `mask-color` | マスク形状の色（16進数、#なし） | DualSense: スティックマスク<br>Fighting Stick Mini: レバーマスク（ボール・シャフト） |
+| `stick-color` | スティック/レバーの色（16進数、#なし） | DualSense: アナログスティック<br>Fighting Stick Mini / 簡易版: レバー |
+| `mask-color` | マスク形状の色（16進数、#なし） | DualSense: スティックマスク<br>Fighting Stick Mini / 簡易版: レバーマスク（ボール・シャフト） |
+| `active-stick-color` | 動作時のスティック/レバーの色（16進数、#なし）。省略時は `stick-color` と同色 | 全コントローラー |
+| `brightness` | 動作時の明るさ加算量（0〜255、デフォルト: 20） | 全コントローラー |
+| `bgcolor` | 背景色（16進数、#なし）。デフォルト: `00ff00`（緑） | **簡易版専用** |
 
 **例：**
 ```
@@ -439,6 +447,12 @@ URL パラメーターを使って、直接色を指定することもできま�
 
 # Fighting Stick Miniのレバーを青、マスクを緑に
 ?controller=fightingStickMini&stick-color=0000ff&mask-color=1c3005
+
+# 動作時のスティックを明るめの赤にする
+?controller=dualsense&stick-color=e82832&active-stick-color=ff6060
+
+# 簡易版の背景を黒にする（OBSのカラーキー向け）
+?controller=fightingStickMiniSimple&bgcolor=000000
 ```
 
 ### 優先順位
@@ -448,6 +462,48 @@ URL パラメーターを使って、直接色を指定することもできま�
 1. **URL パラメーター** - 最優先（OBS用）
 2. **LocalStorage** - 通常ブラウザで保存した設定
 3. **デフォルト色** - 設定がない場合
+
+---
+
+## Fighting Stick Mini 簡易版
+
+コントローラー画像を使わないシンプルモードです。背景色を自由に変更できるため、OBSのクロマキー（緑抜き）だけでなく、カラーキー（任意色抜き）にも対応できます。
+
+### 通常版との違い
+
+| 機能 | 通常版（`fightingStickMini`） | 簡易版（`fightingStickMiniSimple`） |
+|---|---|---|
+| コントローラー画像 | あり | なし（背景色で代替） |
+| 背景色カスタマイズ | - | `?bgcolor=` で変更可能 |
+| サウンド | ○ | ○（同一） |
+| カラーカスタマイズ | ○ | ○（同一） |
+| レバー軸回転 | ○ | ○（同一） |
+| サウンドセット切り替え | ○ | ○（同一） |
+
+### 基本的な使い方
+
+```
+https://tetchan-lab.github.io/controller-viewer/?controller=fightingStickMiniSimple
+```
+
+サイズは **幅 800 × 高さ 425** で設定してください。
+
+### 背景色のカスタマイズ
+
+`?bgcolor=` パラメーターで背景色を指定できます。デフォルトは緑（`00ff00`）のため、OBSのクロマキーでそのまま使用できます。
+
+```
+# デフォルト（緑背景、クロマキー用）
+?controller=fightingStickMiniSimple
+
+# 任意の色に変更（例：黒）
+?controller=fightingStickMiniSimple&bgcolor=000000
+
+# カラーカスタマイズと組み合わせ
+?controller=fightingStickMiniSimple&bgcolor=000000&stick-color=e82832&mask-color=1a1a1a
+```
+
+> **Note:** カラーや回転など、背景色以外の設定は通常版（`fightingStickMini`）と同じクエリパラメーターを使用します。
 
 ---
 
@@ -531,7 +587,7 @@ URLにクエリパラメーターを追加することで、表示や動作を�
 
 | パラメーター | 値 | 説明 | 例 |
 |---|---|---|---|
-| `?controller=` | `dualsense` / `fightingStickMini` | コントローラーを固定表示（UI非表示） | `?controller=dualsense` |
+| `?controller=` | `dualsense` / `fightingStickMini` / `fightingStickMiniSimple` | コントローラーを固定表示（UI非表示） | `?controller=dualsense` |
 | `?device=` | `0`, `1`, `2`...（インデックス） | 特定デバイスのみ受け付ける | `?device=0` |
 | | `dualsense`, `xbox` など（部分一致） | デバイス名で指定 | `?device=dualsense` |
 | | `054c:0ce6`（ベンダー:プロダクトID） | USB識別子で指定（最も確実） | `?device=054c:0ce6` |
@@ -539,8 +595,11 @@ URLにクエリパラメーターを追加することで、表示や動作を�
 | `?sound=` | `on` / `off` | サウンド再生の有効/無効（OBS用） | `?sound=off` |
 | `?soundset=` | `auto` / `dual` / `fighting` | サウンドセットの選択（auto=自動判定） | `?soundset=dual` |
 | `?stick-color=` | 16進数カラーコード（#なし） | スティック/レバーの色（DualSense=アナログスティック、Fighting Stick Mini=レバー） | `?stick-color=e82832` |
-| `?mask-color=` | 16進数カラーコード（#なし） | マスク形状の色（DualSense=スティックマスク、Fighting Stick Mini=レバーマスク） | `?mask-color=1a1a1a` |
-| `?rotate=` | `90` / `180` / `270` | レバー軸の回転角度（Fighting Stick Mini用、縦置きアケコン対応） | `?rotate=270` |
+| `?mask-color=` | 16進数カラーコード（#なし） | マスク形状の色（DualSense=スティックマスク、Fighting Stick Mini / 簡易版=レバーマスク） | `?mask-color=1a1a1a` |
+| `?active-stick-color=` | 16進数カラーコード（#なし） | 動作時のスティック/レバーの色（省略時は `stick-color` と同色） | `?active-stick-color=ff6060` |
+| `?brightness=` | 0〜255（デフォルト: 20） | 動作時の明るさ加算量 | `?brightness=50` |
+| `?bgcolor=` | 16進数カラーコード（#なし） | 背景色（簡易版専用、デフォルト: `00ff00`） | `?bgcolor=000000` |
+| `?rotate=` | `90` / `180` / `270` | レバー軸の回転角度（Fighting Stick Mini / 簡易版、縦置きアケコン対応） | `?rotate=270` |
 | `?debug` | （値不要） | デバッグモード（座標確認用） | `?debug` |
 
 ### 使用例
@@ -572,6 +631,9 @@ https://tetchan-lab.github.io/controller-viewer/?controller=dualsense&stick-colo
 
 # カラーカスタマイズ（Fighting Stick Miniのレバーを青、マスクを緑に）
 https://tetchan-lab.github.io/controller-viewer/?controller=fightingStickMini&stick-color=0000ff&mask-color=1c3005
+
+# 簡易版（画像なし、背景色を黒に）
+https://tetchan-lab.github.io/controller-viewer/?controller=fightingStickMiniSimple&bgcolor=000000
 
 # 複数パラメーターの組み合わせ（サウンドオフ＋デバイス指定＋カラー）
 https://tetchan-lab.github.io/controller-viewer/?controller=dualsense&device=0&sound=off&stick-color=e82832&mask-color=1a1a1a
