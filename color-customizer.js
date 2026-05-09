@@ -688,7 +688,7 @@ function closeColorSettings() {
 
 /**
  * スティック/レバーの明るさを更新（グローバル関数）
- * @param {string} controller - "dualsense" または "fightingStickMini"
+ * @param {string} controller - "dualsense", "fightingStickMini", "fightingStickMiniSimple" のいずれか
  * @param {number} value - 明るさ（0〜100）
  */
 function updateBrightness(controller, value) {
@@ -697,8 +697,13 @@ function updateBrightness(controller, value) {
   // 明るさを設定
   colorCustomizer.setBrightness(controller, value);
   
-  // 表示値を更新
-  const valueDisplay = document.getElementById(`${controller === "dualsense" ? "dualsense" : "fightingstick"}-brightness-value`);
+  // 表示値IDのマッピング
+  const displayIdMap = {
+    "dualsense": "dualsense-brightness-value",
+    "fightingStickMini": "fightingstick-brightness-value",
+    "fightingStickMiniSimple": "simple-brightness-value"
+  };
+  const valueDisplay = document.getElementById(displayIdMap[controller] || `${controller}-brightness-value`);
   if (valueDisplay) {
     valueDisplay.textContent = value;
   }

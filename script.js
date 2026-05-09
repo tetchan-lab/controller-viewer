@@ -1782,30 +1782,6 @@ async function changeSoundset(soundset) {
   updateObsUrl();
 }
 
-// ── カラー設定 ────────────────────────────────────────────────
-
-/**
- * カラー設定モーダルを開く
- */
-function openColorSettings() {
-  const modal = document.getElementById('color-modal');
-  if (modal) {
-    modal.style.display = 'flex';
-  }
-}
-
-/**
- * カラー設定モーダルを閉じる
- */
-function closeColorSettings() {
-  const modal = document.getElementById('color-modal');
-  if (modal) {
-    modal.style.display = 'none';
-  }
-}
-
-
-
 // ── OBS用URL生成 ──────────────────────────────────────────────
 
 /**
@@ -1904,17 +1880,20 @@ function generateObsUrl() {
       }
     } else if (state.currentConfig.id === 'fightingStickMini' || state.currentConfig.id === 'fightingStickMiniSimple') {
       // デフォルト値と異なる場合のみパラメータを追加
-      const leverColor = settings.fightingStickMini.lever;
-      const maskColor = settings.fightingStickMini.mask;
+      const isSimple = state.currentConfig.id === 'fightingStickMiniSimple';
+      const leverSettings = isSimple ? settings.fightingStickMiniSimple : settings.fightingStickMini;
+      const leverColor = leverSettings.lever;
+      const maskColor = leverSettings.mask;
+      const defaultMaskColor = isSimple ? '#1c3005' : '#1c3005';
       if (leverColor !== '#e82832') {
         params.push(`stick-color=${leverColor.replace('#', '')}`);
       }
-      if (maskColor !== '#1c3005') {
+      if (maskColor !== defaultMaskColor) {
         params.push(`mask-color=${maskColor.replace('#', '')}`);
       }
       // 動作時の色が設定されている場合のみ追加
-      if (settings.fightingStickMini.activeLever) {
-        const activeLeverColor = settings.fightingStickMini.activeLever.replace('#', '');
+      if (leverSettings.activeLever) {
+        const activeLeverColor = leverSettings.activeLever.replace('#', '');
         params.push(`active-stick-color=${activeLeverColor}`);
       }
     }
@@ -2000,8 +1979,10 @@ function generateWindowUrl() {
       }
     } else if (state.currentConfig.id === 'fightingStickMini' || state.currentConfig.id === 'fightingStickMiniSimple') {
       // デフォルト値と異なる場合のみパラメータを追加
-      const leverColor = settings.fightingStickMini.lever;
-      const maskColor = settings.fightingStickMini.mask;
+      const isSimple = state.currentConfig.id === 'fightingStickMiniSimple';
+      const leverSettings = isSimple ? settings.fightingStickMiniSimple : settings.fightingStickMini;
+      const leverColor = leverSettings.lever;
+      const maskColor = leverSettings.mask;
       if (leverColor !== '#e82832') {
         params.push(`stick-color=${leverColor.replace('#', '')}`);
       }
@@ -2009,8 +1990,8 @@ function generateWindowUrl() {
         params.push(`mask-color=${maskColor.replace('#', '')}`);
       }
       // 動作時の色が設定されている場合のみ追加
-      if (settings.fightingStickMini.activeLever) {
-        const activeLeverColor = settings.fightingStickMini.activeLever.replace('#', '');
+      if (leverSettings.activeLever) {
+        const activeLeverColor = leverSettings.activeLever.replace('#', '');
         params.push(`active-stick-color=${activeLeverColor}`);
       }
     }
