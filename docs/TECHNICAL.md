@@ -26,6 +26,7 @@ controller-viewer/
 ├── touch-input.js               # タッチ入力を仮想ゲームパッド状態に変換（スマホ対応）
 ├── lever-rotation.js            # レバー軸回転機能（縦置きアケコン対応）
 ├── sound-manager.js             # Web Audio API によるサウンド管理
+├── color-customizer.js          # スティック・レバー・マスクの色設定を管理（UI・LocalStorage・URLパラメーターを統合）
 ├── docs/
 │   ├── CONFIGURATION.md         # カスタマイズガイド（座標計測・新規コントローラー追加）
 │   ├── TECHNICAL.md             # 技術仕様（本ファイル）
@@ -64,8 +65,9 @@ controller-viewer/
 | `config.js` | **設定の中心**：ボタン座標、デバイス名パターン、サウンドパス |
 | `keyboard-input.js` | キーボード/マウスイベントを仮想ゲームパッド状態に変換（`?keyboard=on/off` で制御） |
 | `touch-input.js` | タッチイベントを仮想ゲームパッド状態に変換（スマホ・タブレット対応） |
-| `lever-rotation.js` | レバー軸回転機能（`?rotate=90/180/270` で制御、Fighting Stick Mini専用） |
+| `lever-rotation.js` | レバー軸回転機能（`?rotate=90/180/270` で制御、Fighting Stick Mini 通常版・簡易版対応） |
 | `sound-manager.js` | Web Audio API によるサウンド管理、音量調整、ローディング |
+| `color-customizer.js` | スティック・レバー・マスクの色設定を管理（UI・LocalStorage・URLパラメーターを統合） |
 
 ---
 
@@ -452,7 +454,7 @@ function drawSticks(config, gamepad) {
 
 ### 対応デバイス
 
-この機能は **Fighting Stick Mini** 専用です。  
+この機能は **Fighting Stick Mini（通常版・簡易版）** に対応しています。  
 DualSense など他のコントローラーの `sticks[]` に `rotateAngle` が設定されていても無視されます。
 
 ### 使用例
@@ -720,6 +722,11 @@ https://tetchan-lab.github.io/controller-viewer/?controller=dualsense&device=xbo
 | コントローラー写真 | `config.js` + `images/` | `image`, `imageWidth`, `imageHeight` |
 | 押下時の色・エフェクト | `style.css` | `.btn-overlay.pressed` |
 | スティック表示スタイル | `style.css` | `.stick-dot`, `.stick-overlay` |
+| スティック/レバーの色 | `color-customizer.js` または URL パラメーター | `defaultColors.*.stick` / `?stick-color=` |
+| スティック/レバーの動作時カラー | `color-customizer.js` または URL パラメーター | `defaultColors.*.activeStick` / `?active-stick-color=` |
+| マスクの色 | `color-customizer.js` または URL パラメーター | `defaultColors.*.mask` / `?mask-color=` |
+| 動作時の明るさ加算量 | `color-customizer.js` または URL パラメーター | `defaultColors.*.brightness` / `?brightness=` |
+| 簡易版の背景色 | `color-customizer.js` または URL パラメーター | `defaultColors.fightingStickMiniSimple.bg` / `?bgcolor=` |
 | デバイス自動判定キーワード | `config.js` | `deviceNamePatterns[]` |
 | サウンドファイルのパス | `config.js` | `sounds.{category}.press/release` |
 | ボタンとサウンドの紐付け | `config.js` | `buttons[].soundCategory` |
@@ -727,7 +734,7 @@ https://tetchan-lab.github.io/controller-viewer/?controller=dualsense&device=xbo
 | サウンドセットの初期値 | `sound-manager.js` | `this.soundset = 'auto'` |
 | キーボード入力のキーマッピング | `keyboard-input.js` | `keyMappings` オブジェクト |
 | タッチ入力の有効/無効 | `touch-input.js` | （常に有効、無効化オプションなし） |
-| レバー軸の回転角度 | URL パラメーター | `?rotate=90/180/270` |
+| レバー軸の回転角度 | URL パラメーター | `?rotate=90/180/270`（通常版・簡易版対応） |
 | 新しいコントローラー追加 | `config.js` | 新オブジェクトを追加 + `ALL_CONFIGS` に追記 |
 
 ### 設計原則

@@ -134,7 +134,28 @@
 | Lever（レバー） | — | cx=181 | cy=189 | radius=63 | — |
 
 > **Note:** レバーの十字キー入力（index 12〜15）は `sticks` の Lever 定義で処理されます。`config.js` の `sticks[].axisX` / `axisY` で軸割り当てを変更できます。
+### Fighting Stick Mini 簡易版（表示サイズ: 800×425）
 
+画像なしのシンプルモード（`renderMode: "simple"`）。各ボタンは正円（`w = h`）で描画され、`color`/`pressedColor` で色を直接設定します。
+
+| ボタン | index | x | y | w | h | shape |
+|---|---|---|---|---|---|---|
+| □ | 2 | 417 | 170 | 60 | 60 | circle |
+| △ | 3 | 495 | 150 | 60 | 60 | circle |
+| R1 | 5 | 573 | 140 | 60 | 60 | circle |
+| L1 | 4 | 651 | 143 | 60 | 60 | circle |
+| × | 0 | 418 | 250 | 60 | 60 | circle |
+| ○ | 1 | 496 | 230 | 60 | 60 | circle |
+| R2 | 7 | 574 | 220 | 60 | 60 | circle |
+| L2 | 6 | 652 | 223 | 60 | 60 | circle |
+| PS | 16 | 404 | 70 | 30 | 30 | circle |
+| Share | 8 | 452 | 70 | 22 | 22 | circle |
+| Options | 9 | 500 | 70 | 22 | 22 | circle |
+| L3 | 10 | 548 | 70 | 22 | 22 | circle |
+| R3 | 11 | 596 | 70 | 22 | 22 | circle |
+| Lever（レバー） | — | cx=181 | cy=209 | radius=63 | — |
+
+> **Note:** 簡易版のレバーを占めるのはボールとマスクのみ（`simpleMode: true`）です。背景色は `?bgcolor=` パラメーターまたはブラウザUIで変更できます。
 ---
 
 ## ボタン番号一覧
@@ -258,7 +279,12 @@ http://localhost:8080/?controller=myController&debug
 - `?device=0` - デバイス0番のみ受け付ける（複数コントローラー使用時）
 - `?soundset=dual` - DualSenseのサウンドを使用（コントローラー種別に関わらず）
 - `?soundset=fighting` - Fighting Stick Miniのサウンドを使用（コントローラー種別に関わらず）
-- `?rotate=270` - レバー軸を270度回転（Fighting Stick Mini専用、縦置きアケコン対応）
+- `?rotate=270` - レバー軸を270度回転（Fighting Stick Mini 通常版・簡易版対応、縦置きアケコン対応）
+- `?stick-color=e82832` - スティック/レバーの色（16進数、#なし）
+- `?mask-color=1a1a1a` - マスク形状の色（16進数、#なし）
+- `?active-stick-color=ff6060` - 動作時のスティック/レバーの色（省略時は `stick-color` と同色）
+- `?brightness=50` - 動作時の明るさ加算量（0〜255、デフォルト: 20）
+- `?bgcolor=00ff00` - 簡易版の背景色（16進数、#なし、デフォルト: 緑）
 
 詳細は **[README.md - クエリパラメーター一覧](../README.md#クエリパラメーター一覧)** を参照してください。
 
