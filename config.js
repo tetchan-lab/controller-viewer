@@ -49,8 +49,10 @@ const DUALSENSE_CONFIG = {
    */
   sounds: {
     dpad: {
-      press: "sounds/dualsense/dpad-press.mp3",
-      release: "sounds/dualsense/dpad-release.mp3"
+      press: "sounds/fightingStickMini/lever-press.mp3",
+      release: "sounds/fightingStickMini/lever-release.mp3"
+      /*press: "sounds/dualsense/dpad-press.mp3",
+      release: "sounds/dualsense/dpad-release.mp3"*/
     },
     buttons: {
       press: "sounds/dualsense/btn-press.mp3",
