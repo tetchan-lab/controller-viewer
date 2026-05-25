@@ -174,8 +174,34 @@ body {
   filter: brightness(1.2) drop-shadow(0 0 6px rgba(240, 50, 60, 0.85));
 }
 
+/* 十字キー用三角形シェイプ（下向き三角：上ボタンの中心側先端） */
+.btn-overlay.shape-triangle-down {
+  clip-path: polygon(0% 0%, 100% 0%, 50% 60%);
+  border-radius: 0;
+  border: none;
+}
+
+.btn-overlay.pressed.shape-triangle-down {
+  background: rgb(220, 30, 40, 1);
+  border: none;
+  filter: brightness(1.2) drop-shadow(0 0 6px rgba(240, 50, 60, 0.85));
+}
+
+/* 十字キー用三角形シェイプ（上向き三角：下ボタンの中心側先端） */
+.btn-overlay.shape-triangle-up {
+  clip-path: polygon(0% 100%, 100% 100%, 50% 40%);
+  border-radius: 0;
+  border: none;
+}
+
+.btn-overlay.pressed.shape-triangle-up {
+  background: rgb(220, 30, 40, 1);
+  border: none;
+  filter: brightness(1.2) drop-shadow(0 0 6px rgba(240, 50, 60, 0.85));
+}
+
 /* デフォルトは circle */
-.btn-overlay:not(.shape-rect):not(.shape-triangle-right):not(.shape-triangle-left) {
+.btn-overlay:not(.shape-rect):not(.shape-triangle-right):not(.shape-triangle-left):not(.shape-triangle-down):not(.shape-triangle-up) {
   border-radius: 50%;
 }
 
@@ -256,10 +282,12 @@ body {
   transform: translateY(-0.10em);
 }
 
-/* ── 十字キー「◀」「▶」ラベル ──────────────────────────────── */
-/* 三角形 clip-path の扁平率(60%)に合わせてscaleX圧縮、合成体中央へtranslateX移動 */
+/* ── 十字キー「◀」「▶」「▲」「▼」ラベル ───────────────────────────── */
+/* 三角形 clip-path の扁平率(60%)に合わせてscale圧縮、合成体中央へtranslate移動 */
 .btn-overlay[data-label="◀"] .btn-label,
-.btn-overlay[data-label="▶"] .btn-label {
+.btn-overlay[data-label="▶"] .btn-label,
+.btn-overlay[data-label="▲"] .btn-label,
+.btn-overlay[data-label="▼"] .btn-label {
   font-size: 0px;
 }
 .btn-overlay.pressed[data-label="◀"] .btn-label {
@@ -273,6 +301,18 @@ body {
   font-weight: 900;
   color: #cecece;
   transform: translateX(1px) scaleX(0.6);
+}
+.btn-overlay.pressed[data-label="▲"] .btn-label {
+  font-size: 15px;
+  font-weight: 900;
+  color: #cecece;
+  transform: translateY(-2px) scaleY(0.6);
+}
+.btn-overlay.pressed[data-label="▼"] .btn-label {
+  font-size: 15px;
+  font-weight: 900;
+  color: #cecece;
+  transform: translateY(4px) scaleY(0.6);
 }
 
 /* ── L1,R1,L2,R2ボタン専用ラベル（オプション） ─────────────── */

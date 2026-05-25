@@ -49,15 +49,10 @@ const DUALSENSE_CONFIG = {
    */
   sounds: {
     dpad: {
-      press: "sounds/fightingStickMini/lever-press.mp3",
-      release: "sounds/fightingStickMini/lever-release.mp3"
-      /**
-       * DualSenseの十字キーサウンドからFighting Stick Miniのレバーサウンドに変更。
-       * 戻す場合は58~59行のコメントアウトを外し、52~53行をコメントアウトしてください。
-       * 
-       * press: "sounds/dualsense/dpad-press.mp3",
-       * release: "sounds/dualsense/dpad-release.mp3"
-       */
+      press: "sounds/dualsense/dpad-press.mp3",
+      release: "sounds/dualsense/dpad-release.mp3"
+      /*press: "sounds/fightingStickMini/lever-press.mp3",
+      release: "sounds/fightingStickMini/lever-release.mp3"*/
     },
     buttons: {
       press: "sounds/dualsense/btn-press.mp3",
@@ -121,13 +116,12 @@ const DUALSENSE_CONFIG = {
     { index: 17, label: "Touch",   x: 400, y: 95, w: 280, h: 168, shape: "rect", soundCategory: "touch" },
 
     // ── 十字キー ──────────────────────────────────────────
-    /**
-     * ポゴスタックでは上下の認識はノイズになるためコメントアウト。
-     * 必要な場合はコメントアウトを外してください。
-     * 
-     * { index: 12, label: "↑",       x: 151, y: 107, w: 34, h: 34, soundCategory: "dpad" },
-     * { index: 13, label: "↓",       x: 151, y: 200, w: 34, h: 34, soundCategory: "dpad" },
-     */
+    // 「↑」ボタン: 上側は角丸の四角（本体）＋下側は下向き三角形（中心への先端）を重ねて十字キー形状を表現
+    { index: 12, label: "▲",       x: 152, y: 107, w: 43, h: 40, shape: "rect", soundCategory: "dpad" },
+    { index: 12, label: "",         x: 152, y: 141, w: 44, h: 40, shape: "triangle-down" },
+    // 「↓」ボタン: 下側は角丸の四角（本体）＋上側は上向き三角形（中心への先端）を重ねて十字キー形状を表現
+    { index: 13, label: "▼",       x: 152, y: 199, w: 43, h: 40, shape: "rect", soundCategory: "dpad" },
+    { index: 13, label: "",         x: 152, y: 165, w: 44, h: 40, shape: "triangle-up" },
     // 「←」ボタン: 左側は角丸の四角（本体）＋右側は右向き三角形（中心への先端）を重ねて十字キー形状を表現
     { index: 14, label: "◀",       x: 106, y: 153, w: 40, h: 43, shape: "rect", soundCategory: "dpad" },
     { index: 14, label: "",         x: 139, y: 153, w: 40, h: 46, shape: "triangle-right" },
