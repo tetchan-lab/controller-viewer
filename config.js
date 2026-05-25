@@ -128,9 +128,9 @@ const DUALSENSE_CONFIG = {
      * { index: 12, label: "↑",       x: 151, y: 107, w: 34, h: 34, soundCategory: "dpad" },
      * { index: 13, label: "↓",       x: 151, y: 200, w: 34, h: 34, soundCategory: "dpad" },
      */
-    // TODO 十字キーのラベル←を２つ重ねて形を整形し、１つは緩い四角、もう１つは「三角」状に表示したい。
-    { index: 14, label: "←",       x: 116, y: 152, w: 34, h: 34, soundCategory: "dpad" },
-    { index: 14, label: "←",       x: 103, y: 152, w: 34, h: 42, shape: "rect" },
+    // 「←」ボタン: 左側は角丸の四角（本体）＋右側は右向き三角形（中心への先端）を重ねて十字キー形状を表現
+    { index: 14, label: "◀",       x: 106, y: 153, w: 40, h: 43, shape: "rect", soundCategory: "dpad" },
+    { index: 14, label: "",         x: 139, y: 153, w: 40, h: 46, shape: "triangle-right" },
     { index: 15, label: "→",       x: 198, y: 152, w: 34, h: 34, soundCategory: "dpad" },
   ],
 
