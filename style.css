@@ -161,8 +161,21 @@ body {
   filter: brightness(1.2) drop-shadow(0 0 6px rgba(240, 50, 60, 0.85));
 }
 
+/* 十字キー用三角形シェイプ（左向き三角：右ボタンの中心側先端） */
+.btn-overlay.shape-triangle-left {
+  clip-path: polygon(100% 0%, 40% 50%, 100% 100%);
+  border-radius: 0;
+  border: none;
+}
+
+.btn-overlay.pressed.shape-triangle-left {
+  background: rgb(220, 30, 40, 1);
+  border: none;
+  filter: brightness(1.2) drop-shadow(0 0 6px rgba(240, 50, 60, 0.85));
+}
+
 /* デフォルトは circle */
-.btn-overlay:not(.shape-rect):not(.shape-triangle-right) {
+.btn-overlay:not(.shape-rect):not(.shape-triangle-right):not(.shape-triangle-left) {
   border-radius: 50%;
 }
 
@@ -243,9 +256,10 @@ body {
   transform: translateY(-0.10em);
 }
 
-/* ── 十字キー「◀」ラベル ────────────────────────────────────── */
+/* ── 十字キー「◀」「▶」ラベル ──────────────────────────────── */
 /* 三角形 clip-path の扁平率(60%)に合わせてscaleX圧縮、合成体中央へtranslateX移動 */
-.btn-overlay[data-label="◀"] .btn-label {
+.btn-overlay[data-label="◀"] .btn-label,
+.btn-overlay[data-label="▶"] .btn-label {
   font-size: 0px;
 }
 .btn-overlay.pressed[data-label="◀"] .btn-label {
@@ -253,6 +267,12 @@ body {
   font-weight: 900;
   color: #cecece;
   transform: translateX(-4px) scaleX(0.6);
+}
+.btn-overlay.pressed[data-label="▶"] .btn-label {
+  font-size: 15px;
+  font-weight: 900;
+  color: #cecece;
+  transform: translateX(1px) scaleX(0.6);
 }
 
 /* ── L1,R1,L2,R2ボタン専用ラベル（オプション） ─────────────── */

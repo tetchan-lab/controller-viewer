@@ -131,7 +131,9 @@ const DUALSENSE_CONFIG = {
     // 「←」ボタン: 左側は角丸の四角（本体）＋右側は右向き三角形（中心への先端）を重ねて十字キー形状を表現
     { index: 14, label: "◀",       x: 106, y: 153, w: 40, h: 43, shape: "rect", soundCategory: "dpad" },
     { index: 14, label: "",         x: 139, y: 153, w: 40, h: 46, shape: "triangle-right" },
-    { index: 15, label: "→",       x: 198, y: 152, w: 34, h: 34, soundCategory: "dpad" },
+    // 「→」ボタン: 右側は角丸の四角（本体）＋左側は左向き三角形（中心への先端）を重ねて十字キー形状を表現
+    { index: 15, label: "▶",       x: 199, y: 153, w: 40, h: 43, shape: "rect", soundCategory: "dpad" },
+    { index: 15, label: "",         x: 165, y: 153, w: 40, h: 46, shape: "triangle-left" },
   ],
 
   /**
